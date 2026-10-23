@@ -1,0 +1,2270 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Painel Luiz Otávio</title>
+<meta name="theme-color" content="#1E5F4E">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Painel">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600;700&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a desk planner — compact header with area switch, top tabs on desktop and a bottom bar on phones, each view a grid of plain panels on a cool green-grey ground. */
+:root {
+  --bg: #F1F3EF;
+  --surface: #FFFFFF;
+  --surface-2: #E8EBE5;
+  --ink: #18201C;
+  --muted: #5C6660;
+  --line: #D6DBD3;
+  --accent: #1E5F4E;
+  --accent-ink: #FFFFFF;
+  --accent-soft: #D9EAE3;
+  --work: #2952C9;
+  --work-soft: #E2E8F9;
+  --life: #C0503A;
+  --life-soft: #F7E3DD;
+  --high: #C2362B;
+  --high-soft: #F8E0DD;
+  --mid: #A86D12;
+  --mid-soft: #F6EAD3;
+  --low: #75807A;
+  --ok: #2B8656;
+  --ok-soft: #DCEFE3;
+  --shadow: 0 1px 2px rgba(20, 35, 28, .06), 0 4px 16px rgba(20, 35, 28, .06);
+  --scrim: rgba(18, 24, 21, .45);
+
+  --f-display: "Familjen Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --f-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-data: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --r: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111513; --surface: #191E1B; --surface-2: #222824; --ink: #E6EBE7; --muted: #98A29C; --line: #2D3531;
+    --accent: #62C2A2; --accent-ink: #0D1A15; --accent-soft: #1D3A30;
+    --work: #86A6F7; --work-soft: #1E2944; --life: #EF8D75; --life-soft: #432621;
+    --high: #F2776C; --high-soft: #45211E; --mid: #E2AA4E; --mid-soft: #3D2F17; --low: #8D9690;
+    --ok: #5EC68D; --ok-soft: #1B3527;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.25); --scrim: rgba(0,0,0,.6);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111513; --surface: #191E1B; --surface-2: #222824; --ink: #E6EBE7; --muted: #98A29C; --line: #2D3531;
+  --accent: #62C2A2; --accent-ink: #0D1A15; --accent-soft: #1D3A30;
+  --work: #86A6F7; --work-soft: #1E2944; --life: #EF8D75; --life-soft: #432621;
+  --high: #F2776C; --high-soft: #45211E; --mid: #E2AA4E; --mid-soft: #3D2F17; --low: #8D9690;
+  --ok: #5EC68D; --ok-soft: #1B3527;
+  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.25); --scrim: rgba(0,0,0,.6);
+  color-scheme: dark;
+}
+
+:root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+body { margin: 0; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.45; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: var(--bg); }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+button:disabled { cursor: progress; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+h1, h2, h3 { font-family: var(--f-display); margin: 0; text-wrap: balance; letter-spacing: -0.01em; }
+p { margin: 0; }
+
+.wrap { max-width: 1180px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+/* Header */
+.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: var(--bg); border-bottom: 1px solid var(--line); }
+.top-row { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 10px 24px; padding-block: 16px 10px; }
+.hello { display: grid; gap: 2px; min-width: 0; }
+.hello .date { font-family: var(--f-data); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+.hello h1 { font-size: clamp(22px, 3.6vw, 30px); font-weight: 700; }
+.top-tools { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.save-state { font-family: var(--f-data); font-size: 12px; color: var(--muted); white-space: nowrap; }
+.save-state.err { color: var(--high); font-weight: 500; }
+.seg { display: inline-flex; background: var(--surface-2); border-radius: 999px; padding: 3px; gap: 2px; }
+.seg button { border: 0; background: transparent; padding: 6px 14px; border-radius: 999px; font-weight: 600; font-size: 13px; color: var(--muted); }
+.seg button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: var(--shadow); }
+.tabs { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; margin-bottom: -1px; }
+.tabs::-webkit-scrollbar { display: none; }
+.tabs a { flex: none; text-decoration: none; color: var(--muted); font-weight: 600; font-size: 14px; padding: 10px 12px; border-bottom: 2px solid transparent; display: inline-flex; gap: 6px; align-items: center; }
+.tabs a[aria-current="page"] { color: var(--ink); border-bottom-color: var(--accent); }
+.count { font-family: var(--f-data); font-size: 11px; background: var(--high-soft); color: var(--high); border-radius: 999px; padding: 1px 6px; font-weight: 500; }
+.bottomnav { display: none; }
+
+main { padding-block: 20px 64px; display: grid; gap: 16px; }
+
+@media (max-width: 759px) {
+  .top { position: static; }
+  .tabs { display: none; }
+  .top-row { padding-block: 12px 10px; align-items: center; }
+  .bottomnav {
+    display: grid; grid-template-columns: repeat(7, minmax(0, 1fr));
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
+    background: var(--surface); border-top: 1px solid var(--line);
+    padding: 6px max(6px, env(safe-area-inset-right, 0px)) calc(6px + env(safe-area-inset-bottom, 0px)) max(6px, env(safe-area-inset-left, 0px));
+  }
+  .bottomnav a { display: grid; justify-items: center; gap: 2px; font-size: 11px; font-weight: 600; color: var(--muted); text-decoration: none; padding: 4px 0; position: relative; min-width: 0; }
+  .bottomnav a span.lbl { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .bottomnav a[aria-current="page"] { color: var(--accent); }
+  .bottomnav svg { width: 22px; height: 22px; }
+  .bottomnav .count { position: absolute; top: 0; left: calc(50% + 6px); padding: 0 5px; font-size: 10px; }
+  main { padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px)); }
+}
+
+.notice { border: 1px solid var(--line); background: var(--surface); border-radius: var(--r); padding: 12px 14px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; justify-content: space-between; color: var(--muted); font-size: 14px; }
+.notice strong { color: var(--ink); }
+.notice.warn { border-color: var(--mid); background: var(--mid-soft); color: var(--ink); }
+.notice.err { border-color: var(--high); background: var(--high-soft); color: var(--ink); }
+
+/* Panels */
+.grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); align-items: start; }
+.home { display: grid; gap: 16px; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); align-items: start; }
+.stack { display: grid; gap: 16px; min-width: 0; align-content: start; }
+@media (max-width: 900px) { .home { grid-template-columns: minmax(0, 1fr); } }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 16px; display: grid; gap: 12px; min-width: 0; }
+.panel-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.panel-head h2 { font-size: 17px; font-weight: 600; }
+.panel-head .sub { font-family: var(--f-data); font-size: 12px; color: var(--muted); }
+.link { border: 0; background: none; color: var(--accent); font-weight: 600; font-size: 13px; padding: 4px 0; }
+.view-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+.view-head h2 { font-size: 22px; font-weight: 700; }
+.view-head p { margin-top: 2px; color: var(--muted); font-size: 14px; }
+.view-head .actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.section-title { font-size: 18px; font-weight: 600; }
+.hint { color: var(--muted); font-size: 13px; }
+
+/* Buttons & inputs */
+.btn { border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 8px 14px; font-weight: 600; font-size: 14px; display: inline-flex; align-items: center; gap: 6px; }
+.btn:hover:not(:disabled) { border-color: var(--muted); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.primary:hover:not(:disabled) { filter: brightness(1.08); }
+.btn.danger { color: var(--high); }
+.btn.danger.armed { background: var(--high); color: var(--surface); border-color: var(--high); }
+.btn.small { padding: 4px 10px; font-size: 13px; }
+.btn:disabled { opacity: .55; }
+.icon-btn { border: 1px solid var(--line); background: var(--surface); border-radius: 6px; width: 30px; height: 30px; display: inline-grid; place-items: center; font-size: 15px; line-height: 1; color: var(--muted); padding: 0; flex: none; }
+.icon-btn:hover:not(:disabled) { color: var(--ink); border-color: var(--muted); }
+.icon-btn:disabled { opacity: .5; }
+.field, .inline-form input, .inline-form select { border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 8px 10px; font-size: 14px; min-width: 0; color: var(--ink); }
+.inline-form { display: flex; gap: 8px; flex-wrap: wrap; }
+.inline-form .grow { flex: 1 1 220px; }
+.filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.filters .grow { flex: 1 1 220px; }
+.types { display: inline-flex; gap: 4px; flex-wrap: wrap; }
+.type-btn { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 4px 12px; font-size: 13px; font-weight: 600; color: var(--muted); }
+.type-btn[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+
+/* Chips */
+.chips { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.chip { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: var(--surface-2); color: var(--muted); white-space: nowrap; }
+.chip.work { background: var(--work-soft); color: var(--work); }
+.chip.life { background: var(--life-soft); color: var(--life); }
+.chip.high { background: var(--high-soft); color: var(--high); }
+.chip.mid { background: var(--mid-soft); color: var(--mid); }
+.chip.ok { background: var(--ok-soft); color: var(--ok); }
+.chip.accent { background: var(--accent-soft); color: var(--accent); }
+.filter-chip { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 5px 12px; font-size: 13px; font-weight: 600; color: var(--muted); }
+.filter-chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+.due { font-family: var(--f-data); font-size: 12px; color: var(--muted); white-space: nowrap; }
+.due.late { color: var(--high); font-weight: 500; }
+.due.today { color: var(--mid); font-weight: 500; }
+
+/* Task rows */
+.list { display: grid; }
+.row { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-top: 1px solid var(--line); min-width: 0; }
+.list > .row:first-child { border-top: 0; }
+.check { flex: none; width: 22px; height: 22px; border-radius: 6px; border: 2px solid var(--line); background: var(--surface); margin-top: 1px; padding: 0; display: grid; place-items: center; color: var(--accent-ink); font-size: 12px; }
+.check:hover:not(:disabled) { border-color: var(--accent); }
+.check[aria-checked="true"] { background: var(--accent); border-color: var(--accent); }
+.check:disabled { opacity: .5; }
+.star { flex: none; border: 0; background: none; width: 26px; height: 24px; padding: 0; font-size: 18px; line-height: 1; color: var(--line); }
+.star:hover:not(:disabled) { color: var(--mid); }
+.star.on { color: var(--mid); }
+.row-main { flex: 1; min-width: 0; display: grid; gap: 4px; }
+.row-title { border: 0; background: none; padding: 0; text-align: left; font-weight: 500; overflow-wrap: anywhere; }
+.row-title:hover { color: var(--accent); }
+.row.done .row-title { text-decoration: line-through; color: var(--muted); }
+.row-meta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.row-actions { display: flex; gap: 6px; flex: none; align-items: center; }
+.prio-bar { width: 3px; align-self: stretch; border-radius: 3px; flex: none; background: var(--line); }
+.prio-bar.alta { background: var(--high); }
+.prio-bar.media { background: var(--mid); }
+.group-label { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 700; margin-top: 6px; display: flex; gap: 8px; align-items: center; }
+.group-label.late { color: var(--high); }
+details > summary { cursor: pointer; list-style: none; }
+details > summary::-webkit-details-marker { display: none; }
+details > summary::before { content: "▸ "; }
+details[open] > summary::before { content: "▾ "; }
+.empty { color: var(--muted); font-size: 14px; padding: 6px 0; display: grid; gap: 8px; justify-items: start; }
+.note-text { white-space: pre-wrap; overflow-wrap: anywhere; }
+
+/* Board */
+.board-scroll { overflow-x: auto; padding-bottom: 6px; }
+.board { display: grid; grid-template-columns: repeat(4, minmax(240px, 1fr)); gap: 12px; align-items: start; }
+.col { background: var(--surface-2); border-radius: var(--r); padding: 10px; display: grid; gap: 8px; min-height: 120px; border: 2px dashed transparent; align-content: start; }
+.col.over { border-color: var(--accent); }
+.col-head { display: flex; justify-content: space-between; align-items: center; padding: 2px 4px; gap: 6px; }
+.col-head h3 { font-size: 14px; font-weight: 600; display: flex; gap: 8px; align-items: baseline; }
+.col-head .n { font-family: var(--f-data); font-size: 12px; color: var(--muted); font-weight: 400; }
+.kcard { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 10px; display: grid; gap: 8px; cursor: grab; }
+.kcard.dragging { opacity: .4; }
+.kcard .top-line { display: flex; gap: 6px; align-items: flex-start; }
+.kcard .notes { font-size: 13px; color: var(--muted); overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.kcard .foot { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+.kcard .moves { display: flex; gap: 4px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+
+/* Contacts */
+.pipeline { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+@media (max-width: 600px) { .pipeline { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.stage { border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 8px 10px; text-align: left; display: grid; gap: 2px; min-width: 0; }
+.stage[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.stage .k { font-size: 11px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.stage .v { font-family: var(--f-display); font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.cards { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); align-items: start; }
+.person { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 14px; display: grid; gap: 10px; min-width: 0; align-content: start; }
+.person-top { display: flex; gap: 10px; align-items: flex-start; }
+.avatar { width: 38px; height: 38px; border-radius: 50%; flex: none; display: grid; place-items: center; font-family: var(--f-display); font-weight: 700; font-size: 15px; }
+.avatar.work { background: var(--work-soft); color: var(--work); }
+.avatar.life { background: var(--life-soft); color: var(--life); }
+.person-name { border: 0; background: none; padding: 0; text-align: left; font-family: var(--f-display); font-weight: 600; font-size: 16px; overflow-wrap: anywhere; }
+.person-name:hover { color: var(--accent); }
+.person .co { font-size: 13px; color: var(--muted); overflow-wrap: anywhere; }
+.kv { display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; font-size: 13px; align-items: center; margin: 0; }
+.kv dt { color: var(--muted); }
+.kv dd { margin: 0; min-width: 0; display: flex; gap: 6px; align-items: center; justify-content: space-between; }
+.kv .val { font-family: var(--f-data); font-size: 12px; overflow-wrap: anywhere; user-select: all; }
+.copy { border: 0; background: none; color: var(--accent); font-size: 12px; font-weight: 600; padding: 0; flex: none; }
+.person .notes { font-size: 13px; color: var(--muted); overflow-wrap: anywhere; border-top: 1px solid var(--line); padding-top: 8px; }
+
+/* Goals */
+.goal { display: grid; gap: 8px; }
+.goal-top { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
+.goal-name { border: 0; background: none; padding: 0; text-align: left; font-weight: 600; overflow-wrap: anywhere; }
+.goal-name:hover { color: var(--accent); }
+.pct { font-family: var(--f-display); font-weight: 700; font-size: 20px; font-variant-numeric: tabular-nums; }
+.bar { height: 8px; background: var(--surface-2); border-radius: 999px; overflow: hidden; }
+.bar > span { display: block; height: 100%; border-radius: 999px; background: var(--accent); }
+.bar.life > span { background: var(--life); }
+.bar.work > span { background: var(--work); }
+.bar.thin { height: 6px; }
+.goal-foot { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+.amt { font-family: var(--f-data); font-size: 12px; color: var(--muted); }
+.stepper { display: inline-flex; gap: 4px; align-items: center; }
+.goal-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 16px; min-width: 0; display: grid; gap: 12px; align-content: start; }
+.goal-card.stale { border-color: var(--mid); }
+.next-action { font-size: 14px; border-left: 3px solid var(--accent); padding-left: 10px; overflow-wrap: anywhere; }
+.next-action.missing { border-left-color: var(--mid); color: var(--muted); }
+.spark { width: 100%; height: 48px; display: block; }
+.hist { display: grid; gap: 4px; font-size: 13px; }
+.hist-row { display: grid; grid-template-columns: 72px 72px 1fr; gap: 8px; }
+.hist-row .d, .hist-row .v { font-family: var(--f-data); font-size: 12px; color: var(--muted); }
+.hist-row .n { overflow-wrap: anywhere; }
+
+/* Week summary */
+.kpis { display: grid; gap: 10px; }
+.kpi { display: grid; gap: 4px; }
+.kpi-line { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+.kpi-line .v { font-family: var(--f-display); font-weight: 700; font-size: 18px; font-variant-numeric: tabular-nums; }
+.kpi-line .k { color: var(--muted); font-size: 14px; }
+.split { display: flex; height: 8px; border-radius: 999px; overflow: hidden; background: var(--surface-2); }
+.split .w { background: var(--work); }
+.split .p { background: var(--life); }
+
+/* Habits */
+.habit-grid { display: grid; gap: 0; }
+.habit-row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 8px 12px; align-items: center; padding: 10px 0; border-top: 1px solid var(--line); }
+.habit-row:first-child { border-top: 0; }
+.habit-days { display: grid; grid-template-columns: repeat(7, 34px); gap: 4px; }
+.habit-head .habit-days span { font-size: 11px; text-align: center; color: var(--muted); font-weight: 600; line-height: 1.2; }
+.hday { width: 34px; height: 34px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); font-size: 12px; padding: 0; color: var(--muted); }
+.hday[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.hday.is-today { border-width: 2px; border-color: var(--accent); }
+.hday:disabled { opacity: .35; cursor: default; }
+.habit-score { font-family: var(--f-data); font-size: 12px; color: var(--muted); min-width: 44px; text-align: right; }
+.habit-score.met { color: var(--ok); font-weight: 500; }
+@media (max-width: 600px) {
+  .habit-row { grid-template-columns: minmax(0, 1fr) auto; }
+  .habit-row .habit-days { grid-column: 1 / -1; grid-template-columns: repeat(7, minmax(0, 1fr)); }
+  .habit-row .hday { width: 100%; }
+  .habit-head { display: none; }
+}
+.htoday { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-top: 1px solid var(--line); }
+.list > .htoday:first-child { border-top: 0; }
+
+/* Life wheel */
+.wheel { display: grid; gap: 8px; }
+.wheel-row { display: grid; grid-template-columns: 96px minmax(0, 1fr) 40px 44px; gap: 10px; align-items: center; font-size: 14px; }
+.wheel-row .s { font-family: var(--f-display); font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; }
+.wheel-row .dl { font-family: var(--f-data); font-size: 12px; color: var(--muted); text-align: right; }
+.wheel-row .dl.up { color: var(--ok); }
+.wheel-row .dl.down { color: var(--high); }
+.review-field { display: grid; gap: 2px; }
+.review-field .k { font-size: 12px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); font-weight: 600; }
+
+/* Expenses */
+.amount-field { flex: 0 0 120px; width: 120px; font-family: var(--f-data); }
+.month-nav { display: flex; align-items: center; gap: 6px; }
+.month-nav .m { font-family: var(--f-display); font-weight: 600; font-size: 16px; min-width: 150px; text-align: center; }
+.money { font-family: var(--f-display); font-size: 34px; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.money-sub { display: grid; gap: 2px; font-size: 14px; color: var(--muted); }
+.money-sub strong { color: var(--ink); font-weight: 600; }
+.money-sub .up { color: var(--high); font-weight: 600; }
+.money-sub .down { color: var(--ok); font-weight: 600; }
+.cat-list { display: grid; gap: 2px; }
+.cat-row { display: grid; grid-template-columns: minmax(84px, 150px) minmax(0, 1fr) 138px; gap: 10px; align-items: center; border: 0; background: none; padding: 7px 6px; text-align: left; width: 100%; border-radius: 6px; font-size: 14px; }
+.cat-row:hover { background: var(--surface-2); }
+.cat-row[aria-pressed="true"] { background: var(--accent-soft); }
+.cat-row .amt-r { font-family: var(--f-data); font-size: 13px; text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.cat-row .amt-r small { color: var(--muted); margin-left: 6px; }
+@media (max-width: 600px) {
+  .cat-row { grid-template-columns: minmax(0, 1fr) auto; gap: 4px 10px; }
+  .cat-row .bar { grid-column: 1 / -1; grid-row: 2; }
+}
+.exp-amt { font-family: var(--f-data); font-size: 14px; font-weight: 500; white-space: nowrap; font-variant-numeric: tabular-nums; flex: none; padding-top: 1px; }
+.day-head { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+.day-head .amt { font-size: 12px; }
+
+/* Agenda */
+.week { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+.day { border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 8px 4px; text-align: center; display: grid; gap: 2px; min-width: 0; }
+.day.is-today { border-color: var(--accent); background: var(--accent-soft); }
+.day .wd { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 600; }
+.day .dn { font-family: var(--f-display); font-size: 20px; font-weight: 700; }
+.day .dots { display: flex; gap: 3px; justify-content: center; min-height: 8px; flex-wrap: wrap; }
+.event { display: grid; grid-template-columns: 64px 1fr; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); align-items: start; }
+.list > .event:first-child { border-top: 0; }
+.event .time { font-family: var(--f-data); font-size: 13px; color: var(--muted); padding-top: 1px; }
+.event .when { font-family: var(--f-data); font-size: 12px; color: var(--muted); display: grid; line-height: 1.3; }
+.event .when b { font-family: var(--f-display); font-size: 16px; color: var(--ink); }
+.event-main { display: grid; gap: 4px; min-width: 0; }
+.place { font-size: 13px; color: var(--muted); overflow-wrap: anywhere; }
+
+/* Modal */
+.scrim { position: fixed; inset: 0; background: var(--scrim); z-index: 50; display: grid; place-items: center; padding: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+.modal { background: var(--surface); border-radius: 14px; width: min(560px, 100%); max-height: 100%; overflow-y: auto; padding: 20px; display: grid; gap: 14px; box-shadow: 0 20px 60px rgba(0,0,0,.3); }
+.modal h2 { font-size: 20px; }
+.form { display: grid; gap: 12px; grid-template-columns: 1fr 1fr; }
+.form label { display: grid; gap: 4px; font-size: 13px; font-weight: 600; color: var(--muted); min-width: 0; align-content: start; }
+.form .full { grid-column: 1 / -1; }
+.form .field { width: 100%; font-weight: 400; }
+.form textarea.field { min-height: 72px; resize: vertical; }
+.form-heading { font-family: var(--f-display); font-size: 15px; font-weight: 600; color: var(--ink); margin-top: 4px; }
+.form-error { color: var(--high); font-size: 14px; font-weight: 500; }
+@media (max-width: 480px) { .form { grid-template-columns: 1fr; } }
+.modal-actions { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.modal-actions .right { display: flex; gap: 8px; margin-left: auto; }
+.stat-box { background: var(--surface-2); border-radius: 8px; padding: 10px 12px; font-size: 14px; display: grid; gap: 4px; }
+
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(20px + env(safe-area-inset-bottom, 0px)); background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 12px; font-size: 14px; font-weight: 500; z-index: 60; box-shadow: var(--shadow); max-width: calc(100% - 32px); }
+.toast.err { background: var(--high); color: var(--surface); }
+@media (max-width: 759px) { .toast { bottom: calc(84px + env(safe-area-inset-bottom, 0px)); } }
+
+/* Login */
+.login { min-height: 100vh; min-height: 100dvh; display: grid; place-items: center; padding-block: 24px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.login-card { width: min(400px, 100%); background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 28px 24px; display: grid; gap: 14px; text-align: center; }
+.login-card h1 { font-size: 26px; }
+.login-card p { color: var(--muted); font-size: 15px; }
+.login-card .btn { justify-content: center; padding: 12px 16px; font-size: 15px; }
+.login-card .form-error { text-align: left; }
+.gmark { width: 18px; height: 18px; flex: none; }
+body:not([data-auth="in"]) .top, body:not([data-auth="in"]) main, body:not([data-auth="in"]) .bottomnav { display: none !important; }
+body[data-auth="in"] .login { display: none; }
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+
+</head>
+<body data-auth="pending">
+<section class="login" id="login" aria-live="polite">
+  <div class="login-card">
+    <h1>Painel Luiz Otávio</h1>
+    <p id="login-msg">Carregando…</p>
+    <p class="form-error" id="login-err" hidden></p>
+    <button type="button" class="btn primary" id="login-btn" hidden>
+      <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>
+      Entrar com Google
+    </button>
+    <button type="button" class="btn" id="logout-btn" hidden>Sair desta conta</button>
+  </div>
+</section>
+<header class="top">
+  <div class="wrap">
+    <div class="top-row">
+      <div class="hello">
+        <span class="date" id="today-label"></span>
+        <h1 id="greeting">Olá</h1>
+      </div>
+      <div class="top-tools">
+        <span class="save-state" id="save-state" role="status" aria-live="polite"></span>
+        <button type="button" class="link" id="signout" title="Sair da conta do Google">Sair</button>
+        <div class="seg" role="group" aria-label="Filtrar por área" id="area-seg">
+          <button type="button" data-area="tudo" aria-pressed="true">Tudo</button>
+          <button type="button" data-area="trabalho" aria-pressed="false">Trabalho</button>
+          <button type="button" data-area="pessoal" aria-pressed="false">Pessoal</button>
+        </div>
+      </div>
+    </div>
+    <nav class="tabs" id="tabs" aria-label="Seções"></nav>
+  </div>
+</header>
+
+<main class="wrap" id="main"></main>
+<nav class="bottomnav" id="bottomnav" aria-label="Seções"></nav>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+(() => {
+  "use strict";
+
+  /* =========================================================
+     Helpers
+     ========================================================= */
+  const $ = (s, r = document) => r.querySelector(s);
+  function h(tag, props, ...kids) {
+    const el = document.createElement(tag);
+    for (const [k, v] of Object.entries(props || {})) {
+      if (v == null || v === false) continue;
+      if (k === "class") el.className = v;
+      else if (k === "text") el.textContent = v;
+      else if (k.startsWith("on") && typeof v === "function") el.addEventListener(k.slice(2), v);
+      else el.setAttribute(k, v === true ? "" : String(v));
+    }
+    for (const c of kids.flat(Infinity)) {
+      if (c == null || c === false) continue;
+      el.append(c instanceof Node ? c : document.createTextNode(String(c)));
+    }
+    return el;
+  }
+  const SVG_NS = "http://www.w3.org/2000/svg";
+  function svg(tag, attrs, ...kids) {
+    const el = document.createElementNS(SVG_NS, tag);
+    for (const [k, v] of Object.entries(attrs || {})) if (v != null) el.setAttribute(k, String(v));
+    for (const c of kids.flat()) if (c) el.append(c);
+    return el;
+  }
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  const pad = n => String(n).padStart(2, "0");
+  const isoOf = d => d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+  const parseIso = s => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
+  const today = () => isoOf(new Date());
+  const addDays = (iso, n) => { const d = parseIso(iso); d.setDate(d.getDate() + n); return isoOf(d); };
+  const diffDays = (a, b) => Math.round((parseIso(a) - parseIso(b)) / 86400000);
+  const msOf = iso => parseIso(iso).getTime();
+  const isoFromMs = ms => isoOf(new Date(ms));
+  const dow = iso => (parseIso(iso).getDay() + 6) % 7; // 0 = segunda … 6 = domingo
+  const weekStart = iso => addDays(iso, -dow(iso));
+  const monthKey = iso => iso.slice(0, 7);
+  function weekId(iso) {
+    const d = parseIso(iso);
+    d.setDate(d.getDate() + 3 - ((d.getDay() + 6) % 7));
+    const y = d.getFullYear(), jan4 = new Date(y, 0, 4);
+    const w = 1 + Math.round(((d - jan4) / 86400000 - 3 + ((jan4.getDay() + 6) % 7)) / 7);
+    return y + "-W" + pad(w);
+  }
+  const fmt = (iso, opts) => new Intl.DateTimeFormat("pt-BR", opts).format(parseIso(iso)).replace(/\./g, "");
+  const fmtShort = iso => fmt(iso, { weekday: "short", day: "numeric", month: "short" });
+  const fmtDay = iso => fmt(iso, { day: "numeric", month: "short" });
+  function fmtRange(a, b) {
+    return monthKey(a) === monthKey(b) ? parseIso(a).getDate() + "–" + fmtDay(b) : fmtDay(a) + " – " + fmtDay(b);
+  }
+  function rel(iso) {
+    if (!iso) return "";
+    const d = diffDays(iso, today());
+    if (d === 0) return "hoje";
+    if (d === 1) return "amanhã";
+    if (d === -1) return "ontem";
+    if (d < 0) return "há " + (-d) + " dias";
+    if (d < 7) return "em " + d + " dias";
+    return fmtShort(iso);
+  }
+  function dueClass(iso) { if (!iso) return "due"; const d = diffDays(iso, today()); return d < 0 ? "due late" : d === 0 ? "due today" : "due"; }
+  const store = {
+    get(k, def) { try { const v = localStorage.getItem("painel:" + k); return v == null ? def : v; } catch { return def; } },
+    set(k, v) { try { localStorage.setItem("painel:" + k, v); } catch {} }
+  };
+  const num = n => new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 2 }).format(Number(n) || 0);
+  const brl = n => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 }).format(Number(n) || 0);
+  const round2 = n => Math.round(n * 100) / 100;
+  const plural = (n, one, many) => n + " " + (n === 1 ? one : many);
+
+  /* =========================================================
+     Vocabulary
+     ========================================================= */
+  const AREAS = { trabalho: "Trabalho", pessoal: "Pessoal" };
+  const LIFE = [["saude", "Saúde"], ["financas", "Finanças"], ["carreira", "Carreira"], ["estudos", "Estudos"],
+    ["mente", "Mente"], ["sono", "Sono"], ["espiritual", "Espiritual"], ["relacoes", "Relações"]];
+  const LIFE_LABEL = Object.fromEntries(LIFE);
+  const PRIOS = { alta: "Alta", media: "Média", baixa: "Baixa" };
+  const PRIO_RANK = { alta: 0, media: 1, baixa: 2 };
+  const STATUS = [["algumdia", "Algum dia"], ["afazer", "A fazer"], ["fazendo", "Fazendo"], ["feito", "Feito"]];
+  const STATUS_LABEL = Object.fromEntries(STATUS);
+  const GOAL_STATUS = [["ativa", "Ativa"], ["pausada", "Pausada"], ["concluida", "Concluída"]];
+  const GOAL_STATUS_LABEL = Object.fromEntries(GOAL_STATUS);
+  const STALE_DAYS = 14;          // meta ativa sem atualização há 14 dias ou mais = parada
+  const FOCUS_MAX = 3;            // máximo de tarefas no foco do dia
+  const DONE_BOARD_DAYS = 14;     // coluna Feito mostra as concluídas nos últimos 14 dias
+  const KINDS = { cliente: "Cliente", lead: "Lead", parceiro: "Parceiro", fornecedor: "Fornecedor", amigo: "Amigo", familia: "Família", outro: "Outro" };
+  const PERSONAL_KINDS = new Set(["amigo", "familia"]);
+  const STAGES = [["novo", "Novo"], ["conversa", "Em conversa"], ["proposta", "Proposta"], ["fechado", "Fechado"], ["perdido", "Perdido"]];
+  const STAGE_LABEL = Object.fromEntries(STAGES);
+  const REVIEW_FIELDS = [
+    ["wins", "Principais conquistas"], ["pending", "O que ficou pendente"], ["learned", "O que aprendi"],
+    ["improve", "O que preciso melhorar"], ["timeSink", "O que mais consumiu meu tempo"], ["next", "Prioridades da próxima semana"]
+  ];
+  const EXP_CATS = [
+    ["mercado", "Mercado"], ["alimentacao", "Alimentação fora"], ["transporte", "Transporte"], ["moradia", "Moradia"],
+    ["contas", "Contas (luz, água, internet)"], ["saude", "Saúde"], ["educacao", "Educação"], ["lazer", "Lazer"],
+    ["compras", "Compras"], ["assinaturas", "Assinaturas"], ["doacoes", "Dízimo e doações"], ["trabalho", "Trabalho / negócio"],
+    ["outros", "Outros"]
+  ];
+  const EXP_CAT_LABEL = Object.fromEntries(EXP_CATS);
+  const METHODS = [["", "—"], ["pix", "Pix"], ["debito", "Débito"], ["credito", "Crédito"], ["dinheiro", "Dinheiro"], ["boleto", "Boleto"]];
+  const METHOD_LABEL = Object.fromEntries(METHODS.filter(([k]) => k));
+  const TABS = [
+    ["hoje", "Hoje"], ["tarefas", "Tarefas"], ["agenda", "Agenda"], ["gastos", "Gastos"],
+    ["metas", "Metas"], ["contatos", "Contatos"], ["evolucao", "Evolução"]
+  ];
+  const TAB_ALIASES = { inicio: "hoje", quadro: "tarefas" };
+  const ICONS = {
+    hoje: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+    tarefas: '<rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 12l3 3 5-6"/>',
+    agenda: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+    metas: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>',
+    contatos: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.5 3.4-5.5 6.5-5.5s5.7 2 6.5 5.5M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c1.8.7 3 2.5 3.5 5.2"/>',
+    evolucao: '<path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/>',
+    gastos: '<rect x="3" y="6" width="18" height="14" rx="2"/><path d="M3 10h18"/><path d="M15.5 15h2.5"/><path d="M6 6l9.5-3 1.2 3"/>'
+  };
+  const COL_PT = { tasks: "tarefas", contacts: "contatos", goals: "metas", events: "compromissos", habits: "hábitos",
+    reviews: "revisões", notes: "anotações", cards: "quadro antigo", habitLog: "registro de hábitos",
+    expenseMonths: "meses de gastos", expenses: "gastos" };
+
+  const areaChip = a => a ? h("span", { class: "chip " + (a === "pessoal" ? "life" : "work"), text: AREAS[a] || a }) : null;
+  const lifeChip = k => k && LIFE_LABEL[k] ? h("span", { class: "chip", text: LIFE_LABEL[k] }) : null;
+  const contactArea = c => PERSONAL_KINDS.has(c.kind) ? "pessoal" : "trabalho";
+  const isExample = s => /\(exemplo\)/i.test(s || "");
+
+  /* =========================================================
+     State
+     ========================================================= */
+  // Coleções acompanhadas em tempo real. "cards" é o quadro antigo, lido só para a importação.
+  // Gastos ficam em uma lista por mês (expenseMonths/<AAAA-MM>/items), para que cada consulta continue pequena com os anos.
+  const SUB_COLS = ["tasks", "contacts", "goals", "events", "habits", "reviews", "notes", "cards", "expenseMonths"];
+  const BACKUP_COLS = [...SUB_COLS, "habitLog"];
+  const S = {
+    tab: "hoje",
+    area: store.get("area", "tudo"),
+    data: Object.fromEntries(SUB_COLS.map(c => [c, []])),
+    habitLog: {},          // "2026-10" -> { exists, checks: { habitId: { "21": true } } }
+    exp: {},               // "2026-10" -> gastos daquele mês
+    loaded: new Set(),
+    syncErr: new Set(),
+    status: "loading",     // loading | ready | nodb | denied
+    importing: false,
+    name: "",
+    busy: new Set(),       // "colecao/id" com gravação em andamento
+    open: new Set(),       // <details> abertos
+    capturing: false,
+    saveError: false,
+    ui: {
+      captureType: store.get("captureType", "tarefa"),
+      taskMode: store.get("taskMode", "lista"),
+      taskLife: "", taskPrio: "", taskQuery: "",
+      goalFilter: "ativa",
+      habitWeek: 0,
+      expMonth: monthKey(today()), expCat: "",
+      contactKind: "todos", contactStage: "", contactQuery: ""
+    }
+  };
+  let db = null, pending = 0;
+
+  const list = c => S.data[c];
+  const inArea = (item, area = item.area) => S.area === "tudo" || area === S.area;
+  const busy = key => S.busy.has(key);
+  const byId = (c, id) => list(c).find(x => x.id === id);
+
+  /* =========================================================
+     Persistence — every write waits for the store before the UI changes
+     ========================================================= */
+  // Firestore codes use dashes ("permission-denied"); compare them in one spelling.
+  const codeOf = e => String((e && e.code) || "").replace(/^firestore\//, "").replace(/-/g, "_");
+  function errText(e) {
+    const c = codeOf(e);
+    if (c === "permission_denied" || c === "unauthenticated") return "Sem permissão para salvar. Saia e entre de novo com sua conta do Google.";
+    if (c === "quota_exceeded") return "O espaço do painel está cheio. Apague itens antigos e tente de novo.";
+    if (c === "invalid_argument" || c === "transform_error") return "O painel recusou essa alteração. Recarregue a página e tente de novo.";
+    if (c === "resource_exhausted") return "Muitas alterações seguidas. Espere alguns segundos e tente de novo.";
+    return "Não foi possível salvar. Verifique a conexão e tente de novo.";
+  }
+  function renderSaveState() {
+    const el = $("#save-state");
+    if (!db) { el.textContent = ""; return; }
+    el.className = "save-state" + (S.saveError && !pending ? " err" : "");
+    el.textContent = pending ? "Salvando…" : S.saveError ? "Erro ao salvar" : "Tudo salvo";
+  }
+  async function write(fn, busyKey) {
+    if (!db) { toast("Entre com sua conta do Google para salvar.", "err"); return false; }
+    pending++;
+    if (busyKey) S.busy.add(busyKey);
+    renderSaveState();
+    if (busyKey) render();
+    try {
+      try { await fn(); }
+      catch (e) {
+        if (codeOf(e) !== "unavailable") throw e;
+        await sleep(500 + Math.random() * 700);
+        await fn();
+      }
+      S.saveError = false;
+      return true;
+    } catch (e) {
+      S.saveError = true;
+      toast(errText(e), "err");
+      return false;
+    } finally {
+      pending--;
+      if (busyKey) S.busy.delete(busyKey);
+      renderSaveState();
+      if (busyKey) render();
+    }
+  }
+  const coll = name => db.collection(name);
+  const addDoc = (c, body) => write(() => coll(c).add(body));
+  const updateDoc = (c, id, patch) => write(() => coll(c).doc(id).update(patch), c + "/" + id);
+  const setPath = (path, body) => write(() => db.doc(path).set(body), path);
+  const deleteDoc = (c, id) => write(() => coll(c).doc(id).delete(), c + "/" + id);
+
+  // Only the fields that really changed go to the store, so an edit never overwrites
+  // something changed meanwhile on another device.
+  function changed(orig, vals) {
+    const out = {};
+    for (const [k, v] of Object.entries(vals)) {
+      const a = orig[k];
+      const same = typeof v === "number" ? Number(a ?? 0) === v : String(a ?? "") === String(v ?? "");
+      if (!same) out[k] = v;
+    }
+    return out;
+  }
+
+  /* =========================================================
+     Toast
+     ========================================================= */
+  let toastTimer;
+  function toast(msg, kind) {
+    let t = $(".toast");
+    if (!t) { t = h("div", { class: "toast", role: "status", "aria-live": "polite" }); document.body.append(t); }
+    t.className = "toast" + (kind === "err" ? " err" : "");
+    t.textContent = msg; t.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { t.hidden = true; }, kind === "err" ? 6000 : 2800);
+  }
+
+  /* =========================================================
+     Modal form — stays open until the save is confirmed
+     ========================================================= */
+  function openForm({ title, fields, values = {}, onSave, onDelete, saveLabel = "Salvar" }) {
+    let saving = false;
+    const onKey = e => { if (e.key === "Escape") close(); };
+    const close = () => { if (saving) return; scrim.remove(); document.removeEventListener("keydown", onKey); };
+    const form = h("form", { class: "form", id: "modal-form", novalidate: false });
+    for (const f of fields) {
+      if (f.type === "heading") { form.append(h("div", { class: "form-heading full", text: f.label })); continue; }
+      if (f.type === "node") { form.append(h("div", { class: "full" }, f.node)); continue; }
+      const id = "f-" + f.key;
+      const v = values[f.key] ?? f.default ?? "";
+      let input;
+      if (f.type === "select") {
+        input = h("select", { class: "field", id, name: f.key }, f.options.map(([val, lab]) => h("option", { value: val, text: lab })));
+      } else if (f.type === "textarea") {
+        input = h("textarea", { class: "field", id, name: f.key, rows: f.rows || 3, placeholder: f.placeholder });
+      } else {
+        input = h("input", { class: "field", id, name: f.key, type: f.type || "text", required: f.required, step: f.step, inputmode: f.inputmode, placeholder: f.placeholder, autocomplete: "off" });
+      }
+      input.value = String(v);
+      form.append(h("label", { class: f.full ? "full" : null, for: id }, f.label, input, f.hint ? h("span", { class: "hint", style: "font-weight:400", text: f.hint }) : null));
+    }
+    const errEl = h("p", { class: "form-error", role: "alert", hidden: true });
+    const submitBtn = h("button", { type: "submit", form: "modal-form", class: "btn primary", text: saveLabel });
+    const showErr = msg => { errEl.textContent = msg; errEl.hidden = false; };
+    let delBtn = null;
+    if (onDelete) {
+      let armed = false;
+      delBtn = h("button", { type: "button", class: "btn danger", text: "Excluir", onclick: async () => {
+        if (!armed) { armed = true; delBtn.classList.add("armed"); delBtn.textContent = "Confirmar exclusão"; return; }
+        saving = true; delBtn.disabled = true; submitBtn.disabled = true; delBtn.textContent = "Excluindo…";
+        const ok = await onDelete();
+        saving = false;
+        if (ok) close();
+        else { delBtn.disabled = false; submitBtn.disabled = false; delBtn.textContent = "Confirmar exclusão"; showErr("Não foi possível excluir. Tente de novo."); }
+      } });
+    }
+    const modal = h("div", { class: "modal", role: "dialog", "aria-modal": "true", "aria-label": title },
+      h("h2", { text: title }), form, errEl,
+      h("div", { class: "modal-actions" }, delBtn,
+        h("div", { class: "right" }, h("button", { type: "button", class: "btn", text: "Cancelar", onclick: close }), submitBtn)));
+    form.addEventListener("submit", async e => {
+      e.preventDefault();
+      if (saving) return;
+      const out = {};
+      for (const f of fields) {
+        if (!f.key) continue;
+        let val = form.elements[f.key].value;
+        if (f.type === "number") val = val === "" ? (f.blank ? "" : 0) : Number(val);
+        else if (f.num) val = val === "" ? "" : Number(val);
+        else val = val.trim();
+        out[f.key] = val;
+      }
+      saving = true; submitBtn.disabled = true; submitBtn.textContent = "Salvando…"; errEl.hidden = true;
+      let res;
+      try { res = await onSave(out); } catch { res = false; }
+      saving = false;
+      if (res === true) { close(); return; }
+      submitBtn.disabled = false; submitBtn.textContent = saveLabel;
+      showErr(typeof res === "string" ? res : "Não foi possível salvar. O que você digitou continua aqui; tente de novo.");
+    });
+    const scrim = h("div", { class: "scrim", onclick: e => { if (e.target === scrim) close(); } }, modal);
+    document.body.append(scrim);
+    document.addEventListener("keydown", onKey);
+    const first = form.querySelector("input, select, textarea"); first && first.focus();
+  }
+
+  const areaField = { key: "area", label: "Área", type: "select", options: Object.entries(AREAS) };
+  const lifeField = { key: "lifeArea", label: "Área da vida", type: "select", options: [["", "—"], ...LIFE] };
+  const defaultArea = () => S.area !== "tudo" ? S.area : store.get("capArea", "pessoal");
+
+  /* =========================================================
+     Tasks — status, focus of the day
+     ========================================================= */
+  const taskStatus = t => t.status || (t.done ? "feito" : "afazer");
+  const isOpenTask = t => { const s = taskStatus(t); return s === "afazer" || s === "fazendo"; };
+  function statusPatch(t, st) {
+    const wasDone = t && taskStatus(t) === "feito";
+    return { status: st, done: st === "feito", doneAt: st === "feito" ? ((wasDone && t.doneAt) || Date.now()) : null };
+  }
+  const setTaskStatus = (t, st) => updateDoc("tasks", t.id, statusPatch(t, st));
+  const toggleDone = t => setTaskStatus(t, taskStatus(t) === "feito" ? "afazer" : "feito");
+  async function toggleFocus(t) {
+    const d = today();
+    if (t.focusDate === d) return updateDoc("tasks", t.id, { focusDate: "" });
+    const count = list("tasks").filter(x => x.focusDate === d).length;
+    if (count >= FOCUS_MAX) { toast("Seu foco de hoje já tem " + FOCUS_MAX + " tarefas. Tire uma (☆) para incluir outra.", "err"); return false; }
+    const patch = { focusDate: d };
+    if (taskStatus(t) === "algumdia" || taskStatus(t) === "feito") Object.assign(patch, statusPatch(t, "afazer"));
+    const ok = await updateDoc("tasks", t.id, patch);
+    if (ok) toast("No foco de hoje");
+    return ok;
+  }
+  function sortedTasks(arr) {
+    const t = today();
+    return arr.slice().sort((a, b) => {
+      const la = a.due && a.due < t ? 0 : 1, lb = b.due && b.due < t ? 0 : 1;
+      if (la !== lb) return la - lb;
+      const pa = PRIO_RANK[a.priority] ?? 1, pb = PRIO_RANK[b.priority] ?? 1;
+      if (pa !== pb) return pa - pb;
+      const fa = taskStatus(a) === "fazendo" ? 0 : 1, fb = taskStatus(b) === "fazendo" ? 0 : 1;
+      if (fa !== fb) return fa - fb;
+      return (a.due || "9999").localeCompare(b.due || "9999");
+    });
+  }
+  const tasksInArea = () => list("tasks").filter(t => inArea(t));
+  const openTasks = () => tasksInArea().filter(isOpenTask);
+  const focusTasks = () => tasksInArea().filter(t => t.focusDate === today());
+  const needsToday = () => openTasks().filter(t => (t.due && t.due <= today()) || taskStatus(t) === "fazendo");
+
+  function editTask(t) {
+    openForm({
+      title: t ? "Editar tarefa" : "Nova tarefa",
+      values: t ? { ...t, status: taskStatus(t) } : { area: defaultArea(), priority: "media", status: "afazer", lifeArea: "" },
+      fields: [
+        { key: "title", label: "Tarefa", required: true, full: true },
+        { key: "notes", label: "Descrição", type: "textarea", full: true },
+        areaField, lifeField,
+        { key: "priority", label: "Prioridade", type: "select", options: Object.entries(PRIOS) },
+        { key: "status", label: "Status", type: "select", options: STATUS },
+        { key: "due", label: "Prazo", type: "date", full: true }
+      ],
+      onSave: v => {
+        if (!t) return addDoc("tasks", { ...v, ...statusPatch(null, v.status), focusDate: "", createdAt: Date.now() });
+        const patch = changed({ ...t, status: taskStatus(t) }, v);
+        if (!Object.keys(patch).length) return true;
+        if ("status" in patch) Object.assign(patch, statusPatch(t, v.status));
+        return updateDoc("tasks", t.id, patch);
+      },
+      onDelete: t && (() => deleteDoc("tasks", t.id))
+    });
+  }
+
+  /* =========================================================
+     Goals — progress with history, stalled detection
+     ========================================================= */
+  const goalStatus = g => g.status || "ativa";
+  function goalPct(g) {
+    const b = Number(g.baseline) || 0, t = Number(g.target) || 0, c = Number(g.current) || 0;
+    if (t === b) return c === t && t !== 0 ? 100 : 0;
+    return Math.max(0, Math.min(100, Math.round((c - b) / (t - b) * 100)));
+  }
+  const goalLastUpdate = g => g.updatedAt || g.createdAt || 0;
+  const goalIdleDays = g => goalLastUpdate(g) ? Math.floor((Date.now() - goalLastUpdate(g)) / 86400000) : null;
+  const goalStale = g => goalStatus(g) === "ativa" && goalPct(g) < 100 && (goalIdleDays(g) ?? 0) >= STALE_DAYS;
+  function goalOrder(a, b) {
+    const sa = goalStale(a) ? 0 : 1, sb = goalStale(b) ? 0 : 1;
+    if (sa !== sb) return sa - sb;
+    return (a.deadline || "9999").localeCompare(b.deadline || "9999");
+  }
+  // One history entry per day: a second update on the same day replaces that day's value.
+  function recordProgress(g, value, note) {
+    const d = today();
+    const hist = Array.isArray(g.history) ? g.history : [];
+    const prev = hist.find(e => e.d === d);
+    const next = hist.filter(e => e.d !== d)
+      .concat({ d, v: value, n: note ? note : (prev ? prev.n || "" : "") })
+      .sort((a, b) => a.d.localeCompare(b.d)).slice(-1000);
+    return updateDoc("goals", g.id, { current: value, updatedAt: Date.now(), history: next });
+  }
+  function bumpGoal(id, dir) {
+    const g = byId("goals", id);
+    if (!g || busy("goals/" + id)) return;
+    recordProgress(g, round2((Number(g.current) || 0) + dir * (Number(g.step) || 1)), "");
+  }
+  function logGoal(g) {
+    openForm({
+      title: "Registrar progresso",
+      saveLabel: "Registrar",
+      values: { value: g.current ?? 0 },
+      fields: [
+        { type: "node", node: h("p", { class: "hint" }, h("strong", { text: g.title }), " · alvo " + num(g.target) + (g.unit ? " " + g.unit : "")) },
+        { key: "value", label: "Novo valor" + (g.unit ? " (" + g.unit + ")" : ""), type: "number", step: "any", inputmode: "decimal", required: true },
+        { key: "note", label: "O que aconteceu? (opcional)", type: "textarea", full: true, rows: 2 }
+      ],
+      onSave: v => recordProgress(byId("goals", g.id) || g, v.value, v.note)
+    });
+  }
+  function editGoal(g) {
+    const common = [
+      { key: "title", label: "Meta", required: true, full: true },
+      areaField, lifeField,
+      { key: "unit", label: "Unidade", placeholder: "R$, treinos, livros, kg…" },
+      { key: "step", label: "Passo dos botões + / −", type: "number", step: "any", inputmode: "decimal" },
+      { key: "baseline", label: "Valor inicial", type: "number", step: "any", inputmode: "decimal", hint: "De onde você partiu. Para metas de reduzir, o inicial é maior que o alvo." },
+      { key: "target", label: "Alvo", type: "number", step: "any", inputmode: "decimal", required: true },
+      { key: "deadline", label: "Prazo", type: "date" }
+    ];
+    const tail = [
+      { key: "nextAction", label: "Próxima ação", full: true, placeholder: "O passo concreto que move essa meta" },
+      { key: "notes", label: "Por que essa meta importa", type: "textarea", full: true, rows: 2 }
+    ];
+    const validate = v => (v.target === v.baseline ? "O alvo precisa ser diferente do valor inicial." : null);
+    if (!g) {
+      return openForm({
+        title: "Nova meta",
+        values: { area: defaultArea(), lifeArea: "", baseline: 0, current: 0, target: 10, step: 1 },
+        fields: [...common, { key: "current", label: "Valor atual", type: "number", step: "any", inputmode: "decimal" }, ...tail],
+        onSave: v => {
+          const bad = validate(v); if (bad) return bad;
+          const now = Date.now();
+          return addDoc("goals", { ...v, status: "ativa", createdAt: now, updatedAt: now, history: [{ d: today(), v: v.current, n: "Meta criada" }] });
+        }
+      });
+    }
+    openForm({
+      title: "Editar meta",
+      values: { ...g, baseline: g.baseline ?? 0, status: goalStatus(g) },
+      fields: [...common, { key: "status", label: "Status", type: "select", options: GOAL_STATUS }, ...tail],
+      onSave: v => {
+        const bad = validate(v); if (bad) return bad;
+        const patch = changed({ ...g, baseline: g.baseline ?? 0, status: goalStatus(g) }, v);
+        return Object.keys(patch).length ? updateDoc("goals", g.id, patch) : true;
+      },
+      onDelete: () => deleteDoc("goals", g.id)
+    });
+  }
+
+  /* =========================================================
+     Habits — one log document per month for all habits
+     ========================================================= */
+  const habitActive = hb => (hb.state || "ativo") === "ativo";
+  const habitsInArea = () => list("habits").filter(hb => habitActive(hb) && inArea(hb, hb.area || "pessoal"))
+    .sort((a, b) => (a.order || 0) - (b.order || 0));
+  const dayKey = iso => String(Number(iso.slice(8)));
+  const isChecked = (id, iso) => !!(S.habitLog[monthKey(iso)]?.checks?.[id]?.[dayKey(iso)]);
+  function habitCount(hb, start) {
+    let n = 0;
+    for (let i = 0; i < 7; i++) if (isChecked(hb.id, addDays(start, i))) n++;
+    return n;
+  }
+  let habitQueue = Promise.resolve();
+  function toggleHabit(hb, iso) {
+    const key = "habit/" + hb.id + "/" + iso;
+    if (busy(key) || iso > today()) return;
+    const mk = monthKey(iso), dk = dayKey(iso), next = !isChecked(hb.id, iso);
+    // Writes to the month document go one at a time, in order.
+    // A merge write creates the month document if needed and only touches this habit's day.
+    habitQueue = habitQueue.then(() => write(() =>
+      db.doc("habitLog/" + mk).set({ month: mk, checks: { [hb.id]: { [dk]: next } } }, { merge: true }), key));
+    return habitQueue;
+  }
+  function editHabit(hb) {
+    openForm({
+      title: hb ? "Editar hábito" : "Novo hábito",
+      values: hb ? { ...hb, state: hb.state || "ativo", targetPerWeek: hb.targetPerWeek || 7 } : { area: "pessoal", lifeArea: "saude", targetPerWeek: 7, state: "ativo" },
+      fields: [
+        { key: "name", label: "Hábito", required: true, full: true, placeholder: "Orar, treinar, ler 20 minutos…" },
+        lifeField, areaField,
+        { key: "targetPerWeek", label: "Meta semanal", type: "select", num: true,
+          options: [1, 2, 3, 4, 5, 6, 7].map(n => [String(n), n === 7 ? "Todos os dias" : n + (n === 1 ? " vez" : " vezes") + " por semana"]) },
+        { key: "state", label: "Situação", type: "select", options: [["ativo", "Ativo"], ["arquivado", "Arquivado"]] }
+      ],
+      onSave: v => {
+        if (!hb) return addDoc("habits", { ...v, createdAt: Date.now(), order: Date.now() });
+        const patch = changed({ ...hb, state: hb.state || "ativo", targetPerWeek: hb.targetPerWeek || 7 }, v);
+        return Object.keys(patch).length ? updateDoc("habits", hb.id, patch) : true;
+      },
+      onDelete: hb && (() => deleteDoc("habits", hb.id))
+    });
+  }
+
+  /* =========================================================
+     Expenses — one small collection per month
+     ========================================================= */
+  const expCol = mk => "expenseMonths/" + mk + "/items";
+  const brlc = n => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(Number(n) || 0);
+  const centsOf = arr => arr.reduce((s, e) => s + Math.round((Number(e.amount) || 0) * 100), 0);
+  const moneyInput = n => n ? (Math.round(n * 100) / 100).toFixed(2).replace(".", ",") : "";
+  // Accepts "45,90", "45.90", "1.234,56", "R$ 12" and "1234.5".
+  function parseMoney(s) {
+    let t = String(s || "").replace(/[R$\s]/g, "");
+    if (!t) return NaN;
+    if (t.includes(",")) t = t.replace(/\./g, "").replace(",", ".");
+    else if (/^\d{1,3}(\.\d{3})+$/.test(t)) t = t.replace(/\./g, "");
+    const n = Number(t);
+    return Number.isFinite(n) ? Math.round(n * 100) / 100 : NaN;
+  }
+  const addMonths = (mk, n) => { const d = parseIso(mk + "-01"); d.setMonth(d.getMonth() + n); return monthKey(isoOf(d)); };
+  const monthLabel = mk => { const s = new Intl.DateTimeFormat("pt-BR", { month: "long", year: "numeric" }).format(parseIso(mk + "-01")); return s[0].toUpperCase() + s.slice(1); };
+  const expInArea = mk => (S.exp[mk] || []).filter(e => inArea(e, e.area || "pessoal"));
+  const expMonthKnown = mk => list("expenseMonths").some(m => m.id === mk);
+
+  const expSubs = {};
+  function ensureExpSub(mk) {
+    if (!db || expSubs[mk]) return;
+    expSubs[mk] = coll(expCol(mk)).onSnapshot(snap => {
+      S.exp[mk] = snap.docs.map(d => ({ ...d.data(), id: d.id, _mk: mk }));
+      S.loaded.add("exp:" + mk);
+      S.syncErr.delete("expenses");
+      render();
+    }, err => {
+      if (codeOf(err) === "permission_denied") { S.status = "denied"; render(); return; }
+      delete expSubs[mk]; S.syncErr.add("expenses"); render();
+      setTimeout(() => ensureExpSub(mk), 5000);
+    });
+  }
+  // Keep listening only to the months on screen: this one, the last one and the one being browsed.
+  function syncExpSubs() {
+    if (!db) return;
+    const cur = monthKey(today()), sel = S.ui.expMonth;
+    const wanted = new Set([cur, addMonths(cur, -1), sel, addMonths(sel, -1)]);
+    for (const mk of Object.keys(expSubs)) if (!wanted.has(mk)) { expSubs[mk](); delete expSubs[mk]; delete S.exp[mk]; S.loaded.delete("exp:" + mk); }
+    for (const mk of wanted) ensureExpSub(mk);
+  }
+  function setExpMonth(mk) { S.ui.expMonth = mk; S.ui.expCat = ""; syncExpSubs(); render(); }
+  async function addExpense(body, id) {
+    const mk = monthKey(body.date);
+    const ok = id ? await setPath(expCol(mk) + "/" + id, body) : await addDoc(expCol(mk), body);
+    // The month index lets the backup find every month; a failure here never loses the expense itself.
+    if (ok && !expMonthKnown(mk)) await write(() => db.doc("expenseMonths/" + mk).set({ month: mk }));
+    return ok;
+  }
+  function editExpense(e) {
+    openForm({
+      title: e ? "Editar gasto" : "Novo gasto",
+      values: e ? { ...e, amount: moneyInput(e.amount) } : { date: S.ui.expMonth === monthKey(today()) ? today() : S.ui.expMonth + "-01", category: store.get("capCat", "alimentacao"), area: defaultArea(), method: "" },
+      fields: [
+        { key: "amount", label: "Valor (R$)", required: true, inputmode: "decimal", placeholder: "0,00" },
+        { key: "date", label: "Data", type: "date", required: true },
+        { key: "desc", label: "Descrição", full: true, placeholder: "Com o quê?" },
+        { key: "category", label: "Categoria", type: "select", options: EXP_CATS },
+        { key: "method", label: "Forma de pagamento", type: "select", options: METHODS },
+        areaField
+      ],
+      onSave: async v => {
+        const amount = parseMoney(v.amount);
+        if (!(amount > 0)) return "Digite um valor maior que zero, por exemplo 45,90.";
+        const vals = { ...v, amount };
+        if (!e) return addExpense({ ...vals, createdAt: Date.now() });
+        if (monthKey(vals.date) === e._mk) {
+          const patch = changed(e, vals);
+          return Object.keys(patch).length ? updateDoc(expCol(e._mk), e.id, patch) : true;
+        }
+        // Moving to another month: copy first, then remove the original only after the copy is saved.
+        const { id, _mk, ...rest } = e;
+        if (!(await addExpense({ ...rest, ...vals }, id))) return false;
+        if (!(await deleteDoc(expCol(_mk), id))) toast("O gasto foi para o novo mês, mas a cópia antiga continua. Exclua-a em " + monthLabel(_mk) + ".", "err");
+        S.ui.expMonth = monthKey(vals.date); syncExpSubs();
+        return true;
+      },
+      onDelete: e && (() => deleteDoc(expCol(e._mk), e.id))
+    });
+  }
+  function expensesBetween(start, end) {
+    const out = [];
+    for (const mk of new Set([monthKey(start), monthKey(end)])) out.push(...expInArea(mk).filter(e => e.date >= start && e.date <= end));
+    return out;
+  }
+
+  /* =========================================================
+     Week stats — the same numbers feed Hoje and the weekly review
+     ========================================================= */
+  function weekRange(offset = 0) {
+    const start = addDays(weekStart(today()), 7 * offset);
+    return { start, end: addDays(start, 6), s: msOf(start), e: msOf(addDays(start, 7)), id: weekId(start) };
+  }
+  function rangeFor(start) { return { start, end: addDays(start, 6), s: msOf(start), e: msOf(addDays(start, 7)), id: weekId(start) }; }
+  function weekStats(r) {
+    const done = list("tasks").filter(t => inArea(t) && taskStatus(t) === "feito" && t.doneAt >= r.s && t.doneAt < r.e);
+    const focus = list("tasks").filter(t => inArea(t) && t.focusDate && t.focusDate >= r.start && t.focusDate <= r.end);
+    const byLife = {};
+    for (const t of done) if (t.lifeArea) byLife[t.lifeArea] = (byLife[t.lifeArea] || 0) + 1;
+    let habitsDone = 0, habitsTarget = 0;
+    for (const hb of habitsInArea()) {
+      const target = Number(hb.targetPerWeek) || 7;
+      habitsDone += Math.min(habitCount(hb, r.start), target);
+      habitsTarget += target;
+    }
+    return {
+      tasksDone: done.length,
+      work: done.filter(t => t.area === "trabalho").length,
+      personal: done.filter(t => t.area !== "trabalho").length,
+      byLife,
+      focusDone: focus.filter(t => taskStatus(t) === "feito").length,
+      focusTotal: focus.length,
+      habitsDone, habitsTarget,
+      events: list("events").filter(e => inArea(e) && e.date >= r.start && e.date <= r.end).length,
+      spent: centsOf(expensesBetween(r.start, r.end)) / 100
+    };
+  }
+
+  /* =========================================================
+     Weekly review
+     ========================================================= */
+  const reviewFor = id => byId("reviews", id);
+  const reviewsSorted = () => list("reviews").slice().sort((a, b) => (b.week || b.id).localeCompare(a.week || a.id));
+  function hadActivityBefore(ms) {
+    return ["tasks", "habits", "goals"].some(c => list(c).some(x => !String(x.id).startsWith("ex") && (x.createdAt || Infinity) < ms));
+  }
+  // Sunday: review this week. Monday or Tuesday: last week's review, if it was not done.
+  function pendingReviewStart() {
+    const t = today(), d = dow(t);
+    if (d === 6 && !reviewFor(weekId(t))) return weekStart(t);
+    if (d <= 1) {
+      const last = addDays(weekStart(t), -7);
+      if (!reviewFor(weekId(last)) && hadActivityBefore(msOf(weekStart(t)))) return last;
+    }
+    return null;
+  }
+  function statsBox(st) {
+    return h("div", { class: "stat-box" },
+      h("span", {}, h("strong", { text: plural(st.tasksDone, "tarefa concluída", "tarefas concluídas") }),
+        " · " + st.work + " de trabalho, " + st.personal + " pessoais"),
+      st.focusTotal ? h("span", { text: "Foco do dia cumprido: " + st.focusDone + " de " + st.focusTotal }) : null,
+      st.habitsTarget ? h("span", { text: "Hábitos: " + st.habitsDone + " de " + st.habitsTarget + " na semana" }) : null,
+      h("span", { text: plural(st.events, "compromisso", "compromissos") }),
+      st.spent ? h("span", { text: "Gastos registrados: " + brlc(st.spent) }) : null);
+  }
+  function editReview(start) {
+    const r = rangeFor(start), existing = reviewFor(r.id), st = weekStats(r);
+    const values = existing ? { ...existing } : {};
+    for (const [k] of LIFE) values["score_" + k] = existing?.scores?.[k] ?? "";
+    openForm({
+      title: "Revisão · " + fmtRange(r.start, r.end),
+      values,
+      saveLabel: existing ? "Salvar revisão" : "Concluir revisão",
+      fields: [
+        { type: "heading", label: "A semana em números" },
+        { type: "node", node: statsBox(st) },
+        ...REVIEW_FIELDS.map(([k, l]) => ({ key: k, label: l, type: "textarea", full: true, rows: 2 })),
+        { type: "heading", label: "Como está cada área (1 a 10)" },
+        ...LIFE.map(([k, l]) => ({ key: "score_" + k, label: l, type: "select", num: true,
+          options: [["", "—"], ...Array.from({ length: 10 }, (_, i) => [String(i + 1), String(i + 1)])] }))
+      ],
+      onSave: v => {
+        const scores = {};
+        for (const [k] of LIFE) scores[k] = v["score_" + k] === "" ? null : v["score_" + k];
+        const body = { week: r.id, start: r.start, end: r.end, scores, stats: st, updatedAt: Date.now() };
+        for (const [k] of REVIEW_FIELDS) body[k] = v[k];
+        if (existing) return updateDoc("reviews", r.id, body);
+        return setPath("reviews/" + r.id, { ...body, createdAt: Date.now() });
+      },
+      onDelete: existing && (() => deleteDoc("reviews", r.id))
+    });
+  }
+
+  /* =========================================================
+     Contacts, events, notes
+     ========================================================= */
+  function editContact(c) {
+    openForm({
+      title: c ? "Editar contato" : "Novo contato",
+      values: c || { kind: S.area === "pessoal" ? "amigo" : "cliente", stage: S.area === "pessoal" ? "" : "novo", lastContact: today() },
+      fields: [
+        { key: "name", label: "Nome", required: true },
+        { key: "company", label: "Empresa / relação" },
+        { key: "kind", label: "Tipo", type: "select", options: Object.entries(KINDS) },
+        { key: "stage", label: "Etapa (negócios)", type: "select", options: [["", "Sem etapa"], ...STAGES] },
+        { key: "phone", label: "Telefone / WhatsApp", type: "tel", inputmode: "tel" },
+        { key: "email", label: "E-mail", type: "email" },
+        { key: "lastContact", label: "Último contato", type: "date" },
+        { key: "nextFollowUp", label: "Próximo follow-up", type: "date" },
+        { key: "birthday", label: "Aniversário", type: "date" },
+        { key: "value", label: "Valor do negócio (R$)", type: "number", step: "any", inputmode: "decimal" },
+        { key: "notes", label: "Anotações", type: "textarea", full: true }
+      ],
+      onSave: v => {
+        if (!c) return addDoc("contacts", { ...v, createdAt: Date.now() });
+        const patch = changed(c, v);
+        return Object.keys(patch).length ? updateDoc("contacts", c.id, patch) : true;
+      },
+      onDelete: c && (() => deleteDoc("contacts", c.id))
+    });
+  }
+  const contactDone = c => updateDoc("contacts", c.id, { lastContact: today(), nextFollowUp: "" }).then(ok => { if (ok) toast("Contato registrado"); return ok; });
+  function editEvent(ev, date) {
+    openForm({
+      title: ev ? "Editar compromisso" : "Novo compromisso",
+      values: ev || { area: defaultArea(), date: date || today() },
+      fields: [
+        { key: "title", label: "Compromisso", required: true, full: true },
+        { key: "date", label: "Data", type: "date", required: true },
+        { key: "time", label: "Hora", type: "time" },
+        { key: "place", label: "Local / link" },
+        areaField,
+        { key: "notes", label: "Observações", type: "textarea", full: true }
+      ],
+      onSave: v => {
+        if (!ev) return addDoc("events", { ...v, createdAt: Date.now() });
+        const patch = changed(ev, v);
+        return Object.keys(patch).length ? updateDoc("events", ev.id, patch) : true;
+      },
+      onDelete: ev && (() => deleteDoc("events", ev.id))
+    });
+  }
+  function editNote(n) {
+    openForm({
+      title: "Editar anotação",
+      values: n,
+      fields: [{ key: "text", label: "Anotação", type: "textarea", full: true, required: true, rows: 5 }, areaField],
+      onSave: v => { const patch = changed(n, v); return Object.keys(patch).length ? updateDoc("notes", n.id, patch) : true; },
+      onDelete: () => deleteDoc("notes", n.id)
+    });
+  }
+  async function noteToTask(n) {
+    const text = (n.text || "").trim();
+    const title = text.split("\n")[0].slice(0, 140);
+    const ok = await addDoc("tasks", { title, notes: text === title ? "" : text, area: n.area || "pessoal", lifeArea: "", priority: "media",
+      due: "", ...statusPatch(null, "afazer"), focusDate: "", createdAt: Date.now() });
+    if (!ok) return;
+    if (await deleteDoc("notes", n.id)) toast("Anotação virou tarefa");
+    else toast("A tarefa foi criada, mas a anotação não pôde ser removida.", "err");
+  }
+
+  /* =========================================================
+     Shared UI pieces
+     ========================================================= */
+  function empty(text, label, fn) {
+    return h("div", { class: "empty" }, h("span", { text }), label ? h("button", { class: "btn small", text: label, onclick: fn }) : null);
+  }
+  function loadingOr(c, node) {
+    if ((S.status === "loading" || S.status === "ready") && !S.loaded.has(c)) return h("div", { class: "empty", text: "Carregando…" });
+    return node;
+  }
+  function details(key, summary, content, summaryClass = "group-label") {
+    const d = h("details", { "data-key": key, open: S.open.has(key) }, h("summary", { class: summaryClass, text: summary }), content);
+    d.addEventListener("toggle", () => { d.open ? S.open.add(key) : S.open.delete(key); });
+    return d;
+  }
+  function panel(title, opts, ...body) {
+    return h("section", { class: "panel" },
+      h("div", { class: "panel-head" }, h("h2", { text: title }), opts && opts.sub ? h("span", { class: "sub", text: opts.sub }) : null, opts && opts.action || null),
+      ...body);
+  }
+  const linkBtn = (text, fn) => h("button", { class: "link", text, onclick: fn });
+  const go = tab => () => { location.hash = tab; };
+
+  function checkBtn(t) {
+    const done = taskStatus(t) === "feito";
+    return h("button", { class: "check", role: "checkbox", "aria-checked": done ? "true" : "false",
+      "aria-label": (done ? "Reabrir " : "Concluir ") + t.title, text: done ? "✓" : "",
+      disabled: busy("tasks/" + t.id), onclick: () => toggleDone(t) });
+  }
+  function starBtn(t) {
+    const on = t.focusDate === today();
+    return h("button", { class: "star" + (on ? " on" : ""), "aria-pressed": on ? "true" : "false",
+      title: on ? "Tirar do foco de hoje" : "Colocar no foco de hoje",
+      "aria-label": (on ? "Tirar do foco de hoje: " : "Colocar no foco de hoje: ") + t.title,
+      text: on ? "★" : "☆", disabled: busy("tasks/" + t.id), onclick: () => toggleFocus(t) });
+  }
+  function taskRow(t, opts = {}) {
+    const st = taskStatus(t);
+    return h("div", { class: "row" + (st === "feito" ? " done" : "") },
+      h("span", { class: "prio-bar " + (t.priority || ""), "aria-hidden": "true" }),
+      checkBtn(t),
+      h("div", { class: "row-main" },
+        h("button", { class: "row-title", text: t.title, onclick: () => editTask(t) }),
+        h("div", { class: "row-meta" },
+          st === "fazendo" ? h("span", { class: "chip accent", text: "Fazendo" }) : null,
+          st === "algumdia" ? h("span", { class: "chip", text: "Algum dia" }) : null,
+          t.priority === "alta" && st !== "feito" ? h("span", { class: "chip high", text: "Alta" }) : null,
+          S.area === "tudo" ? areaChip(t.area) : null,
+          lifeChip(t.lifeArea),
+          t.due && st !== "feito" ? h("span", { class: dueClass(t.due), text: rel(t.due) }) : null,
+          opts.showDone && t.doneAt ? h("span", { class: "due", text: "feita " + rel(isoFromMs(t.doneAt)) }) : null)),
+      opts.noStar || st === "feito" ? null : starBtn(t));
+  }
+  function eventRow(e, showDate) {
+    const d = parseIso(e.date);
+    return h("div", { class: "event" },
+      showDate
+        ? h("div", { class: "when" }, h("b", { text: d.getDate() }), h("span", { text: fmt(e.date, { month: "short" }) }), e.time ? h("span", { text: e.time }) : null)
+        : h("div", { class: "time", text: e.time || "dia todo" }),
+      h("div", { class: "event-main" },
+        h("button", { class: "row-title", text: e.title, onclick: () => editEvent(e) }),
+        h("div", { class: "row-meta" },
+          showDate ? h("span", { class: dueClass(e.date), text: rel(e.date) }) : null,
+          S.area === "tudo" ? areaChip(e.area) : null),
+        e.place ? h("div", { class: "place", text: e.place }) : null));
+  }
+  function sparkline(g) {
+    const pts = (g.history || []).filter(e => typeof e.v === "number");
+    if (pts.length < 2) return h("p", { class: "hint", text: pts.length ? "O gráfico aparece a partir da segunda atualização." : "Sem atualizações registradas ainda." });
+    const vals = pts.map(p => p.v), b = Number(g.baseline) || 0, t = Number(g.target) || 0;
+    const lo = Math.min(...vals, b, t), hi = Math.max(...vals, b, t), span = hi - lo || 1;
+    const W = 200, H = 44, P = 4;
+    const x = i => P + i * (W - 2 * P) / (pts.length - 1);
+    const y = v => H - P - (v - lo) / span * (H - 2 * P);
+    const line = pts.map((p, i) => (i ? "L" : "M") + x(i).toFixed(1) + " " + y(p.v).toFixed(1)).join(" ");
+    const last = pts[pts.length - 1];
+    return svg("svg", { class: "spark", viewBox: "0 0 " + W + " " + H, preserveAspectRatio: "none", role: "img", "aria-label": "Evolução: " + vals.map(num).join(", ") },
+      svg("line", { x1: P, x2: W - P, y1: y(t), y2: y(t), stroke: "var(--muted)", "stroke-width": 1, "stroke-dasharray": "3 3", "vector-effect": "non-scaling-stroke" }),
+      svg("path", { d: line, fill: "none", stroke: "var(--accent)", "stroke-width": 2, "vector-effect": "non-scaling-stroke", "stroke-linejoin": "round" }),
+      svg("circle", { cx: x(pts.length - 1), cy: y(last.v), r: 3, fill: "var(--accent)" }));
+  }
+
+  /* ---------- quick capture ---------- */
+  const CAPTURE_TYPES = [["tarefa", "Tarefa"], ["evento", "Compromisso"], ["gasto", "Gasto"], ["nota", "Anotação"]];
+  const CAPTURE_TEXT = {
+    tarefa: ["Nova tarefa", "O que precisa ser feito?"],
+    evento: ["Novo compromisso", "Qual compromisso?"],
+    gasto: ["Descrição do gasto", "Com o quê? (ex.: almoço, gasolina)"],
+    nota: ["Nova anotação", "Anote uma ideia, um lembrete…"]
+  };
+  function captureBox(fixedType) {
+    const type = fixedType || S.ui.captureType;
+    const keep = (id, el) => { el.id = id; el.setAttribute("data-keep", ""); return el; };
+    const [label, ph] = CAPTURE_TEXT[type] || CAPTURE_TEXT.tarefa;
+    const text = keep("cap-text", h("input", { type: "text", class: "field grow", autocomplete: "off", "aria-label": label, placeholder: ph }));
+    const area = keep("cap-area", h("select", { class: "field", "aria-label": "Área" }, Object.entries(AREAS).map(([v, l]) => h("option", { value: v, text: l }))));
+    area.value = defaultArea();
+    const lead = [], extra = [];
+    if (type === "tarefa") {
+      const prio = keep("cap-prio", h("select", { class: "field", "aria-label": "Prioridade" }, Object.entries(PRIOS).map(([v, l]) => h("option", { value: v, text: l }))));
+      prio.value = "media";
+      extra.push(prio, keep("cap-due", h("input", { type: "date", class: "field", "aria-label": "Prazo (opcional)", title: "Prazo (opcional)" })));
+    } else if (type === "evento") {
+      const date = keep("cap-date", h("input", { type: "date", class: "field", "aria-label": "Data", required: true }));
+      date.value = today();
+      extra.push(date, keep("cap-time", h("input", { type: "time", class: "field", "aria-label": "Hora (opcional)" })));
+    } else if (type === "gasto") {
+      lead.push(keep("cap-amount", h("input", { type: "text", class: "field amount-field", inputmode: "decimal", autocomplete: "off", "aria-label": "Valor em reais", placeholder: "R$ 0,00" })));
+      const cat = keep("cap-cat", h("select", { class: "field", "aria-label": "Categoria" }, EXP_CATS.map(([v, l]) => h("option", { value: v, text: l }))));
+      cat.value = store.get("capCat", "alimentacao");
+      const date = keep("cap-date", h("input", { type: "date", class: "field", "aria-label": "Data do gasto", required: true }));
+      date.value = today();
+      extra.push(cat, date);
+    }
+    const submit = h("button", { class: "btn primary", type: "submit", text: S.capturing ? "Salvando…" : "Adicionar", disabled: S.capturing });
+    const form = h("form", { class: "inline-form" }, ...lead, text, ...extra, area, submit);
+    form.addEventListener("submit", async e => {
+      e.preventDefault();
+      if (S.capturing) return;
+      const val = id => (document.getElementById(id) || {}).value || "";
+      const focusEl = id => { const el = document.getElementById(id); el && el.focus(); };
+      const title = val("cap-text").trim();
+      const a = val("cap-area") || defaultArea();
+      let col, body, msg;
+      if (type === "gasto") {
+        const amount = parseMoney(val("cap-amount"));
+        if (!(amount > 0)) { toast("Digite o valor gasto, por exemplo 45,90.", "err"); focusEl("cap-amount"); return; }
+        const date = val("cap-date") || today();
+        const category = val("cap-cat") || "outros";
+        store.set("capCat", category);
+        col = expCol(monthKey(date)); msg = "Gasto de " + brlc(amount) + " registrado";
+        body = { amount, desc: title, category, method: "", date, area: a, createdAt: Date.now() };
+      } else {
+        if (!title) { focusEl("cap-text"); return; }
+        if (type === "tarefa") {
+          col = "tasks"; msg = "Tarefa adicionada";
+          body = { title, notes: "", area: a, lifeArea: "", priority: val("cap-prio") || "media", due: val("cap-due"), ...statusPatch(null, "afazer"), focusDate: "", createdAt: Date.now() };
+        } else if (type === "evento") {
+          if (!val("cap-date")) { toast("Escolha a data do compromisso.", "err"); return; }
+          col = "events"; msg = "Compromisso marcado";
+          body = { title, date: val("cap-date"), time: val("cap-time"), place: "", area: a, notes: "", createdAt: Date.now() };
+        } else {
+          col = "notes"; msg = "Anotação salva";
+          body = { text: title, area: a, createdAt: Date.now() };
+        }
+      }
+      store.set("capArea", a);
+      S.capturing = true; render();
+      const ok = type === "gasto" ? await addExpense(body) : await addDoc(col, body);
+      S.capturing = false;
+      if (ok) {
+        for (const id of ["cap-text", "cap-due", "cap-time", "cap-amount"]) { const el = document.getElementById(id); if (el) el.value = ""; }
+        toast(msg);
+      }
+      render();
+      if (ok) focusEl(type === "gasto" ? "cap-amount" : "cap-text");
+    });
+    if (fixedType) return form;
+    const types = h("div", { class: "types", role: "group", "aria-label": "Tipo" },
+      CAPTURE_TYPES.map(([k, l]) =>
+        h("button", { type: "button", class: "type-btn", "aria-pressed": type === k ? "true" : "false", text: l,
+          onclick: () => { S.ui.captureType = k; store.set("captureType", k); render(); const el = document.getElementById(k === "gasto" ? "cap-amount" : "cap-text"); el && el.focus(); } })));
+    return h("section", { class: "panel" }, h("div", { class: "panel-head" }, h("h2", { text: "Captura rápida" }), types), form);
+  }
+
+  /* =========================================================
+     Views
+     ========================================================= */
+  function viewHoje() {
+    const t = today(), tomorrow = addDays(t, 1);
+    const out = [];
+
+    const pendingStart = pendingReviewStart();
+    if (pendingStart) {
+      const r = rangeFor(pendingStart);
+      out.push(h("div", { class: "notice warn" },
+        h("span", {}, h("strong", { text: "Revisão da semana pendente. " }), "Leva 5 minutos e fecha a semana de " + fmtRange(r.start, r.end) + "."),
+        h("button", { class: "btn small primary", text: "Fazer revisão", onclick: () => editReview(pendingStart) })));
+    }
+    out.push(captureBox());
+
+    // Left: what to do
+    const focus = sortedTasks(focusTasks());
+    const focusAll = list("tasks").filter(x => x.focusDate === t);
+    const focusDone = focus.filter(x => taskStatus(x) === "feito").length;
+    const suggestions = focusAll.length < FOCUS_MAX
+      ? sortedTasks(openTasks().filter(x => x.focusDate !== t)).slice(0, 4) : [];
+    const focusPanel = panel("Foco de hoje", { sub: focus.length ? focusDone + " de " + focus.length + " feitas" : null },
+      loadingOr("tasks", h("div", { style: "display:grid;gap:8px" },
+        focus.length ? h("div", { class: "list" }, focus.map(x => taskRow(x)))
+          : h("p", { class: "hint", text: "Escolha até 3 tarefas que fariam o dia valer a pena. Toque na ☆ de uma tarefa." }),
+        suggestions.length ? [h("div", { class: "group-label", text: "Sugestões · atrasadas e mais importantes" }),
+          h("div", { class: "list" }, suggestions.map(x => taskRow(x)))] : null,
+        !focus.length && !suggestions.length ? empty("Nenhuma tarefa em aberto. Use a captura rápida acima.") : null)));
+
+    const shown = new Set(suggestions.map(x => x.id));
+    const also = sortedTasks(needsToday().filter(x => x.focusDate !== t && !shown.has(x.id)));
+    const alsoPanel = also.length ? panel("Também pendente", {
+      sub: plural(also.filter(x => x.due && x.due < t).length, "atrasada", "atrasadas"),
+      action: linkBtn("Todas as tarefas", go("tarefas")) },
+      h("div", { class: "list" }, also.slice(0, 8).map(x => taskRow(x))),
+      also.length > 8 ? h("p", { class: "hint", text: "e mais " + (also.length - 8) + " em Tarefas." }) : null) : null;
+
+    const notes = list("notes").filter(n => inArea(n, n.area || "pessoal")).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+    const noteRow = n => h("div", { class: "row" },
+      h("div", { class: "row-main" },
+        h("button", { class: "row-title note-text", style: "font-weight:400", text: n.text, onclick: () => editNote(n) }),
+        h("div", { class: "row-meta" }, S.area === "tudo" ? areaChip(n.area) : null, n.createdAt ? h("span", { class: "due", text: rel(isoFromMs(n.createdAt)) }) : null)),
+      h("div", { class: "row-actions" }, h("button", { class: "btn small", text: "Virar tarefa", disabled: busy("notes/" + n.id), onclick: () => noteToTask(n) })));
+    const notesPanel = notes.length ? panel("Anotações", { sub: plural(notes.length, "anotação", "anotações") },
+      h("div", { class: "list" }, notes.slice(0, 5).map(noteRow)),
+      notes.length > 5 ? details("notes-more", "Mais " + (notes.length - 5), h("div", { class: "list" }, notes.slice(5).map(noteRow))) : null) : null;
+
+    // Right: day, attention, evolution
+    const evToday = list("events").filter(e => inArea(e) && (e.date === t || e.date === tomorrow))
+      .sort((a, b) => (a.date + (a.time || "99")).localeCompare(b.date + (b.time || "99")));
+    const nextEv = list("events").filter(e => inArea(e) && e.date > tomorrow).sort((a, b) => a.date.localeCompare(b.date))[0];
+    const agendaPanel = panel("Hoje e amanhã", { action: linkBtn("+ Compromisso", () => editEvent()) },
+      loadingOr("events", h("div", { style: "display:grid;gap:6px" },
+        evToday.length ? h("div", { class: "list" }, evToday.map(e => eventRow(e, true))) : h("p", { class: "hint", text: "Nada marcado para hoje e amanhã." }),
+        nextEv ? h("p", { class: "hint" }, "Próximo: ", h("strong", { text: nextEv.title }), " · " + rel(nextEv.date)) : null)));
+
+    const habits = habitsInArea(), ws = weekStart(t);
+    const habitsPanel = panel("Hábitos de hoje", { action: linkBtn(habits.length ? "Semana" : "Criar hábitos", go("evolucao")) },
+      loadingOr("habits", habits.length ? h("div", { class: "list" }, habits.map(hb => {
+        const on = isChecked(hb.id, t), cnt = habitCount(hb, ws), target = Number(hb.targetPerWeek) || 7;
+        return h("div", { class: "htoday" },
+          h("button", { class: "check", role: "checkbox", "aria-checked": on ? "true" : "false", "aria-label": hb.name + " hoje", text: on ? "✓" : "",
+            disabled: busy("habit/" + hb.id + "/" + t), onclick: () => toggleHabit(hb, t) }),
+          h("span", { style: "flex:1;min-width:0;overflow-wrap:anywhere", text: hb.name }),
+          h("span", { class: "habit-score" + (cnt >= target ? " met" : ""), text: cnt + "/" + target }));
+      })) : empty("Hábitos ajudam a acompanhar saúde, sono, oração e estudos sem criar módulos separados.", "Criar hábito", () => editHabit())));
+
+    const follow = list("contacts").filter(c => c.nextFollowUp && c.nextFollowUp <= t && inArea(c, contactArea(c)))
+      .sort((a, b) => a.nextFollowUp.localeCompare(b.nextFollowUp));
+    const followPanel = follow.length ? panel("Falar com", { action: linkBtn("Contatos", go("contatos")) },
+      h("div", { class: "list" }, follow.slice(0, 6).map(c => h("div", { class: "row" },
+        h("div", { class: "row-main" },
+          h("button", { class: "row-title", text: c.name, onclick: () => editContact(c) }),
+          h("div", { class: "row-meta" }, c.company ? h("span", { class: "due", text: c.company }) : null, h("span", { class: dueClass(c.nextFollowUp), text: rel(c.nextFollowUp) }))),
+        h("button", { class: "btn small", text: "Feito", title: "Registrar contato hoje", disabled: busy("contacts/" + c.id), onclick: () => contactDone(c) }))))) : null;
+
+    const goals = list("goals").filter(g => inArea(g) && goalStatus(g) === "ativa").sort(goalOrder);
+    const goalsPanel = panel("Metas", { action: linkBtn("Ver metas", go("metas")) },
+      loadingOr("goals", goals.length ? h("div", { class: "list", style: "gap:12px" }, goals.slice(0, 4).map(g => {
+        const p = goalPct(g);
+        return h("div", { class: "goal" },
+          h("div", { class: "goal-top" }, h("button", { class: "goal-name", text: g.title, onclick: go("metas") }), h("span", { class: "amt", text: p + "%" })),
+          h("div", { class: "bar thin " + (g.area === "pessoal" ? "life" : "work") }, h("span", { style: "width:" + p + "%" })),
+          goalStale(g) ? h("span", { class: "chip mid", text: "Parada há " + goalIdleDays(g) + " dias" })
+            : !g.nextAction ? h("span", { class: "chip", text: "Sem próxima ação" }) : h("span", { class: "hint", text: "Próximo: " + g.nextAction }));
+      })) : empty("Nenhuma meta ativa.", "Nova meta", () => editGoal())));
+
+    const st = weekStats(weekRange(0)), prev = weekStats(weekRange(-1));
+    const total = st.work + st.personal;
+    const lifeTop = Object.entries(st.byLife).sort((a, b) => b[1] - a[1]).slice(0, 4);
+    const weekPanel = panel("Sua semana", { sub: fmtRange(weekRange(0).start, weekRange(0).end) },
+      h("div", { class: "kpis" },
+        h("div", { class: "kpi" }, h("div", { class: "kpi-line" }, h("span", { class: "k", text: "Tarefas concluídas" }), h("span", { class: "v", text: st.tasksDone })),
+          h("span", { class: "hint", text: "Semana passada: " + prev.tasksDone })),
+        st.focusTotal ? h("div", { class: "kpi-line" }, h("span", { class: "k", text: "Foco do dia cumprido" }), h("span", { class: "v", text: st.focusDone + "/" + st.focusTotal })) : null,
+        st.habitsTarget ? h("div", { class: "kpi" },
+          h("div", { class: "kpi-line" }, h("span", { class: "k", text: "Hábitos na semana" }), h("span", { class: "v", text: st.habitsDone + "/" + st.habitsTarget })),
+          h("div", { class: "bar thin" }, h("span", { style: "width:" + Math.round(st.habitsDone / st.habitsTarget * 100) + "%" }))) : null,
+        st.spent || prev.spent ? h("button", { class: "kpi", style: "border:0;background:none;padding:0;text-align:left", onclick: go("gastos") },
+          h("div", { class: "kpi-line" }, h("span", { class: "k", text: "Gastos na semana" }), h("span", { class: "v", text: brlc(st.spent) })),
+          h("span", { class: "hint", text: "Semana passada: " + brlc(prev.spent) })) : null,
+        h("div", { class: "kpi" },
+          h("div", { class: "kpi-line" }, h("span", { class: "k", text: "Onde foi sua energia" }),
+            h("span", { class: "amt", text: total ? st.work + " trabalho · " + st.personal + " pessoal" : "—" })),
+          total ? h("div", { class: "split", role: "img", "aria-label": st.work + " tarefas de trabalho e " + st.personal + " pessoais" },
+            h("span", { class: "w", style: "width:" + (st.work / total * 100) + "%" }), h("span", { class: "p", style: "width:" + (st.personal / total * 100) + "%" }))
+            : h("span", { class: "hint", text: "Aparece conforme você conclui tarefas." }),
+          lifeTop.length ? h("div", { class: "chips" }, lifeTop.map(([k, n]) => h("span", { class: "chip", text: LIFE_LABEL[k] + " " + n }))) : null)));
+
+    out.push(h("div", { class: "home" },
+      h("div", { class: "stack" }, focusPanel, alsoPanel, notesPanel),
+      h("div", { class: "stack" }, agendaPanel, habitsPanel, followPanel, goalsPanel, weekPanel)));
+    return out;
+  }
+
+  let dragId = null;
+  function viewTarefas() {
+    const t = today(), soon = addDays(t, 7), q = S.ui.taskQuery.trim().toLowerCase();
+    const all = tasksInArea().filter(x =>
+      (!S.ui.taskLife || x.lifeArea === S.ui.taskLife) &&
+      (!S.ui.taskPrio || (x.priority || "media") === S.ui.taskPrio) &&
+      (!q || [x.title, x.notes].some(v => (v || "").toLowerCase().includes(q))));
+    const open = sortedTasks(all.filter(isOpenTask));
+    const someday = all.filter(x => taskStatus(x) === "algumdia").sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+    const done = all.filter(x => taskStatus(x) === "feito").sort((a, b) => (b.doneAt || 0) - (a.doneAt || 0));
+    const filtered = S.ui.taskLife || S.ui.taskPrio || q;
+
+    const modeSeg = h("div", { class: "seg", role: "group", "aria-label": "Visualização" },
+      [["lista", "Lista"], ["quadro", "Quadro"]].map(([k, l]) => h("button", { type: "button", "aria-pressed": S.ui.taskMode === k ? "true" : "false", text: l,
+        onclick: () => { S.ui.taskMode = k; store.set("taskMode", k); render(); } })));
+
+    const lifePresent = LIFE.filter(([k]) => tasksInArea().some(x => x.lifeArea === k));
+    const search = h("input", { type: "search", class: "field grow", id: "task-search", "data-keep": "", placeholder: "Buscar tarefas", "aria-label": "Buscar tarefas",
+      oninput: e => { S.ui.taskQuery = e.target.value; render(); } });
+    search.value = S.ui.taskQuery;
+    const prio = h("select", { class: "field", id: "task-prio-filter", "aria-label": "Filtrar por prioridade",
+      onchange: e => { S.ui.taskPrio = e.target.value; render(); } },
+      h("option", { value: "", text: "Todas as prioridades" }), Object.entries(PRIOS).map(([v, l]) => h("option", { value: v, text: "Prioridade " + l.toLowerCase() })));
+    prio.value = S.ui.taskPrio;
+    const filters = h("div", { style: "display:grid;gap:8px" },
+      h("div", { class: "filters" }, search, prio),
+      lifePresent.length ? h("div", { class: "chips" },
+        [["", "Todas as áreas da vida"], ...lifePresent].map(([k, l]) => h("button", { class: "filter-chip", "aria-pressed": S.ui.taskLife === k ? "true" : "false", text: l,
+          onclick: () => { S.ui.taskLife = k; render(); } }))) : null);
+
+    // Old board cards that were not brought into Tasks yet.
+    const legacy = list("cards").filter(c => !list("tasks").some(x => x.migratedFrom === "cards/" + c.id));
+    const legacyNotice = legacy.length && S.loaded.has("tasks") ? h("div", { class: "notice warn" },
+      h("span", {}, h("strong", { text: plural(legacy.length, "cartão", "cartões") + " do quadro antigo. " }), "O Quadro agora mostra suas tarefas. Traga os cartões para cá; os originais ficam guardados."),
+      h("button", { class: "btn small primary", text: "Trazer para Tarefas", disabled: S.capturing, onclick: () => importCards(legacy) })) : null;
+
+    let body;
+    if (S.ui.taskMode === "quadro") body = board(all);
+    else {
+      const groups = [
+        ["Atrasadas", open.filter(x => x.due && x.due < t), "late"],
+        ["Hoje", open.filter(x => x.due === t)],
+        ["Próximos 7 dias", open.filter(x => x.due > t && x.due <= soon)],
+        ["Mais adiante", open.filter(x => x.due > soon)],
+        ["Sem prazo", open.filter(x => !x.due)]
+      ];
+      const parts = [];
+      for (const [label, items, cls] of groups) {
+        if (!items.length) continue;
+        parts.push(h("div", { class: "group-label" + (cls ? " " + cls : "") }, label, h("span", { class: "chip", text: items.length })));
+        parts.push(h("div", { class: "list" }, items.map(x => taskRow(x))));
+      }
+      if (!open.length) parts.push(empty(filtered ? "Nenhuma tarefa em aberto com esses filtros." : "Nenhuma tarefa em aberto" + (S.area !== "tudo" ? " em " + AREAS[S.area] : "") + "."));
+      if (someday.length) parts.push(details("someday", "Algum dia (" + someday.length + ")", h("div", { class: "list" }, someday.map(x => taskRow(x)))));
+      if (done.length) parts.push(details("done", "Concluídas (" + done.length + ")",
+        h("div", { style: "display:grid;gap:6px" }, h("div", { class: "list" }, done.slice(0, 50).map(x => taskRow(x, { showDone: true }))),
+          done.length > 50 ? h("p", { class: "hint", text: "Mostrando as 50 mais recentes." }) : null)));
+      body = h("section", { class: "panel" }, loadingOr("tasks", h("div", { style: "display:grid;gap:8px" }, parts)));
+    }
+    return [
+      h("div", { class: "view-head" },
+        h("div", {}, h("h2", { text: "Tarefas" }), h("p", { text: plural(open.length, "em aberto", "em aberto") + " · ordenadas por prazo e prioridade" })),
+        h("div", { class: "actions" }, modeSeg, h("button", { class: "btn primary", text: "+ Tarefa", onclick: () => editTask() }))),
+      legacyNotice,
+      h("section", { class: "panel" }, captureBox("tarefa"), filters),
+      body
+    ];
+  }
+  function board(all) {
+    const cols = [["algumdia", "Algum dia"], ["afazer", "A fazer"], ["fazendo", "Fazendo"], ["feito", "Feito"]];
+    const cutoff = Date.now() - DONE_BOARD_DAYS * 86400000;
+    const move = (x, dir) => {
+      const i = cols.findIndex(([k]) => k === taskStatus(x)) + dir;
+      if (i >= 0 && i < cols.length) setTaskStatus(x, cols[i][0]);
+    };
+    return loadingOr("tasks", h("div", { class: "board-scroll" }, h("div", { class: "board" }, cols.map(([key, label], i) => {
+      let items = all.filter(x => taskStatus(x) === key);
+      items = key === "feito" ? items.filter(x => !x.doneAt || x.doneAt >= cutoff).sort((a, b) => (b.doneAt || 0) - (a.doneAt || 0)) : sortedTasks(items);
+      const col = h("div", { class: "col", "data-col": key,
+        ondragover: e => { e.preventDefault(); col.classList.add("over"); },
+        ondragleave: () => col.classList.remove("over"),
+        ondrop: e => {
+          e.preventDefault(); col.classList.remove("over");
+          const x = byId("tasks", dragId);
+          if (x && taskStatus(x) !== key) setTaskStatus(x, key);
+        } },
+        h("div", { class: "col-head" },
+          h("h3", {}, label, h("span", { class: "n", text: key === "feito" ? items.length + " · " + DONE_BOARD_DAYS + " dias" : items.length })),
+          key !== "feito" ? h("button", { class: "icon-btn", "aria-label": "Nova tarefa em " + label, text: "+", onclick: () => {
+            openForm({ title: "Nova tarefa · " + label, values: { area: defaultArea(), priority: "media", lifeArea: "" },
+              fields: [{ key: "title", label: "Tarefa", required: true, full: true }, areaField, lifeField,
+                { key: "priority", label: "Prioridade", type: "select", options: Object.entries(PRIOS) }, { key: "due", label: "Prazo", type: "date" }],
+              onSave: v => addDoc("tasks", { ...v, notes: "", ...statusPatch(null, key), focusDate: "", createdAt: Date.now() }) });
+          } }) : null),
+        items.map(x => {
+          const el = h("article", { class: "kcard", draggable: "true",
+            ondragstart: e => { dragId = x.id; el.classList.add("dragging"); try { e.dataTransfer.setData("text/plain", x.id); e.dataTransfer.effectAllowed = "move"; } catch {} },
+            ondragend: () => { el.classList.remove("dragging"); dragId = null; } },
+            h("div", { class: "top-line" }, h("button", { class: "row-title", style: "flex:1", text: x.title, onclick: () => editTask(x) }), key !== "feito" ? starBtn(x) : null),
+            x.notes ? h("div", { class: "notes", text: x.notes }) : null,
+            h("div", { class: "foot" },
+              h("div", { class: "row-meta" },
+                x.priority === "alta" && key !== "feito" ? h("span", { class: "chip high", text: "Alta" }) : null,
+                S.area === "tudo" ? areaChip(x.area) : null, lifeChip(x.lifeArea),
+                x.due && key !== "feito" ? h("span", { class: dueClass(x.due), text: rel(x.due) }) : null),
+              h("div", { class: "moves" },
+                i > 0 ? h("button", { class: "icon-btn", disabled: busy("tasks/" + x.id), "aria-label": "Mover para " + cols[i - 1][1], title: "Mover para " + cols[i - 1][1], text: "←", onclick: () => move(x, -1) }) : null,
+                i < cols.length - 1 ? h("button", { class: "icon-btn", disabled: busy("tasks/" + x.id), "aria-label": "Mover para " + cols[i + 1][1], title: "Mover para " + cols[i + 1][1], text: "→", onclick: () => move(x, 1) }) : null)));
+          return el;
+        }),
+        !items.length ? h("div", { class: "empty", style: "padding:4px", text: key === "algumdia" ? "Ideias para depois." : "Arraste tarefas para cá." }) : null);
+      return col;
+    }))));
+  }
+  async function importCards(cards) {
+    const map = { ideias: "algumdia", afazer: "afazer", fazendo: "fazendo", feito: "feito" };
+    S.capturing = true; render();
+    let n = 0;
+    for (const c of cards) {
+      const st = map[c.col] || "afazer";
+      const ok = await addDoc("tasks", { title: c.title || "Sem título", notes: c.notes || "", area: c.area || "pessoal", lifeArea: "", priority: "media",
+        due: c.due || "", ...statusPatch(null, st), focusDate: "", createdAt: Date.now(), migratedFrom: "cards/" + c.id });
+      if (!ok) break;
+      n++;
+    }
+    S.capturing = false; render();
+    if (n === cards.length) toast(plural(n, "cartão trazido", "cartões trazidos") + " para Tarefas");
+  }
+
+  function viewAgenda() {
+    const t = today();
+    const evs = list("events").filter(e => inArea(e));
+    const week = Array.from({ length: 7 }, (_, i) => addDays(t, i));
+    const strip = h("div", { class: "week" }, week.map(d => {
+      const day = evs.filter(e => e.date === d);
+      const dt = parseIso(d);
+      return h("button", { class: "day" + (d === t ? " is-today" : ""), title: "Novo compromisso em " + fmtShort(d), "aria-label": "Novo compromisso em " + fmtShort(d), onclick: () => editEvent(null, d) },
+        h("span", { class: "wd", text: fmt(d, { weekday: "short" }) }),
+        h("span", { class: "dn", text: dt.getDate() }),
+        h("span", { class: "dots" }, day.slice(0, 4).map(e => h("span", { class: "dot", style: "background:var(" + (e.area === "pessoal" ? "--life" : "--work") + ")" }))));
+    }));
+    const upcoming = evs.filter(e => e.date >= t).sort((a, b) => (a.date + (a.time || "99")).localeCompare(b.date + (b.time || "99")));
+    const byDate = new Map();
+    for (const e of upcoming) { if (!byDate.has(e.date)) byDate.set(e.date, []); byDate.get(e.date).push(e); }
+    const groups = [];
+    for (const [d, items] of byDate) {
+      const dd = diffDays(d, t);
+      const label = dd === 0 ? "Hoje" : dd === 1 ? "Amanhã" : fmt(d, { weekday: "long", day: "numeric", month: "long" });
+      groups.push(h("div", { class: "group-label", text: label }), h("div", { class: "list" }, items.map(e => eventRow(e, false))));
+    }
+    const past = evs.filter(e => e.date < t).sort((a, b) => b.date.localeCompare(a.date)).slice(0, 30);
+    return [
+      h("div", { class: "view-head" },
+        h("div", {}, h("h2", { text: "Agenda" }), h("p", { text: "Toque em um dia para marcar algo nele." })),
+        h("button", { class: "btn primary", text: "+ Compromisso", onclick: () => editEvent() })),
+      strip,
+      h("section", { class: "panel" },
+        loadingOr("events", groups.length ? h("div", { style: "display:grid;gap:6px" }, groups) : empty("Nada marcado daqui pra frente.", "Marcar compromisso", () => editEvent())),
+        past.length ? details("past-events", "Anteriores (" + past.length + ")", h("div", { class: "list" }, past.map(e => eventRow(e, true)))) : null)
+    ];
+  }
+
+  function viewGastos() {
+    const t = today(), mk = S.ui.expMonth, prevMk = addMonths(mk, -1), curMk = monthKey(t);
+    const loaded = S.loaded.has("exp:" + mk) || !db;
+    const all = expInArea(mk);
+    const totalC = centsOf(all);
+
+    // Fair comparison: the current month is compared with the same days of the previous month.
+    const isCurrent = mk === curMk;
+    const dayCut = isCurrent ? Number(t.slice(8)) : 31;
+    const prevAll = expInArea(prevMk);
+    const prevC = centsOf(prevAll.filter(e => Number(e.date.slice(8)) <= dayCut));
+    const prevLoaded = S.loaded.has("exp:" + prevMk);
+    const daysElapsed = isCurrent ? Number(t.slice(8)) : new Date(Number(mk.slice(0, 4)), Number(mk.slice(5)), 0).getDate();
+    let compare = null;
+    if (prevLoaded && prevC > 0 && totalC > 0) {
+      const diff = Math.round((totalC - prevC) / prevC * 100);
+      compare = h("span", {}, diff === 0 ? "Igual a " : h("span", { class: diff > 0 ? "up" : "down", text: Math.abs(diff) + "% " + (diff > 0 ? "acima" : "abaixo") }),
+        diff === 0 ? "" : " de ", (isCurrent ? "1–" + dayCut + " de " : "") + monthLabel(prevMk).toLowerCase() + " (" + brlc(prevC / 100) + ")");
+    }
+
+    const byCat = {};
+    for (const e of all) byCat[e.category || "outros"] = (byCat[e.category || "outros"] || 0) + Math.round((Number(e.amount) || 0) * 100);
+    const cats = Object.entries(byCat).sort((a, b) => b[1] - a[1]);
+    const maxC = cats.length ? cats[0][1] : 1;
+
+    const shown = all.filter(e => !S.ui.expCat || (e.category || "outros") === S.ui.expCat)
+      .sort((a, b) => b.date.localeCompare(a.date) || (b.createdAt || 0) - (a.createdAt || 0));
+    const byDay = new Map();
+    for (const e of shown) { if (!byDay.has(e.date)) byDay.set(e.date, []); byDay.get(e.date).push(e); }
+    const dayGroups = [];
+    for (const [d, items] of byDay) {
+      const dd = diffDays(d, t);
+      dayGroups.push(h("div", { class: "day-head group-label" }, h("span", { text: dd === 0 ? "Hoje" : dd === -1 ? "Ontem" : fmt(d, { weekday: "long", day: "numeric" }) }), h("span", { class: "amt", text: brlc(centsOf(items) / 100) })),
+        h("div", { class: "list" }, items.map(e => h("div", { class: "row" },
+          h("div", { class: "row-main" },
+            h("button", { class: "row-title", text: e.desc || EXP_CAT_LABEL[e.category] || "Gasto", onclick: () => editExpense(e) }),
+            h("div", { class: "row-meta" }, h("span", { class: "chip", text: EXP_CAT_LABEL[e.category] || "Outros" }),
+              e.method ? h("span", { class: "due", text: METHOD_LABEL[e.method] || e.method }) : null,
+              S.area === "tudo" ? areaChip(e.area) : null)),
+          h("span", { class: "exp-amt", text: brlc(e.amount) })))));
+    }
+
+    const nav = h("div", { class: "month-nav" },
+      h("button", { class: "icon-btn", "aria-label": "Mês anterior", text: "‹", onclick: () => setExpMonth(prevMk) }),
+      h("span", { class: "m", text: monthLabel(mk) }),
+      h("button", { class: "icon-btn", "aria-label": "Próximo mês", text: "›", disabled: mk >= curMk, onclick: () => setExpMonth(addMonths(mk, 1)) }));
+
+    const summary = h("section", { class: "panel" },
+      h("div", { class: "panel-head" }, h("h2", { text: "Total do mês" }), S.area !== "tudo" ? areaChip(S.area) : null),
+      h("div", { class: "money", text: brlc(totalC / 100) }),
+      h("div", { class: "money-sub" },
+        all.length ? h("span", {}, h("strong", { text: plural(all.length, "gasto", "gastos") }), " · média de " + brlc(totalC / 100 / Math.max(1, daysElapsed)) + " por dia") : null,
+        compare,
+        cats.length ? h("span", {}, "Maior categoria: ", h("strong", { text: EXP_CAT_LABEL[cats[0][0]] || "Outros" }), " (" + Math.round(cats[0][1] / totalC * 100) + "%)") : null));
+
+    const catPanel = cats.length ? h("section", { class: "panel" },
+      h("div", { class: "panel-head" }, h("h2", { text: "Para onde foi" }), S.ui.expCat ? linkBtn("Mostrar todas", () => { S.ui.expCat = ""; render(); }) : h("span", { class: "sub", text: "toque para filtrar" })),
+      h("div", { class: "cat-list" }, cats.map(([k, c]) => h("button", { class: "cat-row", "aria-pressed": S.ui.expCat === k ? "true" : "false",
+        onclick: () => { S.ui.expCat = S.ui.expCat === k ? "" : k; render(); } },
+        h("span", { text: EXP_CAT_LABEL[k] || "Outros" }),
+        h("div", { class: "bar thin" }, h("span", { style: "width:" + Math.max(2, c / maxC * 100) + "%" })),
+        h("span", { class: "amt-r" }, brlc(c / 100), h("small", { text: Math.round(c / totalC * 100) + "%" })))))) : null;
+
+    return [
+      h("div", { class: "view-head" },
+        h("div", {}, h("h2", { text: "Gastos" }), h("p", { text: "Anote na hora: valor, o quê e a categoria. O resto o painel soma." })),
+        h("div", { class: "actions" }, nav, h("button", { class: "btn primary", text: "+ Gasto", onclick: () => editExpense() }))),
+      h("section", { class: "panel" }, captureBox("gasto")),
+      !loaded ? h("section", { class: "panel" }, h("div", { class: "empty", text: "Carregando…" })) :
+      all.length ? h("div", { class: "grid" }, summary, catPanel) : null,
+      loaded ? h("section", { class: "panel" },
+        h("div", { class: "panel-head" }, h("h2", { text: S.ui.expCat ? EXP_CAT_LABEL[S.ui.expCat] : "Lançamentos" }),
+          shown.length ? h("span", { class: "sub", text: plural(shown.length, "gasto", "gastos") + (S.ui.expCat ? " · " + brlc(centsOf(shown) / 100) : "") }) : null),
+        shown.length ? h("div", { style: "display:grid;gap:6px" }, dayGroups)
+          : empty("Nenhum gasto registrado em " + monthLabel(mk).toLowerCase() + (S.area !== "tudo" ? " em " + AREAS[S.area] : "") + ". Anote o primeiro acima, leva 5 segundos.")) : null
+    ];
+  }
+
+  function goalCard(g) {
+    const p = goalPct(g), st = goalStatus(g), stale = goalStale(g), idle = goalIdleDays(g);
+    const hist = (g.history || []).slice().reverse();
+    const b = Number(g.baseline) || 0;
+    const busyG = busy("goals/" + g.id);
+    return h("article", { class: "goal-card" + (stale ? " stale" : "") },
+      h("div", { class: "chips" },
+        st !== "ativa" ? h("span", { class: "chip " + (st === "concluida" ? "ok" : ""), text: GOAL_STATUS_LABEL[st] }) : null,
+        stale ? h("span", { class: "chip mid", text: "Parada há " + idle + " dias" }) : null,
+        areaChip(g.area), lifeChip(g.lifeArea),
+        g.deadline ? h("span", { class: dueClass(g.deadline), text: "prazo " + rel(g.deadline) }) : null),
+      h("div", { class: "goal" },
+        h("div", { class: "goal-top" }, h("button", { class: "goal-name", text: g.title, onclick: () => editGoal(g) }), h("span", { class: "pct", text: p + "%" })),
+        h("div", { class: "bar " + (g.area === "pessoal" ? "life" : "work"), role: "progressbar", "aria-valuenow": p, "aria-valuemin": 0, "aria-valuemax": 100, "aria-label": g.title },
+          h("span", { style: "width:" + p + "%" })),
+        h("div", { class: "goal-foot" },
+          h("span", { class: "amt", text: num(g.current) + (g.unit ? " " + g.unit : "") + " · alvo " + num(g.target) + (b ? " · início " + num(b) : "") }),
+          st === "ativa" ? h("span", { class: "stepper" },
+            h("button", { class: "icon-btn", disabled: busyG, "aria-label": "Diminuir " + g.title, title: "−" + num(g.step || 1), text: "−", onclick: () => bumpGoal(g.id, -1) }),
+            h("button", { class: "icon-btn", disabled: busyG, "aria-label": "Aumentar " + g.title, title: "+" + num(g.step || 1), text: "+", onclick: () => bumpGoal(g.id, 1) }),
+            h("button", { class: "btn small", disabled: busyG, text: "Registrar", onclick: () => logGoal(g) })) : null)),
+      g.nextAction ? h("p", { class: "next-action" }, h("span", { class: "hint", text: "Próxima ação: " }), g.nextAction)
+        : st === "ativa" ? h("button", { class: "next-action missing link", style: "text-align:left;color:var(--mid)", text: "Defina a próxima ação →", onclick: () => editGoal(g) }) : null,
+      h("p", { class: "hint", text: idle == null ? "" : "Atualizada " + (idle === 0 ? "hoje" : idle === 1 ? "ontem" : "há " + idle + " dias") }),
+      st === "ativa" && p >= 100 ? h("div", { class: "notice", style: "padding:8px 10px" }, h("span", { text: "Alvo atingido." }),
+        h("button", { class: "btn small primary", disabled: busyG, text: "Marcar como concluída", onclick: () => updateDoc("goals", g.id, { status: "concluida" }) })) : null,
+      details("hist-" + g.id, "Histórico (" + hist.length + ")", h("div", { style: "display:grid;gap:8px;margin-top:8px" },
+        sparkline(g),
+        hist.length ? h("div", { class: "hist" }, hist.slice(0, 12).map(e => h("div", { class: "hist-row" },
+          h("span", { class: "d", text: fmtDay(e.d) }), h("span", { class: "v", text: num(e.v) }), h("span", { class: "n", text: e.n || "" })))) : null)));
+  }
+  function viewMetas() {
+    const all = list("goals").filter(g => inArea(g));
+    const f = S.ui.goalFilter;
+    const goals = all.filter(g => f === "todas" || goalStatus(g) === f).sort(goalOrder);
+    const counts = Object.fromEntries(GOAL_STATUS.map(([k]) => [k, all.filter(g => goalStatus(g) === k).length]));
+    const stale = all.filter(goalStale).length;
+    return [
+      h("div", { class: "view-head" },
+        h("div", {}, h("h2", { text: "Metas" }),
+          h("p", { text: counts.ativa ? plural(counts.ativa, "meta ativa", "metas ativas") + (stale ? " · " + plural(stale, "parada", "paradas") + " (sem atualização há " + STALE_DAYS + "+ dias)" : "") : "Números que você quer mover: faturamento, treinos, leitura, reserva." })),
+        h("button", { class: "btn primary", text: "+ Meta", onclick: () => editGoal() })),
+      h("div", { class: "chips" }, [["ativa", "Ativas"], ["pausada", "Pausadas"], ["concluida", "Concluídas"], ["todas", "Todas"]].map(([k, l]) =>
+        h("button", { class: "filter-chip", "aria-pressed": f === k ? "true" : "false", text: l + (k !== "todas" ? " (" + (counts[k] || 0) + ")" : ""),
+          onclick: () => { S.ui.goalFilter = k; render(); } }))),
+      loadingOr("goals", goals.length ? h("div", { class: "cards" }, goals.map(goalCard))
+        : h("section", { class: "panel" }, empty(f === "ativa" ? "Nenhuma meta ativa." : "Nada aqui.", f === "ativa" ? "Criar meta" : null, () => editGoal())))
+    ];
+  }
+
+  function copyBtn(text) {
+    return h("button", { class: "copy", type: "button", text: "copiar", onclick: async e => {
+      const b = e.currentTarget;
+      try { await navigator.clipboard.writeText(text); b.textContent = "copiado"; setTimeout(() => { b.textContent = "copiar"; }, 1500); }
+      catch { const val = b.parentElement.querySelector(".val"); if (val) { const r = document.createRange(); r.selectNodeContents(val); const s = getSelection(); s.removeAllRanges(); s.addRange(r); } }
+    } });
+  }
+  function viewContatos() {
+    const q = S.ui.contactQuery.toLowerCase();
+    const base = list("contacts").filter(c => inArea(c, contactArea(c)));
+    const business = base.filter(c => c.stage);
+    const shown = base.filter(c =>
+      (S.ui.contactKind === "todos" || c.kind === S.ui.contactKind) &&
+      (!S.ui.contactStage || c.stage === S.ui.contactStage) &&
+      (!q || [c.name, c.company, c.email, c.phone, c.notes].some(v => (v || "").toLowerCase().includes(q))))
+      .sort((a, b) => {
+        const fa = a.nextFollowUp || "9999", fb = b.nextFollowUp || "9999";
+        return fa !== fb ? fa.localeCompare(fb) : (a.name || "").localeCompare(b.name || "", "pt-BR");
+      });
+    const kindsPresent = ["todos", ...Object.keys(KINDS).filter(k => base.some(c => c.kind === k))];
+    const search = h("input", { type: "search", class: "field grow", id: "contact-search", "data-keep": "", placeholder: "Buscar por nome, empresa, anotação…", "aria-label": "Buscar contatos",
+      oninput: e => { S.ui.contactQuery = e.target.value; render(); } });
+    search.value = S.ui.contactQuery;
+
+    const pipeline = business.length ? h("section", { class: "panel" },
+      h("div", { class: "panel-head" }, h("h2", { text: "Funil de negócios" }),
+        h("span", { class: "sub", text: "Em aberto: " + brl(business.filter(c => !["fechado", "perdido"].includes(c.stage)).reduce((s, c) => s + (Number(c.value) || 0), 0)) })),
+      h("div", { class: "pipeline" }, STAGES.map(([k, l]) => h("button", { class: "stage", "aria-pressed": S.ui.contactStage === k ? "true" : "false",
+        onclick: () => { S.ui.contactStage = S.ui.contactStage === k ? "" : k; render(); } },
+        h("span", { class: "k", text: l }), h("span", { class: "v", text: business.filter(c => c.stage === k).length }))))) : null;
+
+    const t = today();
+    const cards = shown.map(c => {
+      const area = contactArea(c);
+      const initials = (c.name || "?").split(/\s+/).filter(w => /^\p{L}/u.test(w)).slice(0, 2).map(w => w[0].toUpperCase()).join("") || "?";
+      let bdayNext = "";
+      if (c.birthday) { const [, m, d] = c.birthday.split("-"); bdayNext = t.slice(0, 4) + "-" + m + "-" + d; if (bdayNext < t) bdayNext = (Number(t.slice(0, 4)) + 1) + "-" + m + "-" + d; }
+      return h("article", { class: "person" },
+        h("div", { class: "person-top" },
+          h("div", { class: "avatar " + (area === "pessoal" ? "life" : "work"), "aria-hidden": "true", text: initials }),
+          h("div", { style: "display:grid;gap:2px;min-width:0;flex:1" },
+            h("button", { class: "person-name", text: c.name, onclick: () => editContact(c) }),
+            c.company ? h("span", { class: "co", text: c.company }) : null),
+          h("div", { class: "chips", style: "justify-content:flex-end" },
+            h("span", { class: "chip " + (area === "pessoal" ? "life" : "work"), text: KINDS[c.kind] || "Contato" }),
+            c.stage ? h("span", { class: "chip " + (c.stage === "fechado" ? "ok" : c.stage === "proposta" ? "mid" : ""), text: STAGE_LABEL[c.stage] }) : null)),
+        h("dl", { class: "kv" },
+          c.phone ? [h("dt", { text: "Telefone" }), h("dd", {}, h("span", { class: "val", text: c.phone }), copyBtn(c.phone))] : null,
+          c.email ? [h("dt", { text: "E-mail" }), h("dd", {}, h("span", { class: "val", text: c.email }), copyBtn(c.email))] : null,
+          h("dt", { text: "Último contato" }), h("dd", {}, h("span", { class: "due", text: c.lastContact ? rel(c.lastContact) : "—" })),
+          h("dt", { text: "Follow-up" }), h("dd", {}, h("span", { class: c.nextFollowUp ? dueClass(c.nextFollowUp) : "due", text: c.nextFollowUp ? rel(c.nextFollowUp) : "—" }),
+            h("button", { class: "copy", text: "registrar hoje", disabled: busy("contacts/" + c.id), onclick: () => contactDone(c) })),
+          c.value ? [h("dt", { text: "Valor" }), h("dd", {}, h("span", { class: "val", text: brl(c.value) }))] : null,
+          bdayNext ? [h("dt", { text: "Aniversário" }), h("dd", {}, h("span", { class: dueClass(bdayNext) === "due today" ? "due today" : "due", text: fmtDay(bdayNext) + " · " + rel(bdayNext) }))] : null),
+        c.notes ? h("div", { class: "notes", text: c.notes }) : null);
+    });
+
+    return [
+      h("div", { class: "view-head" },
+        h("div", {}, h("h2", { text: "Contatos" }), h("p", { text: plural(base.length, "pessoa", "pessoas") + " · ordenadas pelo próximo follow-up" })),
+        h("button", { class: "btn primary", text: "+ Contato", onclick: () => editContact() })),
+      pipeline,
+      h("div", { class: "filters" }, search),
+      kindsPresent.length > 2 ? h("div", { class: "chips" }, kindsPresent.map(k =>
+        h("button", { class: "filter-chip", "aria-pressed": S.ui.contactKind === k ? "true" : "false", text: k === "todos" ? "Todos" : KINDS[k],
+          onclick: () => { S.ui.contactKind = k; render(); } }))) : null,
+      loadingOr("contacts", cards.length ? h("div", { class: "cards" }, cards)
+        : h("section", { class: "panel" }, empty(base.length ? "Nenhum contato com esses filtros." : "Sua rede começa aqui: clientes, parceiros, amigos, família.", base.length ? null : "Adicionar contato", () => editContact())))
+    ];
+  }
+
+  function viewEvolucao() {
+    const t = today();
+    const out = [h("div", { class: "view-head" },
+      h("div", {}, h("h2", { text: "Evolução" }), h("p", { text: "Hábitos, revisão semanal e como cada área da sua vida está andando." })))];
+
+    // Habits — calendar week grid
+    const start = addDays(weekStart(t), 7 * S.ui.habitWeek);
+    const days = Array.from({ length: 7 }, (_, i) => addDays(start, i));
+    const habits = habitsInArea();
+    const archived = list("habits").filter(hb => !habitActive(hb) && inArea(hb, hb.area || "pessoal"));
+    const weekNav = h("div", { class: "seg", role: "group", "aria-label": "Semana dos hábitos" },
+      [[-1, "Semana passada"], [0, "Esta semana"]].map(([k, l]) => h("button", { type: "button", "aria-pressed": S.ui.habitWeek === k ? "true" : "false", text: l,
+        onclick: () => { S.ui.habitWeek = k; render(); } })));
+    const head = h("div", { class: "habit-row habit-head" }, h("span"),
+      h("div", { class: "habit-days" }, days.map(d => h("span", {}, fmt(d, { weekday: "narrow" }).toUpperCase(), h("br"), String(parseIso(d).getDate())))), h("span"));
+    const rows = habits.map(hb => {
+      const cnt = habitCount(hb, start), target = Number(hb.targetPerWeek) || 7;
+      return h("div", { class: "habit-row" },
+        h("div", { style: "display:grid;gap:4px;min-width:0" },
+          h("button", { class: "row-title", text: hb.name, onclick: () => editHabit(hb) }),
+          h("div", { class: "row-meta" }, lifeChip(hb.lifeArea), h("span", { class: "due", text: target === 7 ? "todos os dias" : target + "x por semana" }))),
+        h("div", { class: "habit-days" }, days.map(d => {
+          const on = isChecked(hb.id, d);
+          return h("button", { class: "hday" + (d === t ? " is-today" : ""), "aria-pressed": on ? "true" : "false",
+            "aria-label": hb.name + ", " + fmtShort(d) + (on ? ", feito" : ""), title: fmtShort(d),
+            disabled: d > t || busy("habit/" + hb.id + "/" + d), text: on ? "✓" : String(parseIso(d).getDate()), onclick: () => toggleHabit(hb, d) });
+        })),
+        h("span", { class: "habit-score" + (cnt >= target ? " met" : ""), text: cnt + "/" + target }));
+    });
+    out.push(h("section", { class: "panel" },
+      h("div", { class: "panel-head" }, h("h2", { text: "Hábitos" }),
+        h("div", { class: "actions", style: "display:flex;gap:8px;flex-wrap:wrap" }, weekNav, h("button", { class: "btn small", text: "+ Hábito", onclick: () => editHabit() }))),
+      loadingOr("habits", habits.length ? h("div", { class: "habit-grid" }, head, rows)
+        : empty("Crie hábitos ligados às áreas da sua vida: oração, treino, sono, leitura, registrar gastos.", "Criar hábito", () => editHabit())),
+      archived.length ? details("habits-archived", "Arquivados (" + archived.length + ")",
+        h("div", { class: "list" }, archived.map(hb => h("div", { class: "row" }, h("button", { class: "row-title", text: hb.name, onclick: () => editHabit(hb) }))))) : null));
+
+    // Weekly review
+    const cur = weekRange(0), last = weekRange(-1);
+    const curRev = reviewFor(cur.id), lastRev = reviewFor(last.id);
+    const reviewCard = (r, rev, label) => h("div", { style: "display:grid;gap:8px" },
+      h("div", { class: "panel-head" }, h("h3", { class: "section-title", style: "font-size:16px", text: label + " · " + fmtRange(r.start, r.end) }),
+        h("button", { class: "btn small" + (rev ? "" : " primary"), text: rev ? "Editar revisão" : "Fazer revisão", onclick: () => editReview(r.start) })),
+      rev ? reviewSummary(rev, true) : h("p", { class: "hint", text: "Ainda não feita." }));
+    out.push(h("section", { class: "panel" },
+      h("div", { class: "panel-head" }, h("h2", { text: "Revisão semanal" }), h("span", { class: "sub", text: "Sugestão: domingo à noite" })),
+      loadingOr("reviews", h("div", { style: "display:grid;gap:16px" },
+        reviewCard(cur, curRev, "Esta semana"),
+        !lastRev ? reviewCard(last, lastRev, "Semana passada") : null))));
+
+    // Life wheel
+    const revs = reviewsSorted().filter(r => r.scores && Object.values(r.scores).some(v => typeof v === "number"));
+    if (revs.length) {
+      const latest = revs[0];
+      out.push(h("section", { class: "panel" },
+        h("div", { class: "panel-head" }, h("h2", { text: "Áreas da vida" }), h("span", { class: "sub", text: "Notas da revisão de " + fmtRange(latest.start, latest.end) })),
+        h("div", { class: "wheel" }, LIFE.map(([k, l]) => {
+          const s = latest.scores[k];
+          const prevRev = revs.slice(1).find(r => typeof r.scores[k] === "number");
+          const d = typeof s === "number" && prevRev ? s - prevRev.scores[k] : null;
+          return h("div", { class: "wheel-row" },
+            h("span", { text: l }),
+            h("div", { class: "bar thin" }, h("span", { style: "width:" + (typeof s === "number" ? s * 10 : 0) + "%" })),
+            h("span", { class: "s", text: typeof s === "number" ? s : "—" }),
+            h("span", { class: "dl" + (d > 0 ? " up" : d < 0 ? " down" : ""), text: d == null ? "" : d > 0 ? "+" + d : d === 0 ? "=" : String(d) }));
+        })),
+        h("p", { class: "hint", text: "A variação compara com a revisão anterior que deu nota para a mesma área." })));
+    }
+
+    // History
+    const older = reviewsSorted().filter(r => r.id !== cur.id && r.id !== last.id);
+    if (older.length) out.push(h("section", { class: "panel" },
+      h("div", { class: "panel-head" }, h("h2", { text: "Revisões anteriores" }), h("span", { class: "sub", text: String(older.length) })),
+      h("div", { class: "list" }, older.map(r => h("div", { class: "row" }, details("rev-" + r.id, fmtRange(r.start, r.end) + " · " + (r.stats ? plural(r.stats.tasksDone, "tarefa", "tarefas") : ""),
+        h("div", { style: "display:grid;gap:8px;margin-top:8px" }, reviewSummary(r, false), h("button", { class: "btn small", style: "justify-self:start", text: "Editar", onclick: () => editReview(r.start) })), "row-title"))))));
+
+    // Backup
+    const lastBackup = store.get("lastBackup", "");
+    out.push(h("section", { class: "panel" },
+      h("div", { class: "panel-head" }, h("h2", { text: "Backup dos seus dados" })),
+      h("p", { class: "hint", text: "Baixa um arquivo .json com tudo: tarefas, metas, hábitos, revisões, contatos, agenda e anotações. Faça de vez em quando e guarde no seu Drive." }),
+      h("div", { class: "filters" },
+        h("button", { class: "btn", id: "backup-btn", text: "Exportar backup", disabled: !db, onclick: exportBackup }),
+        h("span", { class: "hint", text: lastBackup ? "Último backup neste aparelho: " + rel(lastBackup) : "Nenhum backup feito neste aparelho ainda." })),
+      h("div", { class: "panel-head", style: "margin-top:8px" }, h("h2", { text: "Importar backup" })),
+      h("p", { class: "hint", text: "Traz de volta os dados de um arquivo de backup, inclusive o da versão antiga do painel no Claude. Só adiciona o que estiver faltando: nada que já está aqui é apagado ou substituído." }),
+      h("div", { class: "filters" },
+        h("label", { class: "btn" + (S.importing || !db ? " disabled" : ""), for: "import-file", style: S.importing || !db ? "opacity:.55;pointer-events:none" : "cursor:pointer",
+          text: S.importing ? "Importando…" : "Escolher arquivo .json" }),
+        h("input", { type: "file", id: "import-file", accept: ".json,application/json", hidden: true, disabled: S.importing || !db,
+          onchange: e => { const f = e.target.files && e.target.files[0]; e.target.value = ""; if (f) importBackup(f); } }))));
+    return out;
+  }
+  function reviewSummary(rev, compact) {
+    const fields = REVIEW_FIELDS.filter(([k]) => rev[k]);
+    return h("div", { style: "display:grid;gap:8px" },
+      rev.stats ? statsBox(rev.stats) : null,
+      (compact ? fields.filter(([k]) => k === "wins" || k === "next") : fields).map(([k, l]) =>
+        h("div", { class: "review-field" }, h("span", { class: "k", text: l }), h("p", { class: "note-text", text: rev[k] }))),
+      compact && fields.length > 2 ? h("p", { class: "hint", text: "Abra “Editar revisão” para ver tudo." }) : null);
+  }
+
+  /* ---------- backup ---------- */
+  async function fetchAll(c) {
+    if (c === "habitLog" || c === "cards" || c === "reviews" || c === "expenseMonths") return (await coll(c).get()).docs;
+    const docs = [];
+    let q = coll(c).orderBy("createdAt").limit(1000);
+    for (let guard = 0; guard < 50; guard++) {
+      const snap = await q.get();
+      docs.push(...snap.docs);
+      if (snap.size < 1000) break;
+      const lastAt = snap.docs[snap.docs.length - 1].data().createdAt;
+      q = coll(c).where("createdAt", ">", lastAt).orderBy("createdAt").limit(1000);
+    }
+    // Documents without createdAt are not returned by ordered queries; add them from the live list.
+    const seen = new Set(docs.map(d => d.id));
+    const extra = (S.data[c] || []).filter(x => !seen.has(x.id)).map(x => ({ id: x.id, data: () => { const { id, ...rest } = x; return rest; } }));
+    return docs.concat(extra);
+  }
+  function saveFile(name, text) {
+    const url = URL.createObjectURL(new Blob([text], { type: "application/json" }));
+    const a = h("a", { href: url, download: name });
+    document.body.append(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
+  }
+  async function exportBackup() {
+    if (!db) return;
+    const btn = document.getElementById("backup-btn");
+    if (btn) { btn.disabled = true; btn.textContent = "Preparando…"; }
+    try {
+      const out = { painel: "Painel Luiz Otávio", formato: 2, exportadoEm: new Date().toISOString(), colecoes: {} };
+      for (const c of BACKUP_COLS) out.colecoes[c] = (await fetchAll(c)).map(d => ({ id: d.id, ...d.data() }));
+      // Every month that has expenses: the index plus whatever is loaded, in case an index write failed.
+      const months = new Set([...out.colecoes.expenseMonths.map(m => m.id), ...Object.keys(S.exp)]);
+      out.colecoes.expenses = [];
+      for (const mk of [...months].sort()) {
+        const snap = await coll(expCol(mk)).get();
+        out.colecoes.expenses.push(...snap.docs.map(d => ({ id: d.id, month: mk, ...d.data() })));
+      }
+      saveFile("painel-backup-" + today() + ".json", JSON.stringify(out, null, 2));
+      store.set("lastBackup", today());
+      toast("Backup baixado");
+    } catch (e) {
+      toast("Não foi possível gerar o backup. " + errText(e), "err");
+    } finally {
+      render();
+    }
+  }
+  // Adds what is missing; never deletes or replaces. Habit logs and month indexes are merged.
+  async function importBackup(file) {
+    let data;
+    try { data = JSON.parse(await file.text()); } catch { toast("Esse arquivo não é um backup do painel.", "err"); return; }
+    const cols = data && data.colecoes;
+    if (!cols || typeof cols !== "object") { toast("Esse arquivo não é um backup do painel.", "err"); return; }
+    S.importing = true; render();
+    const ops = new Map();   // path -> [body, merge]; one write per document
+    let skipped = 0, fresh = 0, done = 0;
+    try {
+      for (const c of BACKUP_COLS) {
+        const docs = Array.isArray(cols[c]) ? cols[c].filter(d => d && d.id) : [];
+        if (!docs.length) continue;
+        const mergeAlways = c === "habitLog" || c === "expenseMonths";
+        const existing = mergeAlways ? new Set() : new Set((await coll(c).get()).docs.map(d => d.id));
+        for (const d of docs) {
+          if (existing.has(String(d.id))) { skipped++; continue; }
+          const { id, ...body } = d;
+          ops.set(c + "/" + id, [body, mergeAlways]);
+          if (!mergeAlways) fresh++;
+        }
+      }
+      const byMonth = {};
+      for (const e of Array.isArray(cols.expenses) ? cols.expenses : []) {
+        if (!e || !e.id) continue;
+        const mk = /^\d{4}-\d{2}$/.test(e.month) ? e.month : (typeof e.date === "string" ? monthKey(e.date) : "");
+        if (mk) (byMonth[mk] = byMonth[mk] || []).push(e);
+      }
+      for (const [mk, items] of Object.entries(byMonth)) {
+        const existing = new Set((await coll(expCol(mk)).get()).docs.map(d => d.id));
+        ops.set("expenseMonths/" + mk, [{ month: mk }, true]);
+        for (const e of items) {
+          if (existing.has(String(e.id))) { skipped++; continue; }
+          const { id, month, ...body } = e;
+          ops.set(expCol(mk) + "/" + id, [body, false]);
+          fresh++;
+        }
+      }
+      const all = [...ops];
+      for (let i = 0; i < all.length; i += 400) {
+        const chunk = all.slice(i, i + 400);
+        const batch = firebase.firestore().batch();
+        for (const [path, [body, merge]] of chunk) batch.set(db.doc(path), body, { merge });
+        pending++; renderSaveState();
+        try { await batch.commit(); } finally { pending--; renderSaveState(); }
+        done += chunk.length;
+      }
+      syncExpSubs();
+      toast(fresh ? "Backup importado: " + plural(fresh, "item novo", "itens novos") + (skipped ? " (" + skipped + " já estavam aqui)" : "") : "Nada novo para importar: tudo já estava aqui.");
+    } catch (e) {
+      toast(errText(e) + (done ? " Foram importados " + done + " itens antes do erro; importe de novo para completar." : ""), "err");
+    } finally {
+      S.importing = false; render();
+    }
+  }
+
+  /* =========================================================
+     Notices
+     ========================================================= */
+  function statusNotices() {
+    const out = [];
+    if (S.status === "denied") out.push(h("div", { class: "notice err" }, h("span", {}, h("strong", { text: "Sem permissão para ler seus dados. " }), "Saia e entre de novo com a conta " + ALLOWED_EMAIL + ".")));
+    if (S.syncErr.size) out.push(h("div", { class: "notice err" }, h("span", {}, h("strong", { text: "Não foi possível atualizar: " }),
+      [...S.syncErr].map(c => COL_PT[c] || c).join(", ") + ". Tentando de novo…")));
+    return out;
+  }
+  function examplesNotice() {
+    const ex = [];
+    for (const c of ["tasks", "contacts", "goals", "events", "habits", "notes", "cards"])
+      for (const it of list(c)) if (String(it.id).startsWith("ex") && isExample(it.title || it.name || it.text)) ex.push([c, it.id]);
+    for (const [mk, items] of Object.entries(S.exp))
+      for (const it of items) if (String(it.id).startsWith("ex") && isExample(it.desc)) ex.push([expCol(mk), it.id]);
+    if (!ex.length) return null;
+    let armed = false;
+    const btn = h("button", { class: "btn small", text: "Apagar exemplos", onclick: async () => {
+      if (!armed) { armed = true; btn.classList.add("danger", "armed"); btn.textContent = "Confirmar: apagar " + ex.length; return; }
+      btn.disabled = true; btn.textContent = "Apagando…";
+      let ok = 0;
+      for (const [c, id] of ex) if (await deleteDoc(c, id)) ok++;
+      toast(ok === ex.length ? "Exemplos apagados" : "Alguns exemplos não foram apagados. Tente de novo.", ok === ex.length ? null : "err");
+    } });
+    return h("div", { class: "notice" },
+      h("span", {}, h("strong", { text: "Itens de exemplo. " }), "Os marcados com (exemplo) mostram como cada parte funciona. Edite ou apague quando quiser."), btn);
+  }
+
+  /* =========================================================
+     Render
+     ========================================================= */
+  function tabCounts() {
+    const t = today();
+    return {
+      tarefas: needsToday().filter(x => x.due && x.due <= t).length,
+      agenda: list("events").filter(e => inArea(e) && e.date === t).length,
+      metas: list("goals").filter(g => inArea(g) && goalStale(g)).length,
+      contatos: list("contacts").filter(c => c.nextFollowUp && c.nextFollowUp <= t && inArea(c, contactArea(c))).length,
+      evolucao: pendingReviewStart() ? 1 : 0
+    };
+  }
+  function icon(name) {
+    const el = document.createElementNS(SVG_NS, "svg");
+    el.setAttribute("viewBox", "0 0 24 24"); el.setAttribute("fill", "none"); el.setAttribute("stroke", "currentColor");
+    el.setAttribute("stroke-width", "1.8"); el.setAttribute("stroke-linecap", "round"); el.setAttribute("stroke-linejoin", "round");
+    el.setAttribute("aria-hidden", "true");
+    el.innerHTML = ICONS[name]; // constant markup defined above
+    return el;
+  }
+  function renderNav() {
+    const counts = tabCounts();
+    $("#tabs").replaceChildren(...TABS.map(([k, l]) =>
+      h("a", { href: "#" + k, "aria-current": S.tab === k ? "page" : null }, l, counts[k] ? h("span", { class: "count", text: counts[k] }) : null)));
+    $("#bottomnav").replaceChildren(...TABS.map(([k, l]) =>
+      h("a", { href: "#" + k, "aria-current": S.tab === k ? "page" : null, "aria-label": l + (counts[k] ? " (" + counts[k] + ")" : "") },
+        icon(k), h("span", { class: "lbl", text: l }), counts[k] ? h("span", { class: "count", text: counts[k] }) : null)));
+  }
+  function renderHeader() {
+    const d = new Date(), hr = d.getHours();
+    const g = hr < 5 ? "Boa noite" : hr < 12 ? "Bom dia" : hr < 18 ? "Boa tarde" : "Boa noite";
+    const first = (S.name || "").split(/\s+/)[0];
+    $("#greeting").textContent = first ? g + ", " + first : g;
+    $("#today-label").textContent = new Intl.DateTimeFormat("pt-BR", { weekday: "long", day: "numeric", month: "long" }).format(d);
+    for (const b of document.querySelectorAll("#area-seg button")) b.setAttribute("aria-pressed", b.dataset.area === S.area ? "true" : "false");
+    renderSaveState();
+  }
+  const VIEWS = { hoje: viewHoje, tarefas: viewTarefas, agenda: viewAgenda, gastos: viewGastos, metas: viewMetas, contatos: viewContatos, evolucao: viewEvolucao };
+  function render() {
+    // Keep typed text and focus across re-renders.
+    const keep = {};
+    for (const el of document.querySelectorAll("#main [data-keep]")) keep[el.id] = el.value;
+    const ae = document.activeElement, focusId = ae && ae.id;
+    let caret = null;
+    try { caret = ae && typeof ae.selectionStart === "number" ? ae.selectionStart : null; } catch {}
+
+    renderHeader(); renderNav();
+    const out = (VIEWS[S.tab] || viewHoje)();
+    $("#main").replaceChildren(...[...statusNotices(), S.tab === "hoje" ? examplesNotice() : null, ...out].filter(Boolean));
+
+    for (const [id, v] of Object.entries(keep)) { const el = document.getElementById(id); if (el) el.value = v; }
+    if (focusId) {
+      const el = document.getElementById(focusId);
+      if (el && el !== document.activeElement) { el.focus({ preventScroll: true }); try { if (caret != null) el.setSelectionRange(caret, caret); } catch {} }
+    }
+  }
+
+  /* =========================================================
+     Wiring
+     ========================================================= */
+  function readHash() {
+    let k = (location.hash || "").replace("#", "");
+    if (k === "quadro") { S.ui.taskMode = "quadro"; store.set("taskMode", "quadro"); }
+    k = TAB_ALIASES[k] || k;
+    if (!TABS.some(([t]) => t === k)) { const saved = store.get("tab", "hoje"); k = TAB_ALIASES[saved] || saved; }
+    if (!TABS.some(([t]) => t === k)) k = "hoje";
+    S.tab = k;
+    store.set("tab", k);
+  }
+  window.addEventListener("hashchange", () => { readHash(); render(); window.scrollTo(0, 0); });
+  $("#area-seg").addEventListener("click", e => {
+    const b = e.target.closest("button[data-area]"); if (!b) return;
+    S.area = b.dataset.area; store.set("area", S.area); render();
+  });
+
+  /* ---------- live data ---------- */
+  function subscribe(c, attempt = 0) {
+    coll(c).onSnapshot(snap => {
+      S.data[c] = snap.docs.map(d => ({ ...d.data(), id: d.id }));
+      S.loaded.add(c);
+      if (S.syncErr.delete(c)) attempt = 0;
+      render();
+    }, err => {
+      S.loaded.add(c);
+      if (codeOf(err) === "permission_denied") { S.status = "denied"; render(); return; }
+      S.syncErr.add(c); render();
+      if (attempt < 4) setTimeout(() => subscribe(c, attempt + 1), 3000 * (attempt + 1));
+    });
+  }
+  const monthSubs = {};
+  function subscribeMonths() {
+    const t = today();
+    const wanted = new Set([monthKey(t), monthKey(addDays(weekStart(t), -7))]);
+    for (const k of Object.keys(monthSubs)) if (!wanted.has(k)) { monthSubs[k](); delete monthSubs[k]; delete S.habitLog[k]; }
+    for (const k of wanted) {
+      if (monthSubs[k]) continue;
+      monthSubs[k] = db.doc("habitLog/" + k).onSnapshot(snap => {
+        S.habitLog[k] = { exists: snap.exists, checks: (snap.exists && snap.data().checks) || {} };
+        S.loaded.add("habitLog");
+        render();
+      }, err => {
+        if (codeOf(err) === "permission_denied") { S.status = "denied"; render(); return; }
+        S.syncErr.add("habitLog"); delete monthSubs[k]; render();
+        setTimeout(() => { S.syncErr.delete("habitLog"); subscribeMonths(); }, 5000);
+      });
+    }
+  }
+  let lastDay = today();
+  setInterval(() => {
+    if (today() === lastDay) return;
+    lastDay = today();
+    if (db) { subscribeMonths(); syncExpSubs(); }
+    render();
+  }, 60000);
+
+  readHash();
+  render();
+
+  /* =========================================================
+     Firebase — Google sign-in, data under users/<uid>/
+     ========================================================= */
+  const FIREBASE_CONFIG = {
+    apiKey: "AIzaSyCjXZbZTQhKS9atYSINtCDpTd4a_kRE3SU",
+    authDomain: "meu-paniel.firebaseapp.com",
+    projectId: "meu-paniel",
+    storageBucket: "meu-paniel.firebasestorage.app",
+    messagingSenderId: "296050221551",
+    appId: "1:296050221551:web:83efcb462b068bc18f161a"
+  };
+  // The Firestore rules accept only this account; the page says so instead of showing an empty panel.
+  const ALLOWED_EMAIL = "luizotaviomoreira30@gmail.com";
+
+  const loginMsg = $("#login-msg"), loginErr = $("#login-err"), loginBtn = $("#login-btn"), logoutBtn = $("#logout-btn");
+  function showLogin(msg, { err = "", canLogin = true, canLogout = false } = {}) {
+    document.body.dataset.auth = "out";
+    loginMsg.textContent = msg;
+    loginErr.textContent = err; loginErr.hidden = !err;
+    loginBtn.hidden = !canLogin; loginBtn.disabled = false;
+    logoutBtn.hidden = !canLogout;
+  }
+  function authErrText(e) {
+    const c = (e && e.code) || "";
+    if (c === "auth/network-request-failed") return "Sem conexão com a internet. Verifique e tente de novo.";
+    if (c === "auth/unauthorized-domain") return "Este endereço ainda não foi autorizado no Firebase (Authentication → Configurações → Domínios autorizados).";
+    if (c === "auth/popup-closed-by-user" || c === "auth/cancelled-popup-request") return "";
+    return "Não foi possível entrar. Tente de novo.";
+  }
+
+  let auth = null, started = false;
+  function startData(uid) {
+    if (started) return;
+    started = true;
+    const fdb = firebase.firestore();
+    const base = "users/" + uid + "/";
+    db = { collection: p => fdb.collection(base + p), doc: p => fdb.doc(base + p) };
+    S.status = "ready";
+    for (const c of SUB_COLS) subscribe(c);
+    subscribeMonths();
+    syncExpSubs();
+    render();
+  }
+
+  async function boot() {
+    if (!window.firebase || !firebase.initializeApp) {
+      showLogin("Não foi possível carregar o painel.", { err: "Verifique sua conexão com a internet e recarregue a página.", canLogin: false });
+      return;
+    }
+    firebase.initializeApp(FIREBASE_CONFIG);
+    auth = firebase.auth();
+    const fdb = firebase.firestore();
+    fdb.settings({ ignoreUndefinedProperties: true, merge: true });
+    // Local test runs talk to the Firebase emulators instead of the real project.
+    const local = ["localhost", "127.0.0.1"].includes(location.hostname) && new URLSearchParams(location.search).has("emulador");
+    if (local) { auth.useEmulator("http://127.0.0.1:9099", { disableWarnings: true }); fdb.useEmulator("127.0.0.1", 8080); }
+    // Keeps a copy on the device: the panel opens fast and shows the last data even without internet.
+    try { await fdb.enablePersistence({ synchronizeTabs: true }); } catch {}
+
+    loginBtn.addEventListener("click", async () => {
+      loginBtn.disabled = true; loginErr.hidden = true;
+      const provider = new firebase.auth.GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: "select_account" });
+      try { await auth.signInWithPopup(provider); }
+      catch (e) {
+        const c = (e && e.code) || "";
+        if (c === "auth/popup-blocked" || c === "auth/operation-not-supported-in-this-environment") {
+          try { await auth.signInWithRedirect(provider); return; } catch (e2) { e = e2; }
+        }
+        const msg = authErrText(e);
+        loginErr.textContent = msg; loginErr.hidden = !msg;
+        loginBtn.disabled = false;
+      }
+    });
+    const signOut = async () => { try { await auth.signOut(); } finally { location.reload(); } };
+    logoutBtn.addEventListener("click", signOut);
+    $("#signout").addEventListener("click", signOut);
+    auth.getRedirectResult().catch(e => { const msg = authErrText(e); if (msg) { loginErr.textContent = msg; loginErr.hidden = false; } });
+
+    auth.onAuthStateChanged(user => {
+      if (!user) { showLogin("Entre com sua conta do Google para ver seus dados."); return; }
+      if ((user.email || "").toLowerCase() !== ALLOWED_EMAIL) {
+        showLogin("A conta " + (user.email || "escolhida") + " não tem acesso a este painel.", { err: "Entre com " + ALLOWED_EMAIL + ".", canLogin: false, canLogout: true });
+        return;
+      }
+      S.name = user.displayName || "";
+      document.body.dataset.auth = "in";
+      startData(user.uid);
+    });
+  }
+  boot();
+})();
+</script>
+</body>
+</html>
