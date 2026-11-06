@@ -333,6 +333,35 @@ details[open] > summary::before { content: "▾ "; }
   .cat-row .bar { grid-column: 1 / -1; grid-row: 2; }
 }
 .exp-amt { font-family: var(--f-data); font-size: 14px; font-weight: 500; white-space: nowrap; font-variant-numeric: tabular-nums; flex: none; padding-top: 1px; }
+.exp-amt.in { color: var(--ok); }
+.flow3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.flow3 > div { display: grid; gap: 2px; min-width: 0; }
+.flow3 .k { font-size: 12px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); font-weight: 600; }
+.flow3 .v { font-family: var(--f-display); font-size: clamp(17px, 2.6vw, 24px); font-weight: 700; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.flow3 .v.in, .money-sub .in { color: var(--ok); }
+@media (max-width: 520px) {
+  .flow3 { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  .flow3 > div { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+  .flow3 .v { font-size: 20px; }
+}
+.flow3 .v.neg, .hint.neg { color: var(--high); }
+.bar.warn > span { background: var(--mid); }
+.bar.over > span { background: var(--high); }
+.bars { display: flex; align-items: flex-end; gap: 3px; height: 120px; }
+.bars .b { flex: 1 1 0; min-width: 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 4px; border: 0; background: none; padding: 0; }
+.bars .b i { display: block; width: 100%; background: var(--accent); border-radius: 3px 3px 0 0; opacity: .85; }
+.bars .b.zero i { background: var(--line); opacity: 1; }
+.bars .b.future i { background: var(--surface-2); }
+.bars .b.hl i { background: var(--mid); opacity: 1; }
+.bars.months .b { cursor: pointer; }
+.bars.months .b:disabled { cursor: default; opacity: .5; }
+.bars .b .v { font-family: var(--f-data); font-size: 11px; color: var(--muted); white-space: nowrap; }
+.bars.months { gap: 10px; height: 150px; }
+.bars-x { display: flex; gap: 3px; font-family: var(--f-data); font-size: 11px; color: var(--muted); }
+.bars-x span { flex: 1 1 0; min-width: 0; text-align: center; overflow: visible; white-space: nowrap; }
+.bars.months + .bars-x { gap: 10px; }
+.check-label { display: flex !important; flex-direction: row; align-items: center; gap: 8px; font-weight: 500 !important; color: var(--ink) !important; cursor: pointer; }
+.check-label input { width: 18px; height: 18px; accent-color: var(--accent); flex: none; }
 .day-head { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
 .day-head .amt { font-size: 12px; }
 
@@ -534,6 +563,9 @@ body[data-auth="in"] .login { display: none; }
   const EXP_CAT_LABEL = Object.fromEntries(EXP_CATS);
   const METHODS = [["", "—"], ["pix", "Pix"], ["debito", "Débito"], ["credito", "Crédito"], ["dinheiro", "Dinheiro"], ["boleto", "Boleto"]];
   const METHOD_LABEL = Object.fromEntries(METHODS.filter(([k]) => k));
+  const INCOME_CATS = [["salario", "Salário"], ["freela", "Freela / serviços"], ["vendas", "Vendas"], ["reembolso", "Reembolso"],
+    ["rendimentos", "Rendimentos"], ["outras_entradas", "Outras entradas"]];
+  const INCOME_LABEL = Object.fromEntries(INCOME_CATS);
   const TABS = [
     ["hoje", "Hoje"], ["tarefas", "Tarefas"], ["agenda", "Agenda"], ["gastos", "Gastos"],
     ["metas", "Metas"], ["contatos", "Contatos"], ["evolucao", "Evolução"]
@@ -550,7 +582,7 @@ body[data-auth="in"] .login { display: none; }
   };
   const COL_PT = { tasks: "tarefas", contacts: "contatos", goals: "metas", events: "compromissos", habits: "hábitos",
     reviews: "revisões", notes: "anotações", cards: "quadro antigo", habitLog: "registro de hábitos",
-    expenseMonths: "meses de gastos", expenses: "gastos" };
+    expenseMonths: "meses de gastos", expenses: "gastos", settings: "preferências" };
 
   const areaChip = a => a ? h("span", { class: "chip " + (a === "pessoal" ? "life" : "work"), text: AREAS[a] || a }) : null;
   const lifeChip = k => k && LIFE_LABEL[k] ? h("span", { class: "chip", text: LIFE_LABEL[k] }) : null;
@@ -562,14 +594,17 @@ body[data-auth="in"] .login { display: none; }
      ========================================================= */
   // Coleções acompanhadas em tempo real. "cards" é o quadro antigo, lido só para a importação.
   // Gastos ficam em uma lista por mês (expenseMonths/<AAAA-MM>/items), para que cada consulta continue pequena com os anos.
-  const SUB_COLS = ["tasks", "contacts", "goals", "events", "habits", "reviews", "notes", "cards", "expenseMonths"];
+  // "settings" guarda preferências como o limite de gastos e as categorias criadas por você.
+  const SUB_COLS = ["tasks", "contacts", "goals", "events", "habits", "reviews", "notes", "cards", "expenseMonths", "settings"];
   const BACKUP_COLS = [...SUB_COLS, "habitLog"];
   const S = {
     tab: "hoje",
     area: store.get("area", "tudo"),
     data: Object.fromEntries(SUB_COLS.map(c => [c, []])),
     habitLog: {},          // "2026-10" -> { exists, checks: { habitId: { "21": true } } }
-    exp: {},               // "2026-10" -> gastos daquele mês
+    exp: {},               // "2026-10" -> gastos daquele mês (ao vivo)
+    expHist: {},           // meses mais antigos lidos uma vez para o gráfico de 6 meses
+    prefill: null,
     loaded: new Set(),
     syncErr: new Set(),
     status: "loading",     // loading | ready | nodb | denied
@@ -585,7 +620,7 @@ body[data-auth="in"] .login { display: none; }
       taskLife: "", taskPrio: "", taskQuery: "",
       goalFilter: "ativa",
       habitWeek: 0,
-      expMonth: monthKey(today()), expCat: "",
+      expMonth: monthKey(today()), expCat: "", expMethod: "", expType: "", expQuery: "", capFlow: "saida",
       contactKind: "todos", contactStage: "", contactQuery: ""
     }
   };
@@ -653,7 +688,7 @@ body[data-auth="in"] .login { display: none; }
     const out = {};
     for (const [k, v] of Object.entries(vals)) {
       const a = orig[k];
-      const same = typeof v === "number" ? Number(a ?? 0) === v : String(a ?? "") === String(v ?? "");
+      const same = typeof v === "boolean" ? !!a === v : typeof v === "number" ? Number(a ?? 0) === v : String(a ?? "") === String(v ?? "");
       if (!same) out[k] = v;
     }
     return out;
@@ -675,7 +710,7 @@ body[data-auth="in"] .login { display: none; }
   /* =========================================================
      Modal form — stays open until the save is confirmed
      ========================================================= */
-  function openForm({ title, fields, values = {}, onSave, onDelete, saveLabel = "Salvar" }) {
+  function openForm({ title, fields, values = {}, onSave, onDelete, saveLabel = "Salvar", extra }) {
     let saving = false;
     const onKey = e => { if (e.key === "Escape") close(); };
     const close = () => { if (saving) return; scrim.remove(); document.removeEventListener("keydown", onKey); };
@@ -686,15 +721,24 @@ body[data-auth="in"] .login { display: none; }
       const id = "f-" + f.key;
       const v = values[f.key] ?? f.default ?? "";
       let input;
+      if (f.type === "checkbox") {
+        input = h("input", { type: "checkbox", id, name: f.key });
+        input.checked = !!values[f.key];
+        form.append(h("label", { class: "check-label full", for: id }, input, h("span", {}, f.label, f.hint ? h("span", { class: "hint", text: " " + f.hint }) : null)));
+        continue;
+      }
       if (f.type === "select") {
         input = h("select", { class: "field", id, name: f.key }, f.options.map(([val, lab]) => h("option", { value: val, text: lab })));
       } else if (f.type === "textarea") {
         input = h("textarea", { class: "field", id, name: f.key, rows: f.rows || 3, placeholder: f.placeholder });
       } else {
-        input = h("input", { class: "field", id, name: f.key, type: f.type || "text", required: f.required, step: f.step, inputmode: f.inputmode, placeholder: f.placeholder, autocomplete: "off" });
+        input = h("input", { class: "field", id, name: f.key, type: f.type || "text", required: f.required, step: f.step, inputmode: f.inputmode, placeholder: f.placeholder, autocomplete: "off", list: f.suggestions ? id + "-list" : null });
       }
       input.value = String(v);
-      form.append(h("label", { class: f.full ? "full" : null, for: id }, f.label, input, f.hint ? h("span", { class: "hint", style: "font-weight:400", text: f.hint }) : null));
+      if (f.onChange) input.addEventListener("change", () => f.onChange(input.value, form));
+      form.append(h("label", { class: f.full ? "full" : null, for: id }, f.label, input,
+        f.suggestions ? h("datalist", { id: id + "-list" }, f.suggestions.map(x => h("option", { value: x }))) : null,
+        f.hint ? h("span", { class: "hint", style: "font-weight:400", text: f.hint }) : null));
     }
     const errEl = h("p", { class: "form-error", role: "alert", hidden: true });
     const submitBtn = h("button", { type: "submit", form: "modal-form", class: "btn primary", text: saveLabel });
@@ -711,9 +755,21 @@ body[data-auth="in"] .login { display: none; }
         else { delBtn.disabled = false; submitBtn.disabled = false; delBtn.textContent = "Confirmar exclusão"; showErr("Não foi possível excluir. Tente de novo."); }
       } });
     }
+    let extraBtn = null;
+    if (extra) {
+      let armed = false;
+      extraBtn = h("button", { type: "button", class: "btn danger", text: extra.label, onclick: async () => {
+        if (!armed) { armed = true; extraBtn.classList.add("armed"); extraBtn.textContent = extra.confirmLabel; return; }
+        saving = true; extraBtn.disabled = true; submitBtn.disabled = true; extraBtn.textContent = "Aguarde…";
+        const ok = await extra.run();
+        saving = false;
+        if (ok) close();
+        else { extraBtn.disabled = false; submitBtn.disabled = false; extraBtn.textContent = extra.confirmLabel; showErr("Não foi possível concluir. Tente de novo."); }
+      } });
+    }
     const modal = h("div", { class: "modal", role: "dialog", "aria-modal": "true", "aria-label": title },
       h("h2", { text: title }), form, errEl,
-      h("div", { class: "modal-actions" }, delBtn,
+      h("div", { class: "modal-actions" }, h("div", { class: "chips" }, delBtn, extraBtn),
         h("div", { class: "right" }, h("button", { type: "button", class: "btn", text: "Cancelar", onclick: close }), submitBtn)));
     form.addEventListener("submit", async e => {
       e.preventDefault();
@@ -721,6 +777,7 @@ body[data-auth="in"] .login { display: none; }
       const out = {};
       for (const f of fields) {
         if (!f.key) continue;
+        if (f.type === "checkbox") { out[f.key] = form.elements[f.key].checked; continue; }
         let val = form.elements[f.key].value;
         if (f.type === "number") val = val === "" ? (f.blank ? "" : 0) : Number(val);
         else if (f.num) val = val === "" ? "" : Number(val);
@@ -956,6 +1013,68 @@ body[data-auth="in"] .login { display: none; }
   const monthLabel = mk => { const s = new Intl.DateTimeFormat("pt-BR", { month: "long", year: "numeric" }).format(parseIso(mk + "-01")); return s[0].toUpperCase() + s.slice(1); };
   const expInArea = mk => (S.exp[mk] || []).filter(e => inArea(e, e.area || "pessoal"));
   const expMonthKnown = mk => list("expenseMonths").some(m => m.id === mk);
+  const daysInMonth = mk => new Date(Number(mk.slice(0, 4)), Number(mk.slice(5)), 0).getDate();
+  // Same day n months later, kept inside the month (31/01 + 1 month = 28 or 29/02).
+  const shiftMonths = (iso, n) => { const mk = addMonths(iso.slice(0, 7), n); return mk + "-" + pad(Math.min(Number(iso.slice(8)), daysInMonth(mk))); };
+  const isIncome = e => e.type === "entrada";
+  const outsOf = arr => arr.filter(e => !isIncome(e));
+  const insOf = arr => arr.filter(isIncome);
+  const rid = p => p + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+
+  /* ---------- finance settings: monthly limit and your own categories ---------- */
+  const finSettings = () => byId("settings", "finance") || {};
+  const customCats = () => (Array.isArray(finSettings().categories) ? finSettings().categories : []).filter(x => typeof x === "string" && x.trim());
+  // Your categories are stored as "c:<name>", so an expense keeps its label even if the category is removed later.
+  function catLabel(k) {
+    if (!k) return "Outros";
+    if (k.startsWith("c:")) return k.slice(2);
+    return EXP_CAT_LABEL[k] || INCOME_LABEL[k] || "Outros";
+  }
+  const expCatOptions = () => [...EXP_CATS.filter(([k]) => k !== "outros"), ...customCats().map(l => ["c:" + l, l]), ["outros", "Outros"]];
+  const saveFinSettings = patch => write(() => db.doc("settings/finance").set(patch, { merge: true }), "settings/finance");
+  function editBudget() {
+    const b = Number(finSettings().budget) || 0;
+    openForm({
+      title: "Limite de gastos do mês",
+      values: { budget: moneyInput(b) },
+      fields: [
+        { key: "budget", label: "Quanto você quer gastar no máximo por mês (R$)", inputmode: "decimal", placeholder: "Ex.: 2.500,00", full: true,
+          hint: "Vale para todas as áreas. Deixe em branco para não usar limite." }
+      ],
+      onSave: v => {
+        if (!v.budget) return saveFinSettings({ budget: 0 });
+        const n = parseMoney(v.budget);
+        if (!(n > 0)) return "Digite um valor, por exemplo 2.500,00.";
+        return saveFinSettings({ budget: n });
+      }
+    });
+  }
+  function editCategories() {
+    openForm({
+      title: "Suas categorias",
+      values: { list: customCats().join("\n") },
+      fields: [
+        { type: "node", node: h("p", { class: "hint", text: "Além das categorias prontas, crie as suas (ex.: Cigarro, Café, Pet). Uma por linha. Tirar uma daqui não apaga os gastos que já usam ela." }) },
+        { key: "list", label: "Uma categoria por linha", type: "textarea", rows: 6, full: true }
+      ],
+      onSave: v => {
+        const seen = new Set(), base = new Set(EXP_CATS.map(([, l]) => l.toLowerCase()));
+        const cats = v.list.split("\n").map(x => x.trim().replace(/\s+/g, " ").slice(0, 40))
+          .filter(x => x && !base.has(x.toLowerCase()) && !seen.has(x.toLowerCase()) && seen.add(x.toLowerCase()));
+        return saveFinSettings({ categories: cats });
+      }
+    });
+  }
+
+  /* ---------- history: typing a description you used before fills category and payment ---------- */
+  function expenseMemory() {
+    const all = [...Object.values(S.exp).flat(), ...Object.values(S.expHist).flat()]
+      .filter(e => e.desc).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+    const byDesc = new Map();
+    for (const e of all) { const k = e.desc.trim().toLowerCase(); if (!byDesc.has(k)) byDesc.set(k, e); }
+    return byDesc;
+  }
+  const descSuggestions = flow => [...expenseMemory().values()].filter(e => (flow === "entrada") === isIncome(e)).slice(0, 60).map(e => e.desc.trim());
 
   const expSubs = {};
   function ensureExpSub(mk) {
@@ -978,8 +1097,26 @@ body[data-auth="in"] .login { display: none; }
     const wanted = new Set([cur, addMonths(cur, -1), sel, addMonths(sel, -1)]);
     for (const mk of Object.keys(expSubs)) if (!wanted.has(mk)) { expSubs[mk](); delete expSubs[mk]; delete S.exp[mk]; S.loaded.delete("exp:" + mk); }
     for (const mk of wanted) ensureExpSub(mk);
+    loadExpHistory();
   }
-  function setExpMonth(mk) { S.ui.expMonth = mk; S.ui.expCat = ""; syncExpSubs(); render(); }
+  // The six-month chart reads older months once; months on screen always come from the live lists above.
+  let histLoading = false;
+  async function loadExpHistory() {
+    if (!db || histLoading) return;
+    const months = Array.from({ length: 6 }, (_, i) => addMonths(S.ui.expMonth, -i)).filter(m => !S.exp[m] && !S.expHist[m]);
+    if (!months.length) return;
+    histLoading = true;
+    try {
+      for (const m of months) {
+        const snap = await coll(expCol(m)).get();
+        S.expHist[m] = snap.docs.map(d => ({ ...d.data(), id: d.id, _mk: m }));
+      }
+    } catch { /* the chart shows only the months it could read */ }
+    histLoading = false;
+    render();
+  }
+  const monthItems = mk => (S.exp[mk] || S.expHist[mk] || []).filter(e => inArea(e, e.area || "pessoal"));
+  function setExpMonth(mk) { S.ui.expMonth = mk; S.ui.expCat = ""; S.ui.expMethod = ""; syncExpSubs(); render(); }
   async function addExpense(body, id) {
     const mk = monthKey(body.date);
     const ok = id ? await setPath(expCol(mk) + "/" + id, body) : await addDoc(expCol(mk), body);
@@ -987,40 +1124,115 @@ body[data-auth="in"] .login { display: none; }
     if (ok && !expMonthKnown(mk)) await write(() => db.doc("expenseMonths/" + mk).set({ month: mk }));
     return ok;
   }
-  function editExpense(e) {
+  // An installment purchase becomes one entry per month, split to the cent (the first one takes the remainder).
+  async function addInstallments(base, n) {
+    const totalC = Math.round(base.amount * 100), partC = Math.floor(totalC / n), group = rid("p");
+    for (let i = 0; i < n; i++) {
+      const cents = partC + (i === 0 ? totalC - partC * n : 0);
+      const ok = await addExpense({ ...base, amount: cents / 100, date: shiftMonths(base.date, i), recurring: false,
+        installment: { group, n: i + 1, of: n, total: base.amount }, createdAt: Date.now() + i });
+      if (!ok) {
+        if (i > 0) toast("Foram lançadas " + i + " de " + n + " parcelas. Lance as outras pelo botão + Gasto.", "err");
+        return i > 0;
+      }
+    }
+    return true;
+  }
+  async function deleteInstallments(e) {
+    const { group, n } = e.installment;
+    const first = addMonths(e._mk, -(n - 1));
+    let ok = true;
+    for (let i = 0; i < e.installment.of; i++) {
+      const m = addMonths(first, i);
+      const snap = await coll(expCol(m)).where("installment.group", "==", group).get();
+      for (const d of snap.docs) ok = (await deleteDoc(expCol(m), d.id)) && ok;
+    }
+    if (ok) toast("Parcelas excluídas");
+    return ok;
+  }
+  // Fixed items from last month that were not entered this month yet.
+  function pendingFixed(mk) {
+    const prev = (S.exp[addMonths(mk, -1)] || []).filter(e => e.recurring && inArea(e, e.area || "pessoal"));
+    const have = new Set((S.exp[mk] || []).map(e => e.recurKey).filter(Boolean));
+    return prev.filter(e => !have.has(e.recurKey || e.id));
+  }
+  function launchFixed(e, mk) {
+    const { id, _mk, createdAt, installment, ...rest } = e;
+    return addExpense({ ...rest, notes: "", recurring: true, recurKey: e.recurKey || e.id,
+      date: mk + "-" + pad(Math.min(Number(e.date.slice(8)), daysInMonth(mk))), createdAt: Date.now() });
+  }
+  async function launchAllFixed(items, mk) {
+    let n = 0;
+    for (const e of items) { if (await launchFixed(e, mk)) n++; else break; }
+    if (n) toast(plural(n, "lançamento fixo feito", "lançamentos fixos feitos"));
+  }
+
+  function editExpense(e, flow) {
+    const type = e ? (e.type || "saida") : (flow || "saida");
+    const income = type === "entrada";
+    const memory = expenseMemory();
+    const fields = [
+      { key: "amount", label: "Valor (R$)", required: true, inputmode: "decimal", placeholder: "0,00" },
+      { key: "date", label: "Data", type: "date", required: true },
+      { key: "desc", label: "Descrição", full: true, placeholder: income ? "De onde veio?" : "Com o quê?", suggestions: descSuggestions(type),
+        onChange: (val, form) => {
+          const prev = memory.get(val.trim().toLowerCase());
+          if (!prev || e) return;
+          if (prev.category && form.elements.category.querySelector('option[value="' + CSS.escape(prev.category) + '"]')) form.elements.category.value = prev.category;
+          if (!income && prev.method && form.elements.method) form.elements.method.value = prev.method;
+        } },
+      { key: "category", label: "Categoria", type: "select", options: income ? INCOME_CATS : expCatOptions() }
+    ];
+    if (!income) fields.push({ key: "method", label: "Forma de pagamento", type: "select", options: METHODS });
+    fields.push(areaField);
+    if (!income && !e) fields.push({ key: "parcelas", label: "Parcelas", type: "select", num: true,
+      options: Array.from({ length: 24 }, (_, i) => [String(i + 1), i === 0 ? "À vista" : (i + 1) + "x"]),
+      hint: "Parcelado no cartão: o valor é dividido e lançado um por mês." });
+    if (!e || !e.installment) fields.push({ key: "recurring", label: income ? "Entrada fixa" : "Gasto fixo", type: "checkbox",
+      hint: income ? "(salário, todo mês)" : "(aluguel, internet, assinatura: todo mês)" });
+    fields.push({ key: "notes", label: "Observação", type: "textarea", rows: 2, full: true });
+    if (e && e.installment) fields.unshift({ type: "node", node: h("p", { class: "hint", text: "Parcela " + e.installment.n + " de " + e.installment.of + " · compra de " + brlc(e.installment.total) + ". Editar aqui muda só esta parcela." }) });
+
+    const last = { category: store.get(income ? "capCatIn" : "capCat", income ? "salario" : "alimentacao"), method: store.get("capMethod", "") };
     openForm({
-      title: e ? "Editar gasto" : "Novo gasto",
-      values: e ? { ...e, amount: moneyInput(e.amount) } : { date: S.ui.expMonth === monthKey(today()) ? today() : S.ui.expMonth + "-01", category: store.get("capCat", "alimentacao"), area: defaultArea(), method: "" },
-      fields: [
-        { key: "amount", label: "Valor (R$)", required: true, inputmode: "decimal", placeholder: "0,00" },
-        { key: "date", label: "Data", type: "date", required: true },
-        { key: "desc", label: "Descrição", full: true, placeholder: "Com o quê?" },
-        { key: "category", label: "Categoria", type: "select", options: EXP_CATS },
-        { key: "method", label: "Forma de pagamento", type: "select", options: METHODS },
-        areaField
-      ],
+      title: e ? (income ? "Editar entrada" : "Editar gasto") : (income ? "Nova entrada" : "Novo gasto"),
+      values: e ? { ...e, amount: moneyInput(e.amount), recurring: !!e.recurring }
+        : { date: S.ui.expMonth === monthKey(today()) ? today() : S.ui.expMonth + "-01", category: last.category, method: last.method, area: defaultArea(), parcelas: 1, recurring: false, ...(S.prefill || {}) },
+      fields,
       onSave: async v => {
         const amount = parseMoney(v.amount);
         if (!(amount > 0)) return "Digite um valor maior que zero, por exemplo 45,90.";
-        const vals = { ...v, amount };
-        if (!e) return addExpense({ ...vals, createdAt: Date.now() });
+        const { parcelas, ...rest } = v;
+        const vals = { ...rest, amount, type };
+        if (income) delete vals.method;
+        if (!e) {
+          store.set(income ? "capCatIn" : "capCat", vals.category);
+          if (!income) store.set("capMethod", vals.method || "");
+          if (parcelas > 1) return addInstallments({ ...vals, recurring: false }, parcelas);
+          return addExpense({ ...vals, recurKey: vals.recurring ? rid("r") : "", createdAt: Date.now() });
+        }
+        if (vals.recurring && !e.recurKey) vals.recurKey = e.id;
+        if (e.installment) delete vals.recurring;
+        if (!e.type) delete vals.type;   // older entries have no type and count as expenses
         if (monthKey(vals.date) === e._mk) {
           const patch = changed(e, vals);
           return Object.keys(patch).length ? updateDoc(expCol(e._mk), e.id, patch) : true;
         }
         // Moving to another month: copy first, then remove the original only after the copy is saved.
-        const { id, _mk, ...rest } = e;
-        if (!(await addExpense({ ...rest, ...vals }, id))) return false;
-        if (!(await deleteDoc(expCol(_mk), id))) toast("O gasto foi para o novo mês, mas a cópia antiga continua. Exclua-a em " + monthLabel(_mk) + ".", "err");
+        const { id, _mk, ...old } = e;
+        if (!(await addExpense({ ...old, ...vals }, id))) return false;
+        if (!(await deleteDoc(expCol(_mk), id))) toast("O lançamento foi para o novo mês, mas a cópia antiga continua. Exclua-a em " + monthLabel(_mk) + ".", "err");
         S.ui.expMonth = monthKey(vals.date); syncExpSubs();
         return true;
       },
-      onDelete: e && (() => deleteDoc(expCol(e._mk), e.id))
+      onDelete: e && (() => deleteDoc(expCol(e._mk), e.id)),
+      extra: e && e.installment ? { label: "Excluir todas as parcelas", confirmLabel: "Confirmar: excluir " + e.installment.of, run: () => deleteInstallments(e) } : null
     });
+    S.prefill = null;
   }
   function expensesBetween(start, end) {
     const out = [];
-    for (const mk of new Set([monthKey(start), monthKey(end)])) out.push(...expInArea(mk).filter(e => e.date >= start && e.date <= end));
+    for (const mk of new Set([monthKey(start), monthKey(end)])) out.push(...outsOf(expInArea(mk)).filter(e => e.date >= start && e.date <= end));
     return out;
   }
 
@@ -1272,8 +1484,11 @@ body[data-auth="in"] .login { display: none; }
   function captureBox(fixedType) {
     const type = fixedType || S.ui.captureType;
     const keep = (id, el) => { el.id = id; el.setAttribute("data-keep", ""); return el; };
-    const [label, ph] = CAPTURE_TEXT[type] || CAPTURE_TEXT.tarefa;
-    const text = keep("cap-text", h("input", { type: "text", class: "field grow", autocomplete: "off", "aria-label": label, placeholder: ph }));
+    // Only the Gastos page offers income; Hoje's capture always records an expense.
+    const flow = type === "gasto" && fixedType === "gasto" ? S.ui.capFlow : "saida";
+    const income = flow === "entrada";
+    const [label, ph] = income ? ["Descrição da entrada", "De onde veio? (ex.: salário, freela)"] : (CAPTURE_TEXT[type] || CAPTURE_TEXT.tarefa);
+    const text = keep("cap-text", h("input", { type: "text", class: "field grow", autocomplete: "off", "aria-label": label, placeholder: ph, list: type === "gasto" ? "cap-desc-list" : null }));
     const area = keep("cap-area", h("select", { class: "field", "aria-label": "Área" }, Object.entries(AREAS).map(([v, l]) => h("option", { value: v, text: l }))));
     area.value = defaultArea();
     const lead = [], extra = [];
@@ -1287,11 +1502,28 @@ body[data-auth="in"] .login { display: none; }
       extra.push(date, keep("cap-time", h("input", { type: "time", class: "field", "aria-label": "Hora (opcional)" })));
     } else if (type === "gasto") {
       lead.push(keep("cap-amount", h("input", { type: "text", class: "field amount-field", inputmode: "decimal", autocomplete: "off", "aria-label": "Valor em reais", placeholder: "R$ 0,00" })));
-      const cat = keep("cap-cat", h("select", { class: "field", "aria-label": "Categoria" }, EXP_CATS.map(([v, l]) => h("option", { value: v, text: l }))));
-      cat.value = store.get("capCat", "alimentacao");
-      const date = keep("cap-date", h("input", { type: "date", class: "field", "aria-label": "Data do gasto", required: true }));
+      const cat = keep(income ? "cap-cat-in" : "cap-cat", h("select", { class: "field", "aria-label": "Categoria" },
+        (income ? INCOME_CATS : expCatOptions()).map(([v, l]) => h("option", { value: v, text: l }))));
+      cat.value = store.get(income ? "capCatIn" : "capCat", income ? "salario" : "alimentacao");
+      if (!cat.value) cat.value = income ? "salario" : "outros";
+      extra.push(cat);
+      if (!income) {
+        const method = keep("cap-method", h("select", { class: "field", "aria-label": "Forma de pagamento" },
+          METHODS.map(([v, l]) => h("option", { value: v, text: v ? l : "Pagamento" }))));
+        method.value = store.get("capMethod", "");
+        extra.push(method);
+      }
+      const date = keep("cap-date", h("input", { type: "date", class: "field", "aria-label": income ? "Data da entrada" : "Data do gasto", required: true }));
       date.value = today();
-      extra.push(cat, date);
+      extra.push(date, h("datalist", { id: "cap-desc-list" }, descSuggestions(flow).map(x => h("option", { value: x }))));
+      // A description used before brings back its category and payment method.
+      text.addEventListener("change", () => {
+        const prev = expenseMemory().get(text.value.trim().toLowerCase());
+        if (!prev || isIncome(prev) !== income) return;
+        const c = document.getElementById(income ? "cap-cat-in" : "cap-cat"), m = document.getElementById("cap-method");
+        if (c && prev.category && [...c.options].some(o => o.value === prev.category)) c.value = prev.category;
+        if (m && prev.method !== undefined) m.value = prev.method || "";
+      });
     }
     const submit = h("button", { class: "btn primary", type: "submit", text: S.capturing ? "Salvando…" : "Adicionar", disabled: S.capturing });
     const form = h("form", { class: "inline-form" }, ...lead, text, ...extra, area, submit);
@@ -1305,12 +1537,19 @@ body[data-auth="in"] .login { display: none; }
       let col, body, msg;
       if (type === "gasto") {
         const amount = parseMoney(val("cap-amount"));
-        if (!(amount > 0)) { toast("Digite o valor gasto, por exemplo 45,90.", "err"); focusEl("cap-amount"); return; }
+        if (!(amount > 0)) { toast(income ? "Digite o valor recebido, por exemplo 1.500,00." : "Digite o valor gasto, por exemplo 45,90.", "err"); focusEl("cap-amount"); return; }
         const date = val("cap-date") || today();
-        const category = val("cap-cat") || "outros";
-        store.set("capCat", category);
-        col = expCol(monthKey(date)); msg = "Gasto de " + brlc(amount) + " registrado";
-        body = { amount, desc: title, category, method: "", date, area: a, createdAt: Date.now() };
+        if (income) {
+          const category = val("cap-cat-in") || "outras_entradas";
+          store.set("capCatIn", category);
+          col = expCol(monthKey(date)); msg = "Entrada de " + brlc(amount) + " registrada";
+          body = { type: "entrada", amount, desc: title, category, date, area: a, notes: "", createdAt: Date.now() };
+        } else {
+          const category = val("cap-cat") || "outros", method = val("cap-method");
+          store.set("capCat", category); store.set("capMethod", method);
+          col = expCol(monthKey(date)); msg = "Gasto de " + brlc(amount) + " registrado";
+          body = { type: "saida", amount, desc: title, category, method, date, area: a, notes: "", createdAt: Date.now() };
+        }
       } else {
         if (!title) { focusEl("cap-text"); return; }
         if (type === "tarefa") {
@@ -1336,6 +1575,20 @@ body[data-auth="in"] .login { display: none; }
       render();
       if (ok) focusEl(type === "gasto" ? "cap-amount" : "cap-text");
     });
+    if (fixedType === "gasto") {
+      const flowSeg = h("div", { class: "types", role: "group", "aria-label": "Tipo de lançamento" },
+        [["saida", "Gasto"], ["entrada", "Entrada"]].map(([k, l]) => h("button", { type: "button", class: "type-btn", "aria-pressed": flow === k ? "true" : "false", text: l,
+          onclick: () => { S.ui.capFlow = k; render(); const el = document.getElementById("cap-amount"); el && el.focus(); } })));
+      const more = h("button", { type: "button", class: "link", text: income ? "Mais opções (fixa, observação)" : "Mais opções (parcelas, gasto fixo, observação)",
+        onclick: () => {
+          const v = id => (document.getElementById(id) || {}).value || "";
+          S.prefill = { amount: v("cap-amount"), desc: v("cap-text"), date: v("cap-date") || today(), area: v("cap-area") || defaultArea() };
+          if (income) S.prefill.category = v("cap-cat-in"); else { S.prefill.category = v("cap-cat"); S.prefill.method = v("cap-method"); }
+          for (const k of Object.keys(S.prefill)) if (!S.prefill[k]) delete S.prefill[k];
+          editExpense(null, flow);
+        } });
+      return h("div", { style: "display:grid;gap:10px" }, h("div", { class: "panel-head" }, flowSeg, more), form);
+    }
     if (fixedType) return form;
     const types = h("div", { class: "types", role: "group", "aria-label": "Tipo" },
       CAPTURE_TYPES.map(([k, l]) =>
@@ -1622,81 +1875,190 @@ body[data-auth="in"] .login { display: none; }
     ];
   }
 
+  const brlShort = n => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", notation: "compact", maximumFractionDigits: 1 }).format(Number(n) || 0);
+  function expenseRow(e) {
+    const inc = isIncome(e);
+    return h("div", { class: "row" },
+      h("div", { class: "row-main" },
+        h("button", { class: "row-title", text: e.desc || catLabel(e.category) || (inc ? "Entrada" : "Gasto"), onclick: () => editExpense(e) }),
+        h("div", { class: "row-meta" },
+          h("span", { class: "chip" + (inc ? " ok" : ""), text: catLabel(e.category) }),
+          e.method ? h("span", { class: "due", text: METHOD_LABEL[e.method] || e.method }) : null,
+          e.installment ? h("span", { class: "chip mid", text: e.installment.n + "/" + e.installment.of }) : null,
+          e.recurring ? h("span", { class: "chip accent", text: "Fixo" }) : null,
+          S.area === "tudo" ? areaChip(e.area) : null),
+        e.notes ? h("span", { class: "hint note-text", text: e.notes }) : null),
+      h("span", { class: "exp-amt" + (inc ? " in" : ""), text: (inc ? "+ " : "") + brlc(e.amount) }));
+  }
   function viewGastos() {
     const t = today(), mk = S.ui.expMonth, prevMk = addMonths(mk, -1), curMk = monthKey(t);
     const loaded = S.loaded.has("exp:" + mk) || !db;
     const all = expInArea(mk);
-    const totalC = centsOf(all);
+    const outs = outsOf(all), ins = insOf(all);
+    const outC = centsOf(outs), inC = centsOf(ins);
+    const isCurrent = mk === curMk;
+    const dim = daysInMonth(mk);
+    const daysElapsed = isCurrent ? Number(t.slice(8)) : dim;
 
     // Fair comparison: the current month is compared with the same days of the previous month.
-    const isCurrent = mk === curMk;
     const dayCut = isCurrent ? Number(t.slice(8)) : 31;
-    const prevAll = expInArea(prevMk);
-    const prevC = centsOf(prevAll.filter(e => Number(e.date.slice(8)) <= dayCut));
-    const prevLoaded = S.loaded.has("exp:" + prevMk);
-    const daysElapsed = isCurrent ? Number(t.slice(8)) : new Date(Number(mk.slice(0, 4)), Number(mk.slice(5)), 0).getDate();
+    const prevC = centsOf(outsOf(expInArea(prevMk)).filter(e => Number(e.date.slice(8)) <= dayCut));
     let compare = null;
-    if (prevLoaded && prevC > 0 && totalC > 0) {
-      const diff = Math.round((totalC - prevC) / prevC * 100);
+    if (S.loaded.has("exp:" + prevMk) && prevC > 0 && outC > 0) {
+      const diff = Math.round((outC - prevC) / prevC * 100);
       compare = h("span", {}, diff === 0 ? "Igual a " : h("span", { class: diff > 0 ? "up" : "down", text: Math.abs(diff) + "% " + (diff > 0 ? "acima" : "abaixo") }),
         diff === 0 ? "" : " de ", (isCurrent ? "1–" + dayCut + " de " : "") + monthLabel(prevMk).toLowerCase() + " (" + brlc(prevC / 100) + ")");
     }
 
-    const byCat = {};
-    for (const e of all) byCat[e.category || "outros"] = (byCat[e.category || "outros"] || 0) + Math.round((Number(e.amount) || 0) * 100);
+    const byCat = {}, byMethod = {};
+    for (const e of outs) {
+      const c = Math.round((Number(e.amount) || 0) * 100);
+      byCat[e.category || "outros"] = (byCat[e.category || "outros"] || 0) + c;
+      byMethod[e.method || ""] = (byMethod[e.method || ""] || 0) + c;
+    }
     const cats = Object.entries(byCat).sort((a, b) => b[1] - a[1]);
+    const methods = Object.entries(byMethod).sort((a, b) => b[1] - a[1]);
     const maxC = cats.length ? cats[0][1] : 1;
 
-    const shown = all.filter(e => !S.ui.expCat || (e.category || "outros") === S.ui.expCat)
+    /* ---------- summary ---------- */
+    const budget = Number(finSettings().budget) || 0;
+    const allOutC = centsOf(outsOf(S.exp[mk] || []));   // the limit counts every area
+    let budgetBlock;
+    if (budget > 0) {
+      const pct = Math.round(allOutC / (budget * 100) * 100), left = budget * 100 - allOutC;
+      const daysLeft = isCurrent ? dim - Number(t.slice(8)) + 1 : 0;
+      budgetBlock = h("div", { class: "kpi" },
+        h("div", { class: "kpi-line" }, h("span", { class: "k", text: "Limite do mês" }), h("span", { class: "amt", text: brlc(allOutC / 100) + " de " + brlc(budget) })),
+        h("div", { class: "bar " + (pct >= 100 ? "over" : pct >= 80 ? "warn" : "") }, h("span", { style: "width:" + Math.min(100, pct) + "%" })),
+        h("span", { class: "hint" + (left < 0 ? " neg" : "") },
+          left < 0 ? "Passou " + brlc(-left / 100) + " do limite."
+            : "Restam " + brlc(left / 100) + (daysLeft > 0 ? " · dá para gastar " + brlc(left / 100 / daysLeft) + " por dia até o fim do mês" : "") + ".",
+          " ", h("button", { class: "link", text: "Alterar", onclick: editBudget })));
+    } else {
+      budgetBlock = h("button", { class: "link", style: "justify-self:start", text: "Definir um limite de gastos para o mês", onclick: editBudget });
+    }
+    const summary = h("section", { class: "panel" },
+      h("div", { class: "panel-head" }, h("h2", { text: ins.length ? "Resumo do mês" : "Total gasto no mês" }), S.area !== "tudo" ? areaChip(S.area) : null),
+      ins.length
+        ? h("div", { class: "flow3" },
+            h("div", {}, h("span", { class: "k", text: "Entrou" }), h("span", { class: "v in", text: brlc(inC / 100) })),
+            h("div", {}, h("span", { class: "k", text: "Saiu" }), h("span", { class: "v", text: brlc(outC / 100) })),
+            h("div", {}, h("span", { class: "k", text: "Saldo" }), h("span", { class: "v " + (inC - outC >= 0 ? "in" : "neg"), text: brlc((inC - outC) / 100) })))
+        : h("div", { class: "money", text: brlc(outC / 100) }),
+      h("div", { class: "money-sub" },
+        outs.length ? h("span", {}, h("strong", { text: plural(outs.length, "gasto", "gastos") }), " · média de " + brlc(outC / 100 / Math.max(1, daysElapsed)) + " por dia") : null,
+        compare,
+        cats.length ? h("span", {}, "Maior categoria: ", h("strong", { text: catLabel(cats[0][0]) }), " (" + Math.round(cats[0][1] / outC * 100) + "%)") : null),
+      budgetBlock);
+
+    /* ---------- where it went: categories and payment ---------- */
+    const catPanel = cats.length ? h("section", { class: "panel" },
+      h("div", { class: "panel-head" }, h("h2", { text: "Para onde foi" }),
+        S.ui.expCat ? linkBtn("Mostrar todas", () => { S.ui.expCat = ""; render(); }) : linkBtn("Suas categorias", editCategories)),
+      h("div", { class: "cat-list" }, cats.map(([k, c]) => h("button", { class: "cat-row", "aria-pressed": S.ui.expCat === k ? "true" : "false",
+        onclick: () => { S.ui.expCat = S.ui.expCat === k ? "" : k; render(); } },
+        h("span", { text: catLabel(k) }),
+        h("div", { class: "bar thin" }, h("span", { style: "width:" + Math.max(2, c / maxC * 100) + "%" })),
+        h("span", { class: "amt-r" }, brlc(c / 100), h("small", { text: Math.round(c / outC * 100) + "%" }))))),
+      methods.some(([k]) => k) ? [
+        h("div", { class: "group-label", text: "Forma de pagamento" }),
+        h("div", { class: "chips" }, methods.map(([k, c]) => h("button", { class: "filter-chip", "aria-pressed": S.ui.expMethod === (k || "-") ? "true" : "false",
+          onclick: () => { S.ui.expMethod = S.ui.expMethod === (k || "-") ? "" : (k || "-"); render(); } },
+          (METHOD_LABEL[k] || "Não informado") + " · " + brlc(c / 100))))] : null) : null;
+
+    /* ---------- charts ---------- */
+    const perDay = Array.from({ length: dim }, () => 0);
+    for (const e of outs) { const d = Number(e.date.slice(8)); if (d >= 1 && d <= dim) perDay[d - 1] += Math.round((Number(e.amount) || 0) * 100); }
+    const maxDay = Math.max(1, ...perDay);
+    const dayChart = h("section", { class: "panel" },
+      h("div", { class: "panel-head" }, h("h2", { text: "Gasto por dia" }), h("span", { class: "sub", text: "maior dia: " + brlc(maxDay > 1 ? maxDay / 100 : 0) })),
+      h("div", { class: "bars days", role: "img", "aria-label": "Gasto por dia em " + monthLabel(mk) },
+        perDay.map((c, i) => {
+          const iso = mk + "-" + pad(i + 1);
+          return h("div", { class: "b" + (c ? "" : " zero") + (iso === t ? " hl" : "") + (iso > t ? " future" : ""), title: "Dia " + (i + 1) + ": " + brlc(c / 100) },
+            h("i", { style: "height:" + (c ? Math.max(3, c / maxDay * 100) : 2) + "%" }));
+        })),
+      h("div", { class: "bars-x" }, perDay.map((_, i) => h("span", { text: [1, 5, 10, 15, 20, 25, dim].includes(i + 1) ? String(i + 1) : "" }))));
+    const months6 = Array.from({ length: 6 }, (_, i) => addMonths(mk, i - 5));
+    const mVals = months6.map(m => ({ m, known: !!(S.exp[m] || S.expHist[m]), c: centsOf(outsOf(monthItems(m))) }));
+    const maxM = Math.max(1, ...mVals.map(x => x.c));
+    const monthChart = h("section", { class: "panel" },
+      h("div", { class: "panel-head" }, h("h2", { text: "Últimos 6 meses" }), h("span", { class: "sub", text: "toque num mês para abrir" })),
+      h("div", { class: "bars months" }, mVals.map(x => h("button", { class: "b" + (x.m === mk ? " hl" : "") + (x.c ? "" : " zero"),
+        title: monthLabel(x.m) + ": " + (x.known ? brlc(x.c / 100) : "carregando"), "aria-label": monthLabel(x.m) + ": " + (x.known ? brlc(x.c / 100) : "carregando"),
+        disabled: x.m > curMk, onclick: () => setExpMonth(x.m) },
+        h("span", { class: "v", text: x.known ? (x.c ? brlShort(x.c / 100) : "—") : "…" }),
+        h("i", { style: "height:" + (x.c ? Math.max(3, x.c / maxM * 100) : 2) + "%" })))),
+      h("div", { class: "bars-x" }, mVals.map(x => h("span", { text: fmt(x.m + "-01", { month: "short" }) }))));
+
+    /* ---------- fixed items still to enter ---------- */
+    const pend = mk <= curMk ? pendingFixed(mk) : [];
+    const fixedPanel = pend.length ? h("section", { class: "panel" },
+      h("div", { class: "panel-head" }, h("h2", { text: "Fixos para lançar em " + monthLabel(mk).split(" ")[0].toLowerCase() }),
+        h("button", { class: "btn small primary", text: "Lançar todos", disabled: S.capturing, onclick: async () => { S.capturing = true; render(); await launchAllFixed(pend, mk); S.capturing = false; render(); } })),
+      h("p", { class: "hint", text: "Estes foram marcados como fixos no mês passado. Confira o valor e lance; nada é lançado sozinho." }),
+      h("div", { class: "list" }, pend.map(e => h("div", { class: "row" },
+        h("div", { class: "row-main" },
+          h("span", { style: "font-weight:500", text: e.desc || catLabel(e.category) }),
+          h("div", { class: "row-meta" }, h("span", { class: "chip" + (isIncome(e) ? " ok" : ""), text: catLabel(e.category) }), h("span", { class: "due", text: "dia " + Number(e.date.slice(8)) }),
+            h("button", { class: "link", style: "font-size:12px", text: "não é mais fixo", onclick: () => updateDoc(expCol(e._mk), e.id, { recurring: false }) }))),
+        h("span", { class: "exp-amt" + (isIncome(e) ? " in" : ""), text: (isIncome(e) ? "+ " : "") + brlc(e.amount) }),
+        h("button", { class: "btn small", text: "Lançar", disabled: S.capturing, onclick: async () => { S.capturing = true; render(); if (await launchFixed(e, mk)) toast("Lançado"); S.capturing = false; render(); } }))))) : null;
+
+    /* ---------- entries ---------- */
+    const q = S.ui.expQuery.trim().toLowerCase();
+    const shown = all.filter(e =>
+      (!S.ui.expType || (S.ui.expType === "entrada") === isIncome(e)) &&
+      (!S.ui.expCat || (!isIncome(e) && (e.category || "outros") === S.ui.expCat)) &&
+      (!S.ui.expMethod || (!isIncome(e) && (e.method || "-") === S.ui.expMethod)) &&
+      (!q || [e.desc, e.notes, catLabel(e.category)].some(v => (v || "").toLowerCase().includes(q))))
       .sort((a, b) => b.date.localeCompare(a.date) || (b.createdAt || 0) - (a.createdAt || 0));
     const byDay = new Map();
     for (const e of shown) { if (!byDay.has(e.date)) byDay.set(e.date, []); byDay.get(e.date).push(e); }
     const dayGroups = [];
     for (const [d, items] of byDay) {
-      const dd = diffDays(d, t);
-      dayGroups.push(h("div", { class: "day-head group-label" }, h("span", { text: dd === 0 ? "Hoje" : dd === -1 ? "Ontem" : fmt(d, { weekday: "long", day: "numeric" }) }), h("span", { class: "amt", text: brlc(centsOf(items) / 100) })),
-        h("div", { class: "list" }, items.map(e => h("div", { class: "row" },
-          h("div", { class: "row-main" },
-            h("button", { class: "row-title", text: e.desc || EXP_CAT_LABEL[e.category] || "Gasto", onclick: () => editExpense(e) }),
-            h("div", { class: "row-meta" }, h("span", { class: "chip", text: EXP_CAT_LABEL[e.category] || "Outros" }),
-              e.method ? h("span", { class: "due", text: METHOD_LABEL[e.method] || e.method }) : null,
-              S.area === "tudo" ? areaChip(e.area) : null)),
-          h("span", { class: "exp-amt", text: brlc(e.amount) })))));
+      const dd = diffDays(d, t), o = centsOf(outsOf(items)), i = centsOf(insOf(items));
+      dayGroups.push(h("div", { class: "day-head group-label" },
+        h("span", { text: dd === 0 ? "Hoje" : dd === -1 ? "Ontem" : dd > 0 ? fmt(d, { weekday: "long", day: "numeric" }) + " (futuro)" : fmt(d, { weekday: "long", day: "numeric" }) }),
+        h("span", { class: "amt", text: [o ? brlc(o / 100) : "", i ? "+ " + brlc(i / 100) : ""].filter(Boolean).join(" · ") })),
+        h("div", { class: "list" }, items.map(expenseRow)));
     }
+    const search = h("input", { type: "search", class: "field grow", id: "exp-search", "data-keep": "", placeholder: "Buscar lançamentos", "aria-label": "Buscar lançamentos",
+      oninput: e => { S.ui.expQuery = e.target.value; render(); } });
+    search.value = S.ui.expQuery;
+    const activeFilters = [
+      S.ui.expCat ? ["Categoria: " + catLabel(S.ui.expCat), () => { S.ui.expCat = ""; }] : null,
+      S.ui.expMethod ? ["Pagamento: " + (METHOD_LABEL[S.ui.expMethod] || "não informado"), () => { S.ui.expMethod = ""; }] : null
+    ].filter(Boolean);
+    const filtered = S.ui.expCat || S.ui.expMethod || S.ui.expType || q;
 
     const nav = h("div", { class: "month-nav" },
       h("button", { class: "icon-btn", "aria-label": "Mês anterior", text: "‹", onclick: () => setExpMonth(prevMk) }),
       h("span", { class: "m", text: monthLabel(mk) }),
-      h("button", { class: "icon-btn", "aria-label": "Próximo mês", text: "›", disabled: mk >= curMk, onclick: () => setExpMonth(addMonths(mk, 1)) }));
-
-    const summary = h("section", { class: "panel" },
-      h("div", { class: "panel-head" }, h("h2", { text: "Total do mês" }), S.area !== "tudo" ? areaChip(S.area) : null),
-      h("div", { class: "money", text: brlc(totalC / 100) }),
-      h("div", { class: "money-sub" },
-        all.length ? h("span", {}, h("strong", { text: plural(all.length, "gasto", "gastos") }), " · média de " + brlc(totalC / 100 / Math.max(1, daysElapsed)) + " por dia") : null,
-        compare,
-        cats.length ? h("span", {}, "Maior categoria: ", h("strong", { text: EXP_CAT_LABEL[cats[0][0]] || "Outros" }), " (" + Math.round(cats[0][1] / totalC * 100) + "%)") : null));
-
-    const catPanel = cats.length ? h("section", { class: "panel" },
-      h("div", { class: "panel-head" }, h("h2", { text: "Para onde foi" }), S.ui.expCat ? linkBtn("Mostrar todas", () => { S.ui.expCat = ""; render(); }) : h("span", { class: "sub", text: "toque para filtrar" })),
-      h("div", { class: "cat-list" }, cats.map(([k, c]) => h("button", { class: "cat-row", "aria-pressed": S.ui.expCat === k ? "true" : "false",
-        onclick: () => { S.ui.expCat = S.ui.expCat === k ? "" : k; render(); } },
-        h("span", { text: EXP_CAT_LABEL[k] || "Outros" }),
-        h("div", { class: "bar thin" }, h("span", { style: "width:" + Math.max(2, c / maxC * 100) + "%" })),
-        h("span", { class: "amt-r" }, brlc(c / 100), h("small", { text: Math.round(c / totalC * 100) + "%" })))))) : null;
+      h("button", { class: "icon-btn", "aria-label": "Próximo mês", text: "›", disabled: mk >= addMonths(curMk, 24), onclick: () => setExpMonth(addMonths(mk, 1)) }));
 
     return [
       h("div", { class: "view-head" },
-        h("div", {}, h("h2", { text: "Gastos" }), h("p", { text: "Anote na hora: valor, o quê e a categoria. O resto o painel soma." })),
-        h("div", { class: "actions" }, nav, h("button", { class: "btn primary", text: "+ Gasto", onclick: () => editExpense() }))),
+        h("div", {}, h("h2", { text: "Gastos" }), h("p", { text: "Anote na hora. O painel soma, compara com o mês passado e avisa do limite." })),
+        h("div", { class: "actions" }, nav,
+          h("button", { class: "btn", text: "+ Entrada", onclick: () => editExpense(null, "entrada") }),
+          h("button", { class: "btn primary", text: "+ Gasto", onclick: () => editExpense(null, "saida") }))),
       h("section", { class: "panel" }, captureBox("gasto")),
-      !loaded ? h("section", { class: "panel" }, h("div", { class: "empty", text: "Carregando…" })) :
-      all.length ? h("div", { class: "grid" }, summary, catPanel) : null,
-      loaded ? h("section", { class: "panel" },
-        h("div", { class: "panel-head" }, h("h2", { text: S.ui.expCat ? EXP_CAT_LABEL[S.ui.expCat] : "Lançamentos" }),
-          shown.length ? h("span", { class: "sub", text: plural(shown.length, "gasto", "gastos") + (S.ui.expCat ? " · " + brlc(centsOf(shown) / 100) : "") }) : null),
-        shown.length ? h("div", { style: "display:grid;gap:6px" }, dayGroups)
-          : empty("Nenhum gasto registrado em " + monthLabel(mk).toLowerCase() + (S.area !== "tudo" ? " em " + AREAS[S.area] : "") + ". Anote o primeiro acima, leva 5 segundos.")) : null
+      fixedPanel,
+      !loaded ? h("section", { class: "panel" }, h("div", { class: "empty", text: "Carregando…" })) : null,
+      loaded && all.length ? h("div", { class: "grid" }, summary, catPanel) : null,
+      loaded && outs.length ? h("div", { class: "grid" }, dayChart, monthChart) : null,
+      loaded && !all.length ? h("section", { class: "panel" }, empty("Nenhum lançamento em " + monthLabel(mk).toLowerCase() + (S.area !== "tudo" ? " em " + AREAS[S.area] : "") + ". Anote o primeiro acima, leva 5 segundos."),
+        budget > 0 ? null : h("button", { class: "link", style: "justify-self:start", text: "Definir um limite de gastos para o mês", onclick: editBudget })) : null,
+      loaded && all.length ? h("section", { class: "panel" },
+        h("div", { class: "panel-head" }, h("h2", { text: "Lançamentos" }),
+          h("span", { class: "sub", text: plural(shown.length, "lançamento", "lançamentos") + (filtered ? " · " + brlc(centsOf(outsOf(shown)) / 100) + (insOf(shown).length ? " · + " + brlc(centsOf(insOf(shown)) / 100) : "") : "") })),
+        h("div", { class: "filters" }, search),
+        ins.length ? h("div", { class: "chips" }, [["", "Todos"], ["saida", "Gastos"], ["entrada", "Entradas"]].map(([k, l]) =>
+          h("button", { class: "filter-chip", "aria-pressed": S.ui.expType === k ? "true" : "false", text: l, onclick: () => { S.ui.expType = k; render(); } }))) : null,
+        activeFilters.length ? h("div", { class: "chips" }, activeFilters.map(([l, clear]) =>
+          h("button", { class: "filter-chip", "aria-pressed": "true", text: l + "  ×", "aria-label": "Tirar filtro " + l, onclick: () => { clear(); render(); } }))) : null,
+        shown.length ? h("div", { style: "display:grid;gap:6px" }, dayGroups) : empty("Nenhum lançamento com esses filtros.")) : null
     ];
   }
 
@@ -1925,7 +2287,7 @@ body[data-auth="in"] .login { display: none; }
 
   /* ---------- backup ---------- */
   async function fetchAll(c) {
-    if (c === "habitLog" || c === "cards" || c === "reviews" || c === "expenseMonths") return (await coll(c).get()).docs;
+    if (c === "habitLog" || c === "cards" || c === "reviews" || c === "expenseMonths" || c === "settings") return (await coll(c).get()).docs;
     const docs = [];
     let q = coll(c).orderBy("createdAt").limit(1000);
     for (let guard = 0; guard < 50; guard++) {
