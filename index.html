@@ -620,7 +620,7 @@ body[data-auth="in"] .login { display: none; }
       taskLife: "", taskPrio: "", taskQuery: "",
       goalFilter: "ativa",
       habitWeek: 0,
-      expMonth: monthKey(today()), expCat: "", expMethod: "", expType: "", expQuery: "", capFlow: "saida",
+      expMonth: monthKey(today()), expCat: "", expMethod: "", expBank: "", expType: "", expQuery: "", capFlow: "saida",
       contactKind: "todos", contactStage: "", contactQuery: ""
     }
   };
@@ -1049,6 +1049,30 @@ body[data-auth="in"] .login { display: none; }
       }
     });
   }
+  const DEFAULT_BANKS = ["Nubank", "Itaú", "Bradesco", "Banco do Brasil", "Caixa", "Santander", "Inter", "C6 Bank", "PicPay", "Mercado Pago", "Dinheiro"];
+  // The bank is stored by name on each entry, so removing it from the list never changes past entries.
+  const userBanks = () => Array.isArray(finSettings().banks) ? finSettings().banks.filter(x => typeof x === "string" && x.trim()) : DEFAULT_BANKS;
+  const bankOptions = current => {
+    const names = userBanks().slice();
+    if (current && !names.includes(current)) names.push(current);
+    return [["", "—"], ...names.map(n => [n, n])];
+  };
+  function editBanks() {
+    openForm({
+      title: "Seus bancos e contas",
+      values: { list: userBanks().join("\n") },
+      fields: [
+        { type: "node", node: h("p", { class: "hint", text: "Os bancos, cartões e contas que você usa (ex.: Nubank, Itaú, Dinheiro). Um por linha, na ordem que preferir. Tirar um daqui não muda os lançamentos antigos." }) },
+        { key: "list", label: "Um por linha", type: "textarea", rows: 8, full: true }
+      ],
+      onSave: v => {
+        const seen = new Set();
+        const banks = v.list.split("\n").map(x => x.trim().replace(/\s+/g, " ").slice(0, 40))
+          .filter(x => x && !seen.has(x.toLowerCase()) && seen.add(x.toLowerCase()));
+        return saveFinSettings({ banks });
+      }
+    });
+  }
   function editCategories() {
     openForm({
       title: "Suas categorias",
@@ -1116,7 +1140,7 @@ body[data-auth="in"] .login { display: none; }
     render();
   }
   const monthItems = mk => (S.exp[mk] || S.expHist[mk] || []).filter(e => inArea(e, e.area || "pessoal"));
-  function setExpMonth(mk) { S.ui.expMonth = mk; S.ui.expCat = ""; S.ui.expMethod = ""; syncExpSubs(); render(); }
+  function setExpMonth(mk) { S.ui.expMonth = mk; S.ui.expCat = ""; S.ui.expMethod = ""; S.ui.expBank = ""; syncExpSubs(); render(); }
   async function addExpense(body, id) {
     const mk = monthKey(body.date);
     const ok = id ? await setPath(expCol(mk) + "/" + id, body) : await addDoc(expCol(mk), body);
@@ -1180,10 +1204,12 @@ body[data-auth="in"] .login { display: none; }
           if (!prev || e) return;
           if (prev.category && form.elements.category.querySelector('option[value="' + CSS.escape(prev.category) + '"]')) form.elements.category.value = prev.category;
           if (!income && prev.method && form.elements.method) form.elements.method.value = prev.method;
+          if (prev.bank && form.elements.bank && [...form.elements.bank.options].some(o => o.value === prev.bank)) form.elements.bank.value = prev.bank;
         } },
       { key: "category", label: "Categoria", type: "select", options: income ? INCOME_CATS : expCatOptions() }
     ];
     if (!income) fields.push({ key: "method", label: "Forma de pagamento", type: "select", options: METHODS });
+    fields.push({ key: "bank", label: income ? "Banco / conta que recebeu" : "Banco / conta", type: "select", options: bankOptions(e && e.bank) });
     fields.push(areaField);
     if (!income && !e) fields.push({ key: "parcelas", label: "Parcelas", type: "select", num: true,
       options: Array.from({ length: 24 }, (_, i) => [String(i + 1), i === 0 ? "À vista" : (i + 1) + "x"]),
@@ -1193,11 +1219,11 @@ body[data-auth="in"] .login { display: none; }
     fields.push({ key: "notes", label: "Observação", type: "textarea", rows: 2, full: true });
     if (e && e.installment) fields.unshift({ type: "node", node: h("p", { class: "hint", text: "Parcela " + e.installment.n + " de " + e.installment.of + " · compra de " + brlc(e.installment.total) + ". Editar aqui muda só esta parcela." }) });
 
-    const last = { category: store.get(income ? "capCatIn" : "capCat", income ? "salario" : "alimentacao"), method: store.get("capMethod", "") };
+    const last = { category: store.get(income ? "capCatIn" : "capCat", income ? "salario" : "alimentacao"), method: store.get("capMethod", ""), bank: store.get(income ? "capBankIn" : "capBank", "") };
     openForm({
       title: e ? (income ? "Editar entrada" : "Editar gasto") : (income ? "Nova entrada" : "Novo gasto"),
       values: e ? { ...e, amount: moneyInput(e.amount), recurring: !!e.recurring }
-        : { date: S.ui.expMonth === monthKey(today()) ? today() : S.ui.expMonth + "-01", category: last.category, method: last.method, area: defaultArea(), parcelas: 1, recurring: false, ...(S.prefill || {}) },
+        : { date: S.ui.expMonth === monthKey(today()) ? today() : S.ui.expMonth + "-01", category: last.category, method: last.method, bank: last.bank, area: defaultArea(), parcelas: 1, recurring: false, ...(S.prefill || {}) },
       fields,
       onSave: async v => {
         const amount = parseMoney(v.amount);
@@ -1208,6 +1234,7 @@ body[data-auth="in"] .login { display: none; }
         if (!e) {
           store.set(income ? "capCatIn" : "capCat", vals.category);
           if (!income) store.set("capMethod", vals.method || "");
+          store.set(income ? "capBankIn" : "capBank", vals.bank || "");
           if (parcelas > 1) return addInstallments({ ...vals, recurring: false }, parcelas);
           return addExpense({ ...vals, recurKey: vals.recurring ? rid("r") : "", createdAt: Date.now() });
         }
@@ -1513,6 +1540,11 @@ body[data-auth="in"] .login { display: none; }
         method.value = store.get("capMethod", "");
         extra.push(method);
       }
+      const bank = keep(income ? "cap-bank-in" : "cap-bank", h("select", { class: "field", "aria-label": "Banco ou conta" },
+        bankOptions().map(([v, l]) => h("option", { value: v, text: v ? l : "Banco" }))));
+      bank.value = store.get(income ? "capBankIn" : "capBank", "");
+      if (bank.value !== store.get(income ? "capBankIn" : "capBank", "")) bank.value = "";
+      extra.push(bank);
       const date = keep("cap-date", h("input", { type: "date", class: "field", "aria-label": income ? "Data da entrada" : "Data do gasto", required: true }));
       date.value = today();
       extra.push(date, h("datalist", { id: "cap-desc-list" }, descSuggestions(flow).map(x => h("option", { value: x }))));
@@ -1523,6 +1555,8 @@ body[data-auth="in"] .login { display: none; }
         const c = document.getElementById(income ? "cap-cat-in" : "cap-cat"), m = document.getElementById("cap-method");
         if (c && prev.category && [...c.options].some(o => o.value === prev.category)) c.value = prev.category;
         if (m && prev.method !== undefined) m.value = prev.method || "";
+        const b = document.getElementById(income ? "cap-bank-in" : "cap-bank");
+        if (b && prev.bank && [...b.options].some(o => o.value === prev.bank)) b.value = prev.bank;
       });
     }
     const submit = h("button", { class: "btn primary", type: "submit", text: S.capturing ? "Salvando…" : "Adicionar", disabled: S.capturing });
@@ -1543,12 +1577,14 @@ body[data-auth="in"] .login { display: none; }
           const category = val("cap-cat-in") || "outras_entradas";
           store.set("capCatIn", category);
           col = expCol(monthKey(date)); msg = "Entrada de " + brlc(amount) + " registrada";
-          body = { type: "entrada", amount, desc: title, category, date, area: a, notes: "", createdAt: Date.now() };
+          const bank = val("cap-bank-in"); store.set("capBankIn", bank);
+          body = { type: "entrada", amount, desc: title, category, bank, date, area: a, notes: "", createdAt: Date.now() };
         } else {
           const category = val("cap-cat") || "outros", method = val("cap-method");
           store.set("capCat", category); store.set("capMethod", method);
           col = expCol(monthKey(date)); msg = "Gasto de " + brlc(amount) + " registrado";
-          body = { type: "saida", amount, desc: title, category, method, date, area: a, notes: "", createdAt: Date.now() };
+          const bank = val("cap-bank"); store.set("capBank", bank);
+          body = { type: "saida", amount, desc: title, category, method, bank, date, area: a, notes: "", createdAt: Date.now() };
         }
       } else {
         if (!title) { focusEl("cap-text"); return; }
@@ -1583,7 +1619,8 @@ body[data-auth="in"] .login { display: none; }
         onclick: () => {
           const v = id => (document.getElementById(id) || {}).value || "";
           S.prefill = { amount: v("cap-amount"), desc: v("cap-text"), date: v("cap-date") || today(), area: v("cap-area") || defaultArea() };
-          if (income) S.prefill.category = v("cap-cat-in"); else { S.prefill.category = v("cap-cat"); S.prefill.method = v("cap-method"); }
+          if (income) { S.prefill.category = v("cap-cat-in"); S.prefill.bank = v("cap-bank-in"); }
+          else { S.prefill.category = v("cap-cat"); S.prefill.method = v("cap-method"); S.prefill.bank = v("cap-bank"); }
           for (const k of Object.keys(S.prefill)) if (!S.prefill[k]) delete S.prefill[k];
           editExpense(null, flow);
         } });
@@ -1884,6 +1921,7 @@ body[data-auth="in"] .login { display: none; }
         h("div", { class: "row-meta" },
           h("span", { class: "chip" + (inc ? " ok" : ""), text: catLabel(e.category) }),
           e.method ? h("span", { class: "due", text: METHOD_LABEL[e.method] || e.method }) : null,
+          e.bank ? h("span", { class: "due", text: e.bank }) : null,
           e.installment ? h("span", { class: "chip mid", text: e.installment.n + "/" + e.installment.of }) : null,
           e.recurring ? h("span", { class: "chip accent", text: "Fixo" }) : null,
           S.area === "tudo" ? areaChip(e.area) : null),
@@ -1918,6 +1956,13 @@ body[data-auth="in"] .login { display: none; }
     }
     const cats = Object.entries(byCat).sort((a, b) => b[1] - a[1]);
     const methods = Object.entries(byMethod).sort((a, b) => b[1] - a[1]);
+    const byBank = {};
+    for (const e of all) {
+      const k = e.bank || "", c = Math.round((Number(e.amount) || 0) * 100);
+      const row = byBank[k] || (byBank[k] = { out: 0, in: 0 });
+      if (isIncome(e)) row.in += c; else row.out += c;
+    }
+    const banks = Object.entries(byBank).sort((a, b) => (b[1].out + b[1].in) - (a[1].out + a[1].in));
     const maxC = cats.length ? cats[0][1] : 1;
 
     /* ---------- summary ---------- */
@@ -1954,7 +1999,8 @@ body[data-auth="in"] .login { display: none; }
     /* ---------- where it went: categories and payment ---------- */
     const catPanel = cats.length ? h("section", { class: "panel" },
       h("div", { class: "panel-head" }, h("h2", { text: "Para onde foi" }),
-        S.ui.expCat ? linkBtn("Mostrar todas", () => { S.ui.expCat = ""; render(); }) : linkBtn("Suas categorias", editCategories)),
+        S.ui.expCat ? linkBtn("Mostrar todas", () => { S.ui.expCat = ""; render(); })
+          : h("div", { class: "chips" }, linkBtn("Suas categorias", editCategories), linkBtn("Seus bancos", editBanks))),
       h("div", { class: "cat-list" }, cats.map(([k, c]) => h("button", { class: "cat-row", "aria-pressed": S.ui.expCat === k ? "true" : "false",
         onclick: () => { S.ui.expCat = S.ui.expCat === k ? "" : k; render(); } },
         h("span", { text: catLabel(k) }),
@@ -1964,7 +2010,12 @@ body[data-auth="in"] .login { display: none; }
         h("div", { class: "group-label", text: "Forma de pagamento" }),
         h("div", { class: "chips" }, methods.map(([k, c]) => h("button", { class: "filter-chip", "aria-pressed": S.ui.expMethod === (k || "-") ? "true" : "false",
           onclick: () => { S.ui.expMethod = S.ui.expMethod === (k || "-") ? "" : (k || "-"); render(); } },
-          (METHOD_LABEL[k] || "Não informado") + " · " + brlc(c / 100))))] : null) : null;
+          (METHOD_LABEL[k] || "Não informado") + " · " + brlc(c / 100))))] : null,
+      banks.some(([k]) => k) ? [
+        h("div", { class: "group-label", text: "Por banco / conta" }),
+        h("div", { class: "chips" }, banks.map(([k, v]) => h("button", { class: "filter-chip", "aria-pressed": S.ui.expBank === (k || "-") ? "true" : "false",
+          onclick: () => { S.ui.expBank = S.ui.expBank === (k || "-") ? "" : (k || "-"); render(); } },
+          (k || "Não informado") + " · " + [v.out ? brlc(v.out / 100) : "", v.in ? "+ " + brlc(v.in / 100) : ""].filter(Boolean).join(" "))))] : null) : null;
 
     /* ---------- charts ---------- */
     const perDay = Array.from({ length: dim }, () => 0);
@@ -2011,7 +2062,8 @@ body[data-auth="in"] .login { display: none; }
       (!S.ui.expType || (S.ui.expType === "entrada") === isIncome(e)) &&
       (!S.ui.expCat || (!isIncome(e) && (e.category || "outros") === S.ui.expCat)) &&
       (!S.ui.expMethod || (!isIncome(e) && (e.method || "-") === S.ui.expMethod)) &&
-      (!q || [e.desc, e.notes, catLabel(e.category)].some(v => (v || "").toLowerCase().includes(q))))
+      (!S.ui.expBank || (e.bank || "-") === S.ui.expBank) &&
+      (!q || [e.desc, e.notes, e.bank, catLabel(e.category)].some(v => (v || "").toLowerCase().includes(q))))
       .sort((a, b) => b.date.localeCompare(a.date) || (b.createdAt || 0) - (a.createdAt || 0));
     const byDay = new Map();
     for (const e of shown) { if (!byDay.has(e.date)) byDay.set(e.date, []); byDay.get(e.date).push(e); }
@@ -2028,9 +2080,10 @@ body[data-auth="in"] .login { display: none; }
     search.value = S.ui.expQuery;
     const activeFilters = [
       S.ui.expCat ? ["Categoria: " + catLabel(S.ui.expCat), () => { S.ui.expCat = ""; }] : null,
-      S.ui.expMethod ? ["Pagamento: " + (METHOD_LABEL[S.ui.expMethod] || "não informado"), () => { S.ui.expMethod = ""; }] : null
+      S.ui.expMethod ? ["Pagamento: " + (METHOD_LABEL[S.ui.expMethod] || "não informado"), () => { S.ui.expMethod = ""; }] : null,
+      S.ui.expBank ? ["Banco: " + (S.ui.expBank === "-" ? "não informado" : S.ui.expBank), () => { S.ui.expBank = ""; }] : null
     ].filter(Boolean);
-    const filtered = S.ui.expCat || S.ui.expMethod || S.ui.expType || q;
+    const filtered = S.ui.expCat || S.ui.expMethod || S.ui.expBank || S.ui.expType || q;
 
     const nav = h("div", { class: "month-nav" },
       h("button", { class: "icon-btn", "aria-label": "Mês anterior", text: "‹", onclick: () => setExpMonth(prevMk) }),
@@ -2041,6 +2094,7 @@ body[data-auth="in"] .login { display: none; }
       h("div", { class: "view-head" },
         h("div", {}, h("h2", { text: "Gastos" }), h("p", { text: "Anote na hora. O painel soma, compara com o mês passado e avisa do limite." })),
         h("div", { class: "actions" }, nav,
+          h("button", { class: "btn", text: "Relatório", onclick: openReport }),
           h("button", { class: "btn", text: "+ Entrada", onclick: () => editExpense(null, "entrada") }),
           h("button", { class: "btn primary", text: "+ Gasto", onclick: () => editExpense(null, "saida") }))),
       h("section", { class: "panel" }, captureBox("gasto")),
@@ -2302,8 +2356,8 @@ body[data-auth="in"] .login { display: none; }
     const extra = (S.data[c] || []).filter(x => !seen.has(x.id)).map(x => ({ id: x.id, data: () => { const { id, ...rest } = x; return rest; } }));
     return docs.concat(extra);
   }
-  function saveFile(name, text) {
-    const url = URL.createObjectURL(new Blob([text], { type: "application/json" }));
+  function saveFile(name, text, type = "application/json") {
+    const url = URL.createObjectURL(text instanceof Blob ? text : new Blob([text], { type }));
     const a = h("a", { href: url, download: name });
     document.body.append(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 10000);
@@ -2385,6 +2439,196 @@ body[data-auth="in"] .login { display: none; }
     } finally {
       S.importing = false; render();
     }
+  }
+
+  /* =========================================================
+     Financial report — PDF to read, Excel and CSV to import elsewhere
+     ========================================================= */
+  // The PDF and Excel libraries load only when a report is generated.
+  const LIBS = {
+    jspdf: "https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js",
+    autotable: "https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js",
+    xlsx: "https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"
+  };
+  const scriptCache = {};
+  function loadScript(url) {
+    return scriptCache[url] || (scriptCache[url] = new Promise((ok, fail) => {
+      const el = document.createElement("script");
+      el.src = url; el.onload = ok;
+      el.onerror = () => { delete scriptCache[url]; el.remove(); fail(new Error("load")); };
+      document.head.append(el);
+    }));
+  }
+  const monthsBetween = (from, to) => { const out = []; for (let m = from; m <= to && out.length < 60; m = addMonths(m, 1)) out.push(m); return out; };
+  const periodLabel = (from, to) => from === to ? monthLabel(from)
+    : (from.slice(0, 4) === to.slice(0, 4) ? monthLabel(from).split(" de ")[0] : monthLabel(from)) + " a " + monthLabel(to).toLowerCase();
+  async function reportEntries(from, to, area) {
+    const rows = [];
+    for (const m of monthsBetween(from, to)) {
+      const items = S.exp[m] || (await coll(expCol(m)).get()).docs.map(d => ({ ...d.data(), id: d.id, _mk: m }));
+      for (const e of items) if (area === "tudo" || (e.area || "pessoal") === area) rows.push(e);
+    }
+    rows.sort((a, b) => a.date.localeCompare(b.date) || (a.createdAt || 0) - (b.createdAt || 0));
+    return rows.map(e => {
+      const inc = isIncome(e), amount = Math.round((Number(e.amount) || 0) * 100) / 100;
+      return {
+        id: e.id, date: e.date, month: e.date.slice(0, 7), type: inc ? "entrada" : "saida", typeLabel: inc ? "Entrada" : "Saída",
+        desc: e.desc || "", category: e.category || "outros", categoryLabel: catLabel(e.category), bank: e.bank || "",
+        method: inc ? "" : (METHOD_LABEL[e.method] || ""), installment: e.installment ? e.installment.n + "/" + e.installment.of : "",
+        fixed: !!e.recurring, area: AREAS[e.area || "pessoal"] || "", amount, signed: inc ? amount : -amount, notes: e.notes || ""
+      };
+    });
+  }
+  function reportSummary(rows) {
+    const sum = arr => Math.round(arr.reduce((s, r) => s + r.amount * 100, 0)) / 100;
+    const outs = rows.filter(r => r.type === "saida"), ins = rows.filter(r => r.type === "entrada");
+    const group = (arr, key) => {
+      const m = new Map();
+      for (const r of arr) { const k = r[key] || "Não informado"; m.set(k, Math.round(((m.get(k) || 0) + r.amount) * 100) / 100); }
+      return [...m].sort((a, b) => b[1] - a[1]);
+    };
+    const banks = new Map();
+    for (const r of rows) {
+      const k = r.bank || "Não informado", b = banks.get(k) || { out: 0, in: 0 };
+      b[r.type === "entrada" ? "in" : "out"] = Math.round((b[r.type === "entrada" ? "in" : "out"] + r.amount) * 100) / 100;
+      banks.set(k, b);
+    }
+    const months = new Map();
+    for (const r of rows) {
+      const b = months.get(r.month) || { out: 0, in: 0 };
+      b[r.type === "entrada" ? "in" : "out"] = Math.round((b[r.type === "entrada" ? "in" : "out"] + r.amount) * 100) / 100;
+      months.set(r.month, b);
+    }
+    return {
+      totalOut: sum(outs), totalIn: sum(ins), count: rows.length, countOut: outs.length,
+      byCategory: group(outs, "categoryLabel"), byMethod: group(outs, "method"), byIncome: group(ins, "categoryLabel"),
+      byBank: [...banks].sort((a, b) => (b[1].out + b[1].in) - (a[1].out + a[1].in)),
+      byMonth: [...months].sort((a, b) => a[0].localeCompare(b[0]))
+    };
+  }
+  const fileStamp = (from, to) => from === to ? from : from + "_a_" + to;
+  const fmtBR = iso => iso.slice(8) + "/" + iso.slice(5, 7) + "/" + iso.slice(0, 4);
+
+  async function reportPdf(rows, sm, from, to, area) {
+    await loadScript(LIBS.jspdf);
+    await loadScript(LIBS.autotable);
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit: "pt", format: "a4" });
+    const W = doc.internal.pageSize.getWidth(), H = doc.internal.pageSize.getHeight(), M = 40;
+    const green = [30, 95, 78];
+    doc.setFont("helvetica", "bold"); doc.setFontSize(18); doc.setTextColor(24, 32, 28);
+    doc.text("Relatório financeiro", M, 54);
+    doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(92, 102, 96);
+    doc.text(periodLabel(from, to) + "  ·  Área: " + (area === "tudo" ? "todas" : AREAS[area].toLowerCase()), M, 72);
+    doc.text("Gerado em " + new Date().toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" }) + " pelo Painel Luiz Otávio", M, 86);
+    const table = (title, head, body, opts = {}) => {
+      let y = doc.lastAutoTable ? doc.lastAutoTable.finalY + 26 : 112;
+      if (y > H - 120) { doc.addPage(); y = 54; }
+      doc.setFont("helvetica", "bold"); doc.setFontSize(12); doc.setTextColor(24, 32, 28);
+      doc.text(title, M, y);
+      doc.autoTable({ startY: y + 8, head: [head], body, margin: { left: M, right: M }, theme: "grid",
+        styles: { font: "helvetica", fontSize: 9, cellPadding: 4, lineColor: [214, 219, 211], textColor: [24, 32, 28] },
+        headStyles: { fillColor: green, textColor: 255, fontStyle: "bold" },
+        alternateRowStyles: { fillColor: [244, 246, 242] }, ...opts });
+    };
+    const days = monthsBetween(from, to).reduce((s, m) => s + (m === monthKey(today()) ? Number(today().slice(8)) : daysInMonth(m)), 0);
+    const pct = v => sm.totalOut ? Math.round(v / sm.totalOut * 100) + "%" : "";
+    table("Resumo", ["Entrou", "Saiu", "Saldo", "Lançamentos", "Média de gastos por dia"],
+      [[brlc(sm.totalIn), brlc(sm.totalOut), brlc(sm.totalIn - sm.totalOut), String(sm.count), brlc(sm.totalOut / Math.max(1, days))]]);
+    if (sm.byMonth.length > 1) table("Por mês", ["Mês", "Entrou", "Saiu", "Saldo"],
+      sm.byMonth.map(([m, v]) => [monthLabel(m), brlc(v.in), brlc(v.out), brlc(v.in - v.out)]));
+    if (sm.byCategory.length) table("Gastos por categoria", ["Categoria", "Valor", "%"], sm.byCategory.map(([k, v]) => [k, brlc(v), pct(v)]),
+      { columnStyles: { 1: { halign: "right" }, 2: { halign: "right" } } });
+    if (sm.byBank.length) table("Por banco / conta", ["Banco / conta", "Saiu", "Entrou"], sm.byBank.map(([k, v]) => [k, brlc(v.out), brlc(v.in)]),
+      { columnStyles: { 1: { halign: "right" }, 2: { halign: "right" } } });
+    if (sm.byMethod.length) table("Gastos por forma de pagamento", ["Forma", "Valor", "%"], sm.byMethod.map(([k, v]) => [k, brlc(v), pct(v)]),
+      { columnStyles: { 1: { halign: "right" }, 2: { halign: "right" } } });
+    if (sm.byIncome.length) table("Entradas por tipo", ["Tipo", "Valor"], sm.byIncome.map(([k, v]) => [k, brlc(v)]), { columnStyles: { 1: { halign: "right" } } });
+    table("Lançamentos", ["Data", "Descrição", "Categoria", "Banco", "Pagamento", "Valor"],
+      rows.map(r => [fmtBR(r.date), r.desc + (r.installment ? " (" + r.installment + ")" : "") + (r.notes ? "\n" + r.notes : ""), r.categoryLabel, r.bank, r.method,
+        (r.type === "entrada" ? "+ " : "") + brlc(r.amount)]),
+      { columnStyles: { 0: { cellWidth: 58 }, 5: { halign: "right", cellWidth: 74 } },
+        didParseCell: d => { if (d.section === "body" && d.column.index === 5 && rows[d.row.index].type === "entrada") d.cell.styles.textColor = [43, 134, 86]; } });
+    const n = doc.getNumberOfPages();
+    for (let i = 1; i <= n; i++) {
+      doc.setPage(i); doc.setFont("helvetica", "normal"); doc.setFontSize(8); doc.setTextColor(120);
+      doc.text("Painel Luiz Otávio · " + periodLabel(from, to), M, H - 20);
+      doc.text("Página " + i + " de " + n, W - M, H - 20, { align: "right" });
+    }
+    doc.save("relatorio-financeiro-" + fileStamp(from, to) + ".pdf");
+  }
+
+  async function reportXlsx(rows, sm, from, to) {
+    await loadScript(LIBS.xlsx);
+    const X = window.XLSX;
+    const wb = X.utils.book_new();
+    const money = "#,##0.00", dateFmt = "dd/mm/yyyy";
+    const serial = iso => (Date.UTC(+iso.slice(0, 4), +iso.slice(5, 7) - 1, +iso.slice(8)) - Date.UTC(1899, 11, 30)) / 86400000;
+    const sheet = (name, header, body, formats = {}, widths = []) => {
+      const ws = X.utils.aoa_to_sheet([header, ...body]);
+      for (let r = 1; r <= body.length; r++) for (const [c, z] of Object.entries(formats)) {
+        const cell = ws[X.utils.encode_cell({ r, c: Number(c) })];
+        if (cell && cell.t === "n") cell.z = z;
+      }
+      ws["!cols"] = header.map((h, i) => ({ wch: widths[i] || Math.max(10, h.length + 2) }));
+      if (body.length) ws["!autofilter"] = { ref: ws["!ref"] };
+      X.utils.book_append_sheet(wb, ws, name);
+    };
+    sheet("Lançamentos",
+      ["Data", "Mês", "Tipo", "Descrição", "Categoria", "Banco / conta", "Forma de pagamento", "Parcela", "Fixo", "Área", "Valor", "Valor com sinal", "Observação", "ID"],
+      rows.map(r => [serial(r.date), r.month, r.typeLabel, r.desc, r.categoryLabel, r.bank, r.method, r.installment, r.fixed ? "Sim" : "Não", r.area, r.amount, r.signed, r.notes, r.id]),
+      { 0: dateFmt, 10: money, 11: money }, [12, 9, 9, 30, 22, 16, 18, 8, 6, 10, 12, 14, 30, 22]);
+    sheet("Resumo", ["Período", "Entrou", "Saiu", "Saldo", "Lançamentos"],
+      [[periodLabel(from, to), sm.totalIn, sm.totalOut, Math.round((sm.totalIn - sm.totalOut) * 100) / 100, sm.count]], { 1: money, 2: money, 3: money }, [28, 14, 14, 14, 12]);
+    sheet("Por mês", ["Mês", "Entrou", "Saiu", "Saldo"], sm.byMonth.map(([m, v]) => [m, v.in, v.out, Math.round((v.in - v.out) * 100) / 100]), { 1: money, 2: money, 3: money }, [10, 14, 14, 14]);
+    sheet("Por categoria", ["Categoria", "Valor", "%"], sm.byCategory.map(([k, v]) => [k, v, sm.totalOut ? Math.round(v / sm.totalOut * 1000) / 10 : 0]), { 1: money }, [26, 14, 8]);
+    sheet("Por banco", ["Banco / conta", "Saiu", "Entrou"], sm.byBank.map(([k, v]) => [k, v.out, v.in]), { 1: money, 2: money }, [22, 14, 14]);
+    X.writeFile(wb, "relatorio-financeiro-" + fileStamp(from, to) + ".xlsx");
+  }
+
+  // Plain CSV for importing elsewhere: ISO dates, dot decimals, stable ids and codes next to the labels.
+  function reportCsv(rows, from, to) {
+    const q = v => { const s = String(v ?? ""); return /[",\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+    const head = ["id", "data", "mes", "tipo", "descricao", "categoria", "categoria_codigo", "banco", "forma_pagamento", "parcela", "fixo", "area", "valor", "valor_com_sinal", "observacao"];
+    const lines = rows.map(r => [r.id, r.date, r.month, r.type, r.desc, r.categoryLabel, r.category, r.bank, r.method, r.installment, r.fixed ? "sim" : "nao", r.area,
+      r.amount.toFixed(2), r.signed.toFixed(2), r.notes].map(q).join(","));
+    saveFile("lancamentos-" + fileStamp(from, to) + ".csv", "\ufeff" + [head.join(","), ...lines].join("\r\n"), "text/csv;charset=utf-8");
+  }
+
+  function openReport() {
+    const mk = S.ui.expMonth;
+    openForm({
+      title: "Relatório financeiro",
+      saveLabel: "Gerar relatório",
+      values: { from: mk, to: mk, area: S.area, format: store.get("reportFormat", "pdf") },
+      fields: [
+        { type: "node", node: h("p", { class: "hint", text: "Escolha o período. O PDF é para ler e guardar; o Excel e o CSV trazem todos os lançamentos, um por linha, prontos para importar em outro programa." }) },
+        { key: "from", label: "De (mês)", type: "month", required: true, placeholder: "AAAA-MM" },
+        { key: "to", label: "Até (mês)", type: "month", required: true, placeholder: "AAAA-MM" },
+        { key: "area", label: "Área", type: "select", options: [["tudo", "Todas as áreas"], ["trabalho", "Trabalho"], ["pessoal", "Pessoal"]] },
+        { key: "format", label: "Formato", type: "select", options: [["pdf", "PDF (para ler e guardar)"], ["xlsx", "Excel (.xlsx)"], ["csv", "CSV (para importar em outro programa)"]] }
+      ],
+      onSave: async v => {
+        const okMonth = m => /^\d{4}-\d{2}$/.test(m) && +m.slice(5) >= 1 && +m.slice(5) <= 12;
+        if (!okMonth(v.from) || !okMonth(v.to)) return "Escolha os meses no formato AAAA-MM, por exemplo 2026-11.";
+        if (v.from > v.to) return "O mês inicial precisa ser antes do mês final.";
+        if (monthsBetween(v.from, v.to).length >= 60 && addMonths(v.from, 59) < v.to) return "Escolha um período de até 5 anos.";
+        store.set("reportFormat", v.format);
+        let rows;
+        try { rows = await reportEntries(v.from, v.to, v.area); } catch (e) { return "Não foi possível ler os lançamentos. " + errText(e); }
+        if (!rows.length) return "Nenhum lançamento nesse período" + (v.area !== "tudo" ? " em " + AREAS[v.area] : "") + ".";
+        const sm = reportSummary(rows);
+        try {
+          if (v.format === "pdf") await reportPdf(rows, sm, v.from, v.to, v.area);
+          else if (v.format === "xlsx") await reportXlsx(rows, sm, v.from, v.to);
+          else reportCsv(rows, v.from, v.to);
+        } catch (e) {
+          return e && e.message === "load" ? "Não foi possível baixar o gerador do relatório. Verifique a internet e tente de novo." : "Não foi possível gerar o relatório. Tente de novo.";
+        }
+        toast("Relatório baixado: " + plural(rows.length, "lançamento", "lançamentos"));
+        return true;
+      }
+    });
   }
 
   /* =========================================================
