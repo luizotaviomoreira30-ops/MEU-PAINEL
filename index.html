@@ -39,6 +39,11 @@
   --ok-soft: #DCEFE3;
   --shadow: 0 1px 2px rgba(20, 35, 28, .06), 0 4px 16px rgba(20, 35, 28, .06);
   --scrim: rgba(18, 24, 21, .45);
+  --side: #15302A;
+  --side-ink: #E4EFEA;
+  --side-muted: #9DB8AE;
+  --side-active: rgba(255, 255, 255, .13);
+  --card-shadow: 0 1px 2px rgba(20, 35, 28, .05), 0 2px 10px rgba(20, 35, 28, .04);
 
   --f-display: "Familjen Grotesk", "Helvetica Neue", Arial, sans-serif;
   --f-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -53,6 +58,7 @@
     --high: #F2776C; --high-soft: #45211E; --mid: #E2AA4E; --mid-soft: #3D2F17; --low: #8D9690;
     --ok: #5EC68D; --ok-soft: #1B3527;
     --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.25); --scrim: rgba(0,0,0,.6);
+    --side: #18221E; --side-ink: #E6EBE7; --side-muted: #8FA59C; --side-active: rgba(255,255,255,.08); --card-shadow: none;
     color-scheme: dark;
   }
 }
@@ -63,6 +69,7 @@
   --high: #F2776C; --high-soft: #45211E; --mid: #E2AA4E; --mid-soft: #3D2F17; --low: #8D9690;
   --ok: #5EC68D; --ok-soft: #1B3527;
   --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.25); --scrim: rgba(0,0,0,.6);
+    --side: #18221E; --side-ink: #E6EBE7; --side-muted: #8FA59C; --side-active: rgba(255,255,255,.08); --card-shadow: none;
   color-scheme: dark;
 }
 
@@ -83,31 +90,59 @@ p { margin: 0; }
 
 .wrap { max-width: 1180px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
 
-/* Header */
-.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: var(--bg); border-bottom: 1px solid var(--line); }
-.top-row { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 10px 24px; padding-block: 16px 10px; }
-.hello { display: grid; gap: 2px; min-width: 0; }
-.hello .date { font-family: var(--f-data); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
-.hello h1 { font-size: clamp(22px, 3.6vw, 30px); font-weight: 700; }
-.top-tools { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+/* Shell: sidebar on desktop, icon rail on tablets, bottom bar on phones */
+.shell { display: grid; grid-template-columns: 240px minmax(0, 1fr); min-height: 100vh; align-items: start; }
+.side { position: sticky; top: calc(12px + env(safe-area-inset-top, 0px)); margin: 12px 0 12px max(12px, env(safe-area-inset-left, 0px)); height: calc(100vh - 24px - env(safe-area-inset-top, 0px)); background: var(--side); color: var(--side-ink); border-radius: 18px; display: flex; flex-direction: column; gap: 22px; padding: 18px 12px; overflow-y: auto; }
+.brand { display: flex; align-items: center; gap: 10px; color: inherit; text-decoration: none; padding: 4px 8px; }
+.brand-mark { width: 38px; height: 38px; border-radius: 11px; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; flex: none; }
+.brand-mark svg { width: 22px; height: 22px; }
+.brand-txt { display: grid; line-height: 1.15; min-width: 0; }
+.brand-txt b { font-family: var(--f-display); font-size: 16px; }
+.brand-txt small { color: var(--side-muted); font-size: 12px; }
+.side-nav { display: grid; gap: 4px; }
+.side-nav a { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 11px; color: var(--side-muted); text-decoration: none; font-weight: 600; font-size: 14px; }
+.side-nav a:hover { color: var(--side-ink); background: rgba(255, 255, 255, .05); }
+.side-nav a[aria-current="page"] { background: var(--side-active); color: var(--side-ink); }
+.side-nav svg { width: 20px; height: 20px; flex: none; }
+.side-nav .count { margin-left: auto; }
+.side-foot { margin-top: auto; display: flex; align-items: center; gap: 10px; padding: 12px 8px 4px; border-top: 1px solid rgba(255, 255, 255, .1); font-size: 13px; min-width: 0; }
+.side-foot .me-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.avatar-sm { width: 32px; height: 32px; border-radius: 50%; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; font-weight: 700; font-family: var(--f-display); font-size: 13px; flex: none; }
+.content { min-width: 0; padding-left: 28px; padding-right: max(28px, env(safe-area-inset-right, 0px)); }
+.top { padding-block: 22px 6px; }
+.top-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; max-width: 1240px; }
+.hello { display: grid; gap: 4px; min-width: 0; }
+.hello h1 { font-size: clamp(24px, 3.2vw, 32px); font-weight: 700; }
+.hello .lead { color: var(--muted); font-size: 15px; }
+.top-tools { display: flex; align-items: center; gap: 10px 12px; flex-wrap: wrap; }
 .save-state { font-family: var(--f-data); font-size: 12px; color: var(--muted); white-space: nowrap; }
 .save-state.err { color: var(--high); font-weight: 500; }
+.date-pill { text-decoration: none; border: 1px solid var(--line); background: var(--surface); border-radius: 11px; padding: 8px 12px; display: inline-flex; gap: 8px; align-items: center; font-weight: 600; font-size: 14px; color: var(--ink); box-shadow: var(--card-shadow); }
+.date-pill svg { width: 18px; height: 18px; color: var(--accent); }
 .seg { display: inline-flex; background: var(--surface-2); border-radius: 999px; padding: 3px; gap: 2px; }
 .seg button { border: 0; background: transparent; padding: 6px 14px; border-radius: 999px; font-weight: 600; font-size: 13px; color: var(--muted); }
 .seg button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: var(--shadow); }
-.tabs { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; margin-bottom: -1px; }
-.tabs::-webkit-scrollbar { display: none; }
-.tabs a { flex: none; text-decoration: none; color: var(--muted); font-weight: 600; font-size: 14px; padding: 10px 12px; border-bottom: 2px solid transparent; display: inline-flex; gap: 6px; align-items: center; }
-.tabs a[aria-current="page"] { color: var(--ink); border-bottom-color: var(--accent); }
 .count { font-family: var(--f-data); font-size: 11px; background: var(--high-soft); color: var(--high); border-radius: 999px; padding: 1px 6px; font-weight: 500; }
 .bottomnav { display: none; }
 
-main { padding-block: 20px 64px; display: grid; gap: 16px; }
+main { padding-block: 14px 56px; display: grid; gap: 18px; max-width: 1240px; }
 
+@media (max-width: 1023px) and (min-width: 760px) {
+  .shell { grid-template-columns: 84px minmax(0, 1fr); }
+  .side { padding: 16px 10px; align-items: center; }
+  .brand { padding: 4px; }
+  .brand-txt, .side-nav .lbl, .side-foot .me-name { display: none; }
+  .side-nav a { justify-content: center; padding: 11px; position: relative; }
+  .side-nav .count { position: absolute; top: 2px; right: 2px; margin: 0; }
+  .side-foot { justify-content: center; padding-inline: 0; }
+  .content { padding-left: 20px; padding-right: max(20px, env(safe-area-inset-right, 0px)); }
+}
 @media (max-width: 759px) {
-  .top { position: static; }
-  .tabs { display: none; }
-  .top-row { padding-block: 12px 10px; align-items: center; }
+  .shell { display: block; }
+  .side { display: none; }
+  .content { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .top { padding-block: 14px 2px; }
+  .hello .lead { font-size: 14px; }
   .bottomnav {
     display: grid; grid-template-columns: repeat(7, minmax(0, 1fr));
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
@@ -122,6 +157,56 @@ main { padding-block: 20px 64px; display: grid; gap: 16px; }
   main { padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px)); }
 }
 
+/* Overview: stat cards, timeline, weekly habit grid */
+.stats4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+@media (max-width: 1100px) { .stats4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.stat4 { display: flex; align-items: center; gap: 14px; padding: 16px; border-radius: 16px; border: 1px solid transparent; text-align: left; color: var(--ink); min-width: 0; background: var(--accent-soft); }
+.stat4:hover { border-color: var(--line); }
+.stat4 .ic { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; color: var(--surface); background: var(--accent); flex: none; }
+.stat4 .ic svg { width: 22px; height: 22px; }
+.stat4 .tx { display: grid; gap: 2px; min-width: 0; }
+.stat4 .n { font-family: var(--f-display); font-size: 28px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+.stat4 .l { font-size: 13px; font-weight: 600; color: var(--ink); opacity: .8; }
+.stat4 .s { font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.stat4 .s.warn { color: var(--high); font-weight: 600; }
+.stat4.c-work { background: var(--work-soft); } .stat4.c-work .ic { background: var(--work); }
+.stat4.c-ok { background: var(--ok-soft); } .stat4.c-ok .ic { background: var(--ok); }
+.stat4.c-mid { background: var(--mid-soft); } .stat4.c-mid .ic { background: var(--mid); }
+@media (max-width: 480px) { .stat4 { padding: 12px; gap: 10px; } .stat4 .ic { width: 38px; height: 38px; } .stat4 .n { font-size: 22px; } }
+.home2 { display: grid; gap: 18px; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+@media (max-width: 900px) { .home2 { grid-template-columns: minmax(0, 1fr); } }
+.ph-title { display: inline-flex; align-items: center; gap: 9px; }
+.ph-title svg { width: 20px; height: 20px; color: var(--accent); flex: none; }
+.tl { display: grid; gap: 10px; position: relative; }
+.tl::before { content: ""; position: absolute; left: 61px; top: 10px; bottom: 10px; width: 2px; background: var(--line); }
+.tl-row { display: grid; grid-template-columns: 48px 10px minmax(0, 1fr) auto; align-items: center; gap: 0 12px; position: relative; }
+.tl-time { font-family: var(--f-data); font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.tl-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--work); box-shadow: 0 0 0 3px var(--surface); z-index: 1; }
+.tl-row.life .tl-dot { background: var(--life); }
+.tl-pill { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-radius: 11px; background: var(--work-soft); border: 0; text-align: left; min-width: 0; font-weight: 500; color: var(--ink); }
+.tl-row.life .tl-pill { background: var(--life-soft); }
+.tl-pill .pi { width: 26px; height: 26px; border-radius: 8px; display: grid; place-items: center; background: var(--work); color: var(--surface); flex: none; }
+.tl-row.life .tl-pill .pi { background: var(--life); }
+.tl-pill .pi svg { width: 16px; height: 16px; }
+.tl-pill .tt { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.ring { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--line); display: grid; place-items: center; font-size: 12px; color: var(--surface); flex: none; }
+.ring.on { background: var(--ok); border-color: var(--ok); }
+.hw { display: grid; grid-template-columns: minmax(0, 1fr) repeat(7, 28px); gap: 8px 6px; align-items: center; }
+.hw .dl { font-size: 12px; font-weight: 700; color: var(--muted); text-align: center; }
+.hw .dl.today { color: var(--accent); }
+.hw .nm { border: 0; background: none; padding: 0; text-align: left; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.hw .nm:hover { color: var(--accent); }
+.hd { width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--line); background: var(--surface); padding: 0; display: grid; place-items: center; font-size: 12px; color: var(--surface); justify-self: center; }
+.hd[aria-pressed="true"] { background: var(--ok); border-color: var(--ok); }
+.hd.is-today { border-color: var(--accent); }
+.hd[aria-pressed="true"].is-today { border-color: var(--ok); box-shadow: 0 0 0 2px var(--accent-soft); }
+.hd:disabled { opacity: .35; cursor: default; border-style: dashed; }
+@media (max-width: 400px) { .hw { grid-template-columns: minmax(0, 1fr) repeat(7, 24px); gap: 8px 4px; } .hd { width: 22px; height: 22px; } }
+.gp { display: grid; gap: 6px; }
+.gp-top { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
+.gp-top .nm { border: 0; background: none; padding: 0; text-align: left; font-weight: 600; overflow-wrap: anywhere; }
+.gp-top .pc { font-family: var(--f-display); font-weight: 700; font-variant-numeric: tabular-nums; }
+
 .notice { border: 1px solid var(--line); background: var(--surface); border-radius: var(--r); padding: 12px 14px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; justify-content: space-between; color: var(--muted); font-size: 14px; }
 .notice strong { color: var(--ink); }
 .notice.warn { border-color: var(--mid); background: var(--mid-soft); color: var(--ink); }
@@ -132,7 +217,7 @@ main { padding-block: 20px 64px; display: grid; gap: 16px; }
 .home { display: grid; gap: 16px; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); align-items: start; }
 .stack { display: grid; gap: 16px; min-width: 0; align-content: start; }
 @media (max-width: 900px) { .home { grid-template-columns: minmax(0, 1fr); } }
-.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 16px; display: grid; gap: 12px; min-width: 0; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 18px; display: grid; gap: 12px; min-width: 0; box-shadow: var(--card-shadow); }
 .panel-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
 .panel-head h2 { font-size: 17px; font-weight: 600; }
 .panel-head .sub { font-family: var(--f-data); font-size: 12px; color: var(--muted); }
@@ -408,7 +493,7 @@ details[open] > summary::before { content: "▾ "; }
 .login-card .btn { justify-content: center; padding: 12px 16px; font-size: 15px; }
 .login-card .form-error { text-align: left; }
 .gmark { width: 18px; height: 18px; flex: none; }
-body:not([data-auth="in"]) .top, body:not([data-auth="in"]) main, body:not([data-auth="in"]) .bottomnav { display: none !important; }
+body:not([data-auth="in"]) .shell, body:not([data-auth="in"]) .bottomnav { display: none !important; }
 body[data-auth="in"] .login { display: none; }
 
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
@@ -428,28 +513,37 @@ body[data-auth="in"] .login { display: none; }
     <button type="button" class="btn" id="logout-btn" hidden>Sair desta conta</button>
   </div>
 </section>
-<header class="top">
-  <div class="wrap">
-    <div class="top-row">
-      <div class="hello">
-        <span class="date" id="today-label"></span>
-        <h1 id="greeting">Olá</h1>
-      </div>
-      <div class="top-tools">
-        <span class="save-state" id="save-state" role="status" aria-live="polite"></span>
-        <button type="button" class="link" id="signout" title="Sair da conta do Google">Sair</button>
-        <div class="seg" role="group" aria-label="Filtrar por área" id="area-seg">
-          <button type="button" data-area="tudo" aria-pressed="true">Tudo</button>
-          <button type="button" data-area="trabalho" aria-pressed="false">Trabalho</button>
-          <button type="button" data-area="pessoal" aria-pressed="false">Pessoal</button>
+<div class="shell">
+  <aside class="side" aria-label="Menu">
+    <a class="brand" href="#hoje" title="Visão geral">
+      <span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+      <span class="brand-txt"><b>Meu Painel</b><small>Luiz Otávio</small></span>
+    </a>
+    <nav class="side-nav" id="tabs" aria-label="Seções"></nav>
+    <div class="side-foot"><span class="avatar-sm" id="me-initials" aria-hidden="true">L</span><span class="me-name" id="me-name"></span></div>
+  </aside>
+  <div class="content">
+    <header class="top">
+      <div class="top-row">
+        <div class="hello">
+          <h1 id="greeting">Olá!</h1>
+          <p class="lead" id="today-label">Organize sua rotina, foque no que importa e avance nas suas metas.</p>
+        </div>
+        <div class="top-tools">
+          <span class="save-state" id="save-state" role="status" aria-live="polite"></span>
+          <button type="button" class="link" id="signout" title="Sair da conta do Google">Sair</button>
+          <div class="seg" role="group" aria-label="Filtrar por área" id="area-seg">
+            <button type="button" data-area="tudo" aria-pressed="true">Tudo</button>
+            <button type="button" data-area="trabalho" aria-pressed="false">Trabalho</button>
+            <button type="button" data-area="pessoal" aria-pressed="false">Pessoal</button>
+          </div>
+          <a class="date-pill" href="#agenda" title="Abrir agenda"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span id="date-text"></span></a>
         </div>
       </div>
-    </div>
-    <nav class="tabs" id="tabs" aria-label="Seções"></nav>
+    </header>
+    <main id="main"></main>
   </div>
-</header>
-
-<main class="wrap" id="main"></main>
+</div>
 <nav class="bottomnav" id="bottomnav" aria-label="Seções"></nav>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -567,10 +661,11 @@ body[data-auth="in"] .login { display: none; }
     ["rendimentos", "Rendimentos"], ["outras_entradas", "Outras entradas"]];
   const INCOME_LABEL = Object.fromEntries(INCOME_CATS);
   const TABS = [
-    ["hoje", "Hoje"], ["tarefas", "Tarefas"], ["agenda", "Agenda"], ["gastos", "Gastos"],
+    ["hoje", "Visão geral"], ["tarefas", "Tarefas"], ["agenda", "Agenda"], ["gastos", "Gastos"],
     ["metas", "Metas"], ["contatos", "Contatos"], ["evolucao", "Evolução"]
   ];
   const TAB_ALIASES = { inicio: "hoje", quadro: "tarefas" };
+  const TAB_SHORT = { hoje: "Início" };   // the phone's bottom bar has room for short names only
   const ICONS = {
     hoje: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
     tarefas: '<rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 12l3 3 5-6"/>',
@@ -578,8 +673,15 @@ body[data-auth="in"] .login { display: none; }
     metas: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>',
     contatos: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.5 3.4-5.5 6.5-5.5s5.7 2 6.5 5.5M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c1.8.7 3 2.5 3.5 5.2"/>',
     evolucao: '<path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/>',
-    gastos: '<rect x="3" y="6" width="18" height="14" rx="2"/><path d="M3 10h18"/><path d="M15.5 15h2.5"/><path d="M6 6l9.5-3 1.2 3"/>'
+    gastos: '<rect x="3" y="6" width="18" height="14" rx="2"/><path d="M3 10h18"/><path d="M15.5 15h2.5"/><path d="M6 6l9.5-3 1.2 3"/>',
+    inicio: '<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/>',
+    habito: '<path d="M17 2l4 4-4 4"/><path d="M3 11V9a3 3 0 0 1 3-3h15"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a3 3 0 0 1-3 3H3"/>',
+    nota: '<path d="M5 3h10l4 4v14H5z"/><path d="M15 3v4h4M8 12h8M8 16h6"/>',
+    semana: '<path d="M4 20V11M10 20V5M16 20v-6M22 20H2"/>',
+    trabalho: '<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 13h18"/>',
+    pessoal: '<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>'
   };
+  const NAV_ICON = { hoje: "inicio" };
   const COL_PT = { tasks: "tarefas", contacts: "contatos", goals: "metas", events: "compromissos", habits: "hábitos",
     reviews: "revisões", notes: "anotações", cards: "quadro antigo", habitLog: "registro de hábitos",
     expenseMonths: "meses de gastos", expenses: "gastos", settings: "preferências" };
@@ -1434,8 +1536,9 @@ body[data-auth="in"] .login { display: none; }
     return d;
   }
   function panel(title, opts, ...body) {
+    const heading = opts && opts.icon ? h("h2", { class: "ph-title" }, icon(opts.icon), title) : h("h2", { text: title });
     return h("section", { class: "panel" },
-      h("div", { class: "panel-head" }, h("h2", { text: title }), opts && opts.sub ? h("span", { class: "sub", text: opts.sub }) : null, opts && opts.action || null),
+      h("div", { class: "panel-head" }, heading, opts && opts.sub ? h("span", { class: "sub", text: opts.sub }) : null, opts && opts.action || null),
       ...body);
   }
   const linkBtn = (text, fn) => h("button", { class: "link", text, onclick: fn });
@@ -1638,7 +1741,8 @@ body[data-auth="in"] .login { display: none; }
      Views
      ========================================================= */
   function viewHoje() {
-    const t = today(), tomorrow = addDays(t, 1);
+    const t = today(), tomorrow = addDays(t, 1), ws = weekStart(t);
+    const nowHM = pad(new Date().getHours()) + ":" + pad(new Date().getMinutes());
     const out = [];
 
     const pendingStart = pendingReviewStart();
@@ -1648,84 +1752,92 @@ body[data-auth="in"] .login { display: none; }
         h("span", {}, h("strong", { text: "Revisão da semana pendente. " }), "Leva 5 minutos e fecha a semana de " + fmtRange(r.start, r.end) + "."),
         h("button", { class: "btn small primary", text: "Fazer revisão", onclick: () => editReview(pendingStart) })));
     }
+
+    /* ---------- the day's numbers ---------- */
+    const todayTasks = sortedTasks(openTasks().filter(x => (x.due && x.due <= t) || x.focusDate === t || taskStatus(x) === "fazendo"));
+    const late = todayTasks.filter(x => x.due && x.due < t).length;
+    const evToday = list("events").filter(e => inArea(e) && e.date === t).sort((a, b) => (a.time || "99").localeCompare(b.time || "99"));
+    const nextToday = evToday.find(e => e.time && e.time >= nowHM);
+    const habits = habitsInArea();
+    const habitsDone = habits.filter(hb => isChecked(hb.id, t)).length;
+    const goals = list("goals").filter(g => inArea(g) && goalStatus(g) === "ativa").sort(goalOrder);
+    const staleN = goals.filter(goalStale).length;
+    const stat = (cls, ic, n, label, sub, warn, tab) => h("button", { class: "stat4 " + cls, onclick: go(tab) },
+      h("span", { class: "ic" }, icon(ic)),
+      h("span", { class: "tx" }, h("span", { class: "n", text: n }), h("span", { class: "l", text: label }), sub ? h("span", { class: "s" + (warn ? " warn" : ""), text: sub }) : null));
+    out.push(h("div", { class: "stats4" },
+      stat("", "tarefas", todayTasks.length, "Tarefas hoje", late ? plural(late, "atrasada", "atrasadas") : "nenhuma atrasada", late > 0, "tarefas"),
+      stat("c-work", "agenda", evToday.length, evToday.length === 1 ? "Compromisso" : "Compromissos", nextToday ? "próximo às " + nextToday.time : evToday.length ? "todos já passaram" : "nada marcado hoje", false, "agenda"),
+      stat("c-ok", "habito", habits.length ? habitsDone + "/" + habits.length : "0", "Hábitos hoje", habits.length ? (habitsDone === habits.length ? "todos feitos" : (habits.length - habitsDone) + " faltando") : "crie o primeiro", false, "evolucao"),
+      stat("c-mid", "metas", goals.length, "Metas em progresso", staleN ? plural(staleN, "parada", "paradas") : goals.length ? "todas andando" : "defina uma meta", staleN > 0, "metas")));
+
     out.push(captureBox());
 
-    // Left: what to do
-    const focus = sortedTasks(focusTasks());
+    /* ---------- today's agenda as a timeline ---------- */
+    const tomorrowEv = list("events").filter(e => inArea(e) && e.date === tomorrow).sort((a, b) => (a.time || "99").localeCompare(b.time || "99"));
+    const nextEv = list("events").filter(e => inArea(e) && e.date > tomorrow).sort((a, b) => (a.date + (a.time || "99")).localeCompare(b.date + (b.time || "99")))[0];
+    const agendaPanel = panel("Agenda de hoje", { icon: "agenda", action: linkBtn("+ Compromisso", () => editEvent()) },
+      loadingOr("events", h("div", { style: "display:grid;gap:10px" },
+        evToday.length ? h("div", { class: "tl" }, evToday.map(e => {
+          const passed = !!e.time && e.time < nowHM, life = e.area === "pessoal";
+          return h("div", { class: "tl-row" + (life ? " life" : "") },
+            h("span", { class: "tl-time", text: e.time || "dia todo" }),
+            h("span", { class: "tl-dot", "aria-hidden": "true" }),
+            h("button", { class: "tl-pill", title: [e.title, e.place].filter(Boolean).join(" · "), onclick: () => editEvent(e) },
+              h("span", { class: "pi" }, icon(life ? "pessoal" : "trabalho")), h("span", { class: "tt", text: e.title })),
+            h("span", { class: "ring" + (passed ? " on" : ""), title: passed ? "Já passou" : "Ainda vai acontecer", "aria-label": passed ? "já passou" : "ainda vai acontecer", text: passed ? "✓" : "" }));
+        })) : h("p", { class: "hint", text: "Nada marcado para hoje." }),
+        tomorrowEv.length ? h("p", { class: "hint" }, "Amanhã: ", h("strong", { text: tomorrowEv[0].title }), tomorrowEv[0].time ? " às " + tomorrowEv[0].time : "", tomorrowEv.length > 1 ? " e mais " + (tomorrowEv.length - 1) : "")
+          : nextEv ? h("p", { class: "hint" }, "Próximo: ", h("strong", { text: nextEv.title }), " · " + rel(nextEv.date)) : null)));
+
+    /* ---------- tasks: focus first, then what is due ---------- */
     const focusAll = list("tasks").filter(x => x.focusDate === t);
+    const focus = sortedTasks(focusTasks());
     const focusDone = focus.filter(x => taskStatus(x) === "feito").length;
-    const suggestions = focusAll.length < FOCUS_MAX
-      ? sortedTasks(openTasks().filter(x => x.focusDate !== t)).slice(0, 4) : [];
-    const focusPanel = panel("Foco de hoje", { sub: focus.length ? focusDone + " de " + focus.length + " feitas" : null },
+    const rest = todayTasks.filter(x => x.focusDate !== t);
+    const suggestions = !todayTasks.length && focusAll.length < FOCUS_MAX ? sortedTasks(openTasks()).slice(0, 4) : [];
+    const shownTasks = [...focus, ...rest].slice(0, 8);
+    const tasksPanel = panel("Tarefas", { icon: "tarefas", sub: focus.length ? "foco: " + focusDone + " de " + focus.length : null,
+      action: h("button", { class: "btn small primary", text: "+ Nova tarefa", onclick: () => editTask() }) },
       loadingOr("tasks", h("div", { style: "display:grid;gap:8px" },
-        focus.length ? h("div", { class: "list" }, focus.map(x => taskRow(x)))
-          : h("p", { class: "hint", text: "Escolha até 3 tarefas que fariam o dia valer a pena. Toque na ☆ de uma tarefa." }),
-        suggestions.length ? [h("div", { class: "group-label", text: "Sugestões · atrasadas e mais importantes" }),
-          h("div", { class: "list" }, suggestions.map(x => taskRow(x)))] : null,
-        !focus.length && !suggestions.length ? empty("Nenhuma tarefa em aberto. Use a captura rápida acima.") : null)));
+        shownTasks.length ? h("div", { class: "list" }, shownTasks.map(x => taskRow(x))) : null,
+        suggestions.length ? [h("div", { class: "group-label", text: "Nada para hoje · sugestões" }), h("div", { class: "list" }, suggestions.map(x => taskRow(x)))] : null,
+        !shownTasks.length && !suggestions.length ? empty("Nenhuma tarefa em aberto. Use a captura rápida ou o botão + Nova tarefa.") : null,
+        focusAll.length < FOCUS_MAX && (shownTasks.length || suggestions.length) ? h("p", { class: "hint", text: "Toque na ☆ para escolher até 3 tarefas de foco do dia." }) : null,
+        todayTasks.length + focus.filter(x => taskStatus(x) === "feito").length > shownTasks.length ? linkBtn("Ver todas as tarefas", go("tarefas")) : null)));
 
-    const shown = new Set(suggestions.map(x => x.id));
-    const also = sortedTasks(needsToday().filter(x => x.focusDate !== t && !shown.has(x.id)));
-    const alsoPanel = also.length ? panel("Também pendente", {
-      sub: plural(also.filter(x => x.due && x.due < t).length, "atrasada", "atrasadas"),
-      action: linkBtn("Todas as tarefas", go("tarefas")) },
-      h("div", { class: "list" }, also.slice(0, 8).map(x => taskRow(x))),
-      also.length > 8 ? h("p", { class: "hint", text: "e mais " + (also.length - 8) + " em Tarefas." }) : null) : null;
-
-    const notes = list("notes").filter(n => inArea(n, n.area || "pessoal")).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-    const noteRow = n => h("div", { class: "row" },
-      h("div", { class: "row-main" },
-        h("button", { class: "row-title note-text", style: "font-weight:400", text: n.text, onclick: () => editNote(n) }),
-        h("div", { class: "row-meta" }, S.area === "tudo" ? areaChip(n.area) : null, n.createdAt ? h("span", { class: "due", text: rel(isoFromMs(n.createdAt)) }) : null)),
-      h("div", { class: "row-actions" }, h("button", { class: "btn small", text: "Virar tarefa", disabled: busy("notes/" + n.id), onclick: () => noteToTask(n) })));
-    const notesPanel = notes.length ? panel("Anotações", { sub: plural(notes.length, "anotação", "anotações") },
-      h("div", { class: "list" }, notes.slice(0, 5).map(noteRow)),
-      notes.length > 5 ? details("notes-more", "Mais " + (notes.length - 5), h("div", { class: "list" }, notes.slice(5).map(noteRow))) : null) : null;
-
-    // Right: day, attention, evolution
-    const evToday = list("events").filter(e => inArea(e) && (e.date === t || e.date === tomorrow))
-      .sort((a, b) => (a.date + (a.time || "99")).localeCompare(b.date + (b.time || "99")));
-    const nextEv = list("events").filter(e => inArea(e) && e.date > tomorrow).sort((a, b) => a.date.localeCompare(b.date))[0];
-    const agendaPanel = panel("Hoje e amanhã", { action: linkBtn("+ Compromisso", () => editEvent()) },
-      loadingOr("events", h("div", { style: "display:grid;gap:6px" },
-        evToday.length ? h("div", { class: "list" }, evToday.map(e => eventRow(e, true))) : h("p", { class: "hint", text: "Nada marcado para hoje e amanhã." }),
-        nextEv ? h("p", { class: "hint" }, "Próximo: ", h("strong", { text: nextEv.title }), " · " + rel(nextEv.date)) : null)));
-
-    const habits = habitsInArea(), ws = weekStart(t);
-    const habitsPanel = panel("Hábitos de hoje", { action: linkBtn(habits.length ? "Semana" : "Criar hábitos", go("evolucao")) },
-      loadingOr("habits", habits.length ? h("div", { class: "list" }, habits.map(hb => {
-        const on = isChecked(hb.id, t), cnt = habitCount(hb, ws), target = Number(hb.targetPerWeek) || 7;
-        return h("div", { class: "htoday" },
-          h("button", { class: "check", role: "checkbox", "aria-checked": on ? "true" : "false", "aria-label": hb.name + " hoje", text: on ? "✓" : "",
-            disabled: busy("habit/" + hb.id + "/" + t), onclick: () => toggleHabit(hb, t) }),
-          h("span", { style: "flex:1;min-width:0;overflow-wrap:anywhere", text: hb.name }),
-          h("span", { class: "habit-score" + (cnt >= target ? " met" : ""), text: cnt + "/" + target }));
-      })) : empty("Hábitos ajudam a acompanhar saúde, sono, oração e estudos sem criar módulos separados.", "Criar hábito", () => editHabit())));
-
-    const follow = list("contacts").filter(c => c.nextFollowUp && c.nextFollowUp <= t && inArea(c, contactArea(c)))
-      .sort((a, b) => a.nextFollowUp.localeCompare(b.nextFollowUp));
-    const followPanel = follow.length ? panel("Falar com", { action: linkBtn("Contatos", go("contatos")) },
-      h("div", { class: "list" }, follow.slice(0, 6).map(c => h("div", { class: "row" },
-        h("div", { class: "row-main" },
-          h("button", { class: "row-title", text: c.name, onclick: () => editContact(c) }),
-          h("div", { class: "row-meta" }, c.company ? h("span", { class: "due", text: c.company }) : null, h("span", { class: dueClass(c.nextFollowUp), text: rel(c.nextFollowUp) }))),
-        h("button", { class: "btn small", text: "Feito", title: "Registrar contato hoje", disabled: busy("contacts/" + c.id), onclick: () => contactDone(c) }))))) : null;
-
-    const goals = list("goals").filter(g => inArea(g) && goalStatus(g) === "ativa").sort(goalOrder);
-    const goalsPanel = panel("Metas", { action: linkBtn("Ver metas", go("metas")) },
-      loadingOr("goals", goals.length ? h("div", { class: "list", style: "gap:12px" }, goals.slice(0, 4).map(g => {
+    /* ---------- goals ---------- */
+    const goalsPanel = panel("Progresso das metas", { icon: "metas", action: linkBtn("Ver metas", go("metas")) },
+      loadingOr("goals", goals.length ? h("div", { style: "display:grid;gap:14px" }, goals.slice(0, 5).map(g => {
         const p = goalPct(g);
-        return h("div", { class: "goal" },
-          h("div", { class: "goal-top" }, h("button", { class: "goal-name", text: g.title, onclick: go("metas") }), h("span", { class: "amt", text: p + "%" })),
-          h("div", { class: "bar thin " + (g.area === "pessoal" ? "life" : "work") }, h("span", { style: "width:" + p + "%" })),
-          goalStale(g) ? h("span", { class: "chip mid", text: "Parada há " + goalIdleDays(g) + " dias" })
-            : !g.nextAction ? h("span", { class: "chip", text: "Sem próxima ação" }) : h("span", { class: "hint", text: "Próximo: " + g.nextAction }));
+        return h("div", { class: "gp" },
+          h("div", { class: "gp-top" }, h("button", { class: "nm", text: g.title, onclick: go("metas") }), h("span", { class: "pc", text: p + "%" })),
+          h("div", { class: "bar " + (g.area === "pessoal" ? "life" : "work"), role: "progressbar", "aria-valuenow": p, "aria-valuemin": 0, "aria-valuemax": 100, "aria-label": g.title },
+            h("span", { style: "width:" + p + "%" })),
+          goalStale(g) ? h("span", { class: "chip mid", style: "justify-self:start", text: "Parada há " + goalIdleDays(g) + " dias" }) : null);
       })) : empty("Nenhuma meta ativa.", "Nova meta", () => editGoal())));
 
+    /* ---------- habits of the week ---------- */
+    const days = Array.from({ length: 7 }, (_, i) => addDays(ws, i));
+    const letters = ["S", "T", "Q", "Q", "S", "S", "D"];
+    const habitsPanel = panel("Hábitos da semana", { icon: "habito", action: linkBtn(habits.length ? "Ver evolução" : "Criar hábito", habits.length ? go("evolucao") : () => editHabit()) },
+      loadingOr("habits", habits.length ? h("div", { class: "hw" },
+        h("span"), days.map((d, i) => h("span", { class: "dl" + (d === t ? " today" : ""), title: fmtShort(d), text: letters[i] })),
+        habits.map(hb => [
+          h("button", { class: "nm", text: hb.name, title: hb.name, onclick: () => editHabit(hb) }),
+          days.map(d => {
+            const on = isChecked(hb.id, d);
+            return h("button", { class: "hd" + (d === t ? " is-today" : ""), "aria-pressed": on ? "true" : "false",
+              "aria-label": hb.name + ", " + fmtShort(d) + (on ? ", feito" : ""), title: fmtShort(d),
+              disabled: d > t || busy("habit/" + hb.id + "/" + d), text: on ? "✓" : "", onclick: () => toggleHabit(hb, d) });
+          })
+        ])) : empty("Hábitos ajudam a acompanhar saúde, sono, oração e estudos.", "Criar hábito", () => editHabit())));
+
+    /* ---------- the week, people to call, notes ---------- */
     const st = weekStats(weekRange(0)), prev = weekStats(weekRange(-1));
     const total = st.work + st.personal;
     const lifeTop = Object.entries(st.byLife).sort((a, b) => b[1] - a[1]).slice(0, 4);
-    const weekPanel = panel("Sua semana", { sub: fmtRange(weekRange(0).start, weekRange(0).end) },
+    const weekPanel = panel("Sua semana", { icon: "semana", sub: fmtRange(weekRange(0).start, weekRange(0).end) },
       h("div", { class: "kpis" },
         h("div", { class: "kpi" }, h("div", { class: "kpi-line" }, h("span", { class: "k", text: "Tarefas concluídas" }), h("span", { class: "v", text: st.tasksDone })),
           h("span", { class: "hint", text: "Semana passada: " + prev.tasksDone })),
@@ -1744,9 +1856,27 @@ body[data-auth="in"] .login { display: none; }
             : h("span", { class: "hint", text: "Aparece conforme você conclui tarefas." }),
           lifeTop.length ? h("div", { class: "chips" }, lifeTop.map(([k, n]) => h("span", { class: "chip", text: LIFE_LABEL[k] + " " + n }))) : null)));
 
-    out.push(h("div", { class: "home" },
-      h("div", { class: "stack" }, focusPanel, alsoPanel, notesPanel),
-      h("div", { class: "stack" }, agendaPanel, habitsPanel, followPanel, goalsPanel, weekPanel)));
+    const follow = list("contacts").filter(c => c.nextFollowUp && c.nextFollowUp <= t && inArea(c, contactArea(c)))
+      .sort((a, b) => a.nextFollowUp.localeCompare(b.nextFollowUp));
+    const followPanel = follow.length ? panel("Falar com", { icon: "contatos", action: linkBtn("Contatos", go("contatos")) },
+      h("div", { class: "list" }, follow.slice(0, 6).map(c => h("div", { class: "row" },
+        h("div", { class: "row-main" },
+          h("button", { class: "row-title", text: c.name, onclick: () => editContact(c) }),
+          h("div", { class: "row-meta" }, c.company ? h("span", { class: "due", text: c.company }) : null, h("span", { class: dueClass(c.nextFollowUp), text: rel(c.nextFollowUp) }))),
+        h("button", { class: "btn small", text: "Feito", title: "Registrar contato hoje", disabled: busy("contacts/" + c.id), onclick: () => contactDone(c) }))))) : null;
+
+    const notes = list("notes").filter(n => inArea(n, n.area || "pessoal")).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+    const noteRow = n => h("div", { class: "row" },
+      h("div", { class: "row-main" },
+        h("button", { class: "row-title note-text", style: "font-weight:400", text: n.text, onclick: () => editNote(n) }),
+        h("div", { class: "row-meta" }, S.area === "tudo" ? areaChip(n.area) : null, n.createdAt ? h("span", { class: "due", text: rel(isoFromMs(n.createdAt)) }) : null)),
+      h("div", { class: "row-actions" }, h("button", { class: "btn small", text: "Virar tarefa", disabled: busy("notes/" + n.id), onclick: () => noteToTask(n) })));
+    const notesPanel = notes.length ? panel("Anotações", { icon: "nota", sub: plural(notes.length, "anotação", "anotações") },
+      h("div", { class: "list" }, notes.slice(0, 5).map(noteRow)),
+      notes.length > 5 ? details("notes-more", "Mais " + (notes.length - 5), h("div", { class: "list" }, notes.slice(5).map(noteRow))) : null) : null;
+
+    out.push(h("div", { class: "home2" }, agendaPanel, tasksPanel, goalsPanel, habitsPanel));
+    out.push(h("div", { class: "home2" }, weekPanel, h("div", { class: "stack" }, followPanel, notesPanel)));
     return out;
   }
 
@@ -2684,17 +2814,19 @@ body[data-auth="in"] .login { display: none; }
   function renderNav() {
     const counts = tabCounts();
     $("#tabs").replaceChildren(...TABS.map(([k, l]) =>
-      h("a", { href: "#" + k, "aria-current": S.tab === k ? "page" : null }, l, counts[k] ? h("span", { class: "count", text: counts[k] }) : null)));
+      h("a", { href: "#" + k, "aria-current": S.tab === k ? "page" : null, title: l, "aria-label": l + (counts[k] ? " (" + counts[k] + ")" : "") },
+        icon(NAV_ICON[k] || k), h("span", { class: "lbl", text: l }), counts[k] ? h("span", { class: "count", text: counts[k] }) : null)));
     $("#bottomnav").replaceChildren(...TABS.map(([k, l]) =>
       h("a", { href: "#" + k, "aria-current": S.tab === k ? "page" : null, "aria-label": l + (counts[k] ? " (" + counts[k] + ")" : "") },
-        icon(k), h("span", { class: "lbl", text: l }), counts[k] ? h("span", { class: "count", text: counts[k] }) : null)));
+        icon(NAV_ICON[k] || k), h("span", { class: "lbl", text: TAB_SHORT[k] || l }), counts[k] ? h("span", { class: "count", text: counts[k] }) : null)));
   }
   function renderHeader() {
-    const d = new Date(), hr = d.getHours();
-    const g = hr < 5 ? "Boa noite" : hr < 12 ? "Bom dia" : hr < 18 ? "Boa tarde" : "Boa noite";
+    const d = new Date();
     const first = (S.name || "").split(/\s+/)[0];
-    $("#greeting").textContent = first ? g + ", " + first : g;
-    $("#today-label").textContent = new Intl.DateTimeFormat("pt-BR", { weekday: "long", day: "numeric", month: "long" }).format(d);
+    $("#greeting").textContent = first ? "Olá, " + first + "! 👋" : "Olá! 👋";
+    $("#date-text").textContent = "Hoje, " + new Intl.DateTimeFormat("pt-BR", { day: "numeric", month: "long" }).format(d);
+    $("#me-name").textContent = S.name || "";
+    $("#me-initials").textContent = (S.name || "L").split(/\s+/).filter(w => /^\p{L}/u.test(w)).slice(0, 2).map(w => w[0].toUpperCase()).join("") || "L";
     for (const b of document.querySelectorAll("#area-seg button")) b.setAttribute("aria-pressed", b.dataset.area === S.area ? "true" : "false");
     renderSaveState();
   }
