@@ -1,0 +1,9 @@
+{
+  "name": "meu-ecossistema",
+  "private": true,
+  "type": "module",
+  "description": "Meu Painel + Meu Financeiro. Sem build: os arquivos são publicados como estão no GitHub Pages.",
+  "scripts": {
+    "test": "node --test tests/*.test.mjs"
+  }
+}
