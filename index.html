@@ -37,6 +37,7 @@
   --low: #75807A;
   --ok: #2B8656;
   --ok-soft: #DCEFE3;
+  --fin: #173B5E; --fin-soft: #E6ECF3;
   --shadow: 0 1px 2px rgba(20, 35, 28, .06), 0 4px 16px rgba(20, 35, 28, .06);
   --scrim: rgba(18, 24, 21, .45);
   --side: #15302A;
@@ -57,6 +58,7 @@
     --work: #86A6F7; --work-soft: #1E2944; --life: #EF8D75; --life-soft: #432621;
     --high: #F2776C; --high-soft: #45211E; --mid: #E2AA4E; --mid-soft: #3D2F17; --low: #8D9690;
     --ok: #5EC68D; --ok-soft: #1B3527;
+    --fin: #6F9BC8; --fin-soft: #1B2633;
     --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.25); --scrim: rgba(0,0,0,.6);
     --side: #18221E; --side-ink: #E6EBE7; --side-muted: #8FA59C; --side-active: rgba(255,255,255,.08); --card-shadow: none;
     color-scheme: dark;
@@ -68,6 +70,7 @@
   --work: #86A6F7; --work-soft: #1E2944; --life: #EF8D75; --life-soft: #432621;
   --high: #F2776C; --high-soft: #45211E; --mid: #E2AA4E; --mid-soft: #3D2F17; --low: #8D9690;
   --ok: #5EC68D; --ok-soft: #1B3527;
+  --fin: #6F9BC8; --fin-soft: #1B2633;
   --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.25); --scrim: rgba(0,0,0,.6);
     --side: #18221E; --side-ink: #E6EBE7; --side-muted: #8FA59C; --side-active: rgba(255,255,255,.08); --card-shadow: none;
   color-scheme: dark;
@@ -105,6 +108,9 @@ p { margin: 0; }
 .side-nav a[aria-current="page"] { background: var(--side-active); color: var(--side-ink); }
 .side-nav svg { width: 20px; height: 20px; flex: none; }
 .side-nav .count { margin-left: auto; }
+.side-nav .grp { padding: 14px 12px 4px; font-size: 10.5px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: var(--side-muted); opacity: .75; }
+.side-nav .grp:first-child { padding-top: 0; }
+.side-nav a.ext .lbl::after { content: " ↗"; opacity: .7; }
 .side-foot { margin-top: auto; display: flex; align-items: center; gap: 10px; padding: 12px 8px 4px; border-top: 1px solid rgba(255, 255, 255, .1); font-size: 13px; min-width: 0; }
 .side-foot .me-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .avatar-sm { width: 32px; height: 32px; border-radius: 50%; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; font-weight: 700; font-family: var(--f-display); font-size: 13px; flex: none; }
@@ -133,6 +139,8 @@ main { padding-block: 14px 56px; display: grid; gap: 18px; max-width: 1240px; }
   .brand { padding: 4px; }
   .brand-txt, .side-nav .lbl, .side-foot .me-name { display: none; }
   .side-nav a { justify-content: center; padding: 11px; position: relative; }
+  .side-nav .grp { font-size: 0; padding: 6px 0 0; margin: 6px 10px 0; border-top: 1px solid rgba(255, 255, 255, .08); }
+  .side-nav .grp:first-child { display: none; }
   .side-nav .count { position: absolute; top: 2px; right: 2px; margin: 0; }
   .side-foot { justify-content: center; padding-inline: 0; }
   .content { padding-left: 20px; padding-right: max(20px, env(safe-area-inset-right, 0px)); }
@@ -160,6 +168,23 @@ main { padding-block: 14px 56px; display: grid; gap: 18px; max-width: 1240px; }
 /* Overview: stat cards, timeline, weekly habit grid */
 .stats4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
 @media (max-width: 1100px) { .stats4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.stats4.six { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (max-width: 1100px) { .stats4.six { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.stat4.c-fin { background: var(--fin-soft); } .stat4.c-fin .ic { background: var(--fin); }
+.stat4.c-late { background: var(--high-soft); } .stat4.c-late .ic { background: var(--high); }
+a.btn { text-decoration: none; display: inline-flex; align-items: center; }
+.fin-kpis { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
+.fin-kpi { padding: 14px 16px; border-radius: 14px; background: var(--surface-2, rgba(0,0,0,.03)); display: grid; gap: 4px; min-width: 0; }
+.fin-kpi .k { font-size: 12.5px; color: var(--muted); font-weight: 600; }
+.fin-kpi .v { font-family: var(--f-display); font-size: 24px; font-weight: 700; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.fin-kpi .v.neg { color: var(--high); } .fin-kpi .v.pos { color: var(--ok); }
+.fin-kpi .s { font-size: 12px; color: var(--muted); }
+.fin-line { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; padding: 8px 0; border-bottom: 1px solid var(--line); min-width: 0; }
+.fin-line:last-child { border-bottom: 0; }
+.fin-line .t { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fin-line .a { font-variant-numeric: tabular-nums; font-weight: 600; white-space: nowrap; }
+.fin-line .a.in { color: var(--ok); }
+.fin-line small { display: block; color: var(--muted); font-size: 12px; }
 .stat4 { display: flex; align-items: center; gap: 14px; padding: 16px; border-radius: 16px; border: 1px solid transparent; text-align: left; color: var(--ink); min-width: 0; background: var(--accent-soft); }
 .stat4:hover { border-color: var(--line); }
 .stat4 .ic { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; color: var(--surface); background: var(--accent); flex: none; }
@@ -549,6 +574,12 @@ body[data-auth="in"] .login { display: none; }
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script type="module">
+  // The same financial engine the Meu Financeiro app uses: one set of rules for both apps.
+  import * as FinCore from "./shared/fincore.js";
+  window.FinCore = FinCore;
+  window.dispatchEvent(new Event("fincore"));
+</script>
 <script>
 (() => {
   "use strict";
@@ -661,11 +692,18 @@ body[data-auth="in"] .login { display: none; }
     ["rendimentos", "Rendimentos"], ["outras_entradas", "Outras entradas"]];
   const INCOME_LABEL = Object.fromEntries(INCOME_CATS);
   const TABS = [
-    ["hoje", "Visão geral"], ["tarefas", "Tarefas"], ["agenda", "Agenda"], ["gastos", "Gastos"],
-    ["metas", "Metas"], ["contatos", "Contatos"], ["evolucao", "Evolução"]
+    ["hoje", "Painel inicial"], ["tarefas", "Tarefas"], ["agenda", "Agenda"], ["metas", "Metas"], ["evolucao", "Evolução"],
+    ["contatos", "Contatos"], ["financeiro", "Resumo financeiro"], ["gastos", "Gastos"]
   ];
+  // The side menu groups the sections; the phone's bottom bar keeps the daily ones.
+  const NAV_GROUPS = [
+    ["Visão geral", ["hoje"]], ["Organização", ["tarefas", "agenda"]], ["Desenvolvimento", ["metas", "evolucao"]],
+    ["Vida pessoal", ["contatos"]], ["Financeiro", ["financeiro", "gastos"]]
+  ];
+  const BOTTOM_TABS = ["hoje", "tarefas", "agenda", "financeiro", "metas", "contatos", "evolucao"];
+  const FIN_URL = "./financeiro/";
   const TAB_ALIASES = { inicio: "hoje", quadro: "tarefas" };
-  const TAB_SHORT = { hoje: "Início" };   // the phone's bottom bar has room for short names only
+  const TAB_SHORT = { hoje: "Início", financeiro: "Finanças" };   // the phone's bottom bar has room for short names only
   const ICONS = {
     hoje: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
     tarefas: '<rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 12l3 3 5-6"/>',
@@ -674,6 +712,8 @@ body[data-auth="in"] .login { display: none; }
     contatos: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.5 3.4-5.5 6.5-5.5s5.7 2 6.5 5.5M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c1.8.7 3 2.5 3.5 5.2"/>',
     evolucao: '<path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/>',
     gastos: '<rect x="3" y="6" width="18" height="14" rx="2"/><path d="M3 10h18"/><path d="M15.5 15h2.5"/><path d="M6 6l9.5-3 1.2 3"/>',
+    financeiro: '<path d="M3 8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M16 13h2"/><path d="M3 10h18"/>',
+    externo: '<path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>',
     inicio: '<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/>',
     habito: '<path d="M17 2l4 4-4 4"/><path d="M3 11V9a3 3 0 0 1 3-3h15"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a3 3 0 0 1-3 3H3"/>',
     nota: '<path d="M5 3h10l4 4v14H5z"/><path d="M15 3v4h4M8 12h8M8 16h6"/>',
@@ -724,7 +764,9 @@ body[data-auth="in"] .login { display: none; }
       habitWeek: 0,
       expMonth: monthKey(today()), expCat: "", expMethod: "", expBank: "", expType: "", expQuery: "", capFlow: "saida",
       contactKind: "todos", contactStage: "", contactQuery: ""
-    }
+    },
+    // Read from Meu Financeiro. The Painel keeps no ledger of its own: a quick expense is written there, once.
+    fin: { settings: {}, share: null, accounts: [], cards: [], categories: [], txns: [], range: "", loaded: new Set(), err: new Set() }
   };
   let db = null, pending = 0;
 
@@ -1244,6 +1286,7 @@ body[data-auth="in"] .login { display: none; }
   const monthItems = mk => (S.exp[mk] || S.expHist[mk] || []).filter(e => inArea(e, e.area || "pessoal"));
   function setExpMonth(mk) { S.ui.expMonth = mk; S.ui.expCat = ""; S.ui.expMethod = ""; S.ui.expBank = ""; syncExpSubs(); render(); }
   async function addExpense(body, id) {
+    if (finMode()) { toast("Os gastos agora ficam no Meu Financeiro.", "err"); return false; }
     const mk = monthKey(body.date);
     const ok = id ? await setPath(expCol(mk) + "/" + id, body) : await addDoc(expCol(mk), body);
     // The month index lets the backup find every month; a failure here never loses the expense itself.
@@ -1294,6 +1337,7 @@ body[data-auth="in"] .login { display: none; }
   }
 
   function editExpense(e, flow) {
+    if (finMode()) { toast("Os gastos agora ficam no Meu Financeiro. Anote por lá ou pela captura rápida.", "err"); return; }
     const type = e ? (e.type || "saida") : (flow || "saida");
     const income = type === "entrada";
     const memory = expenseMemory();
@@ -1366,6 +1410,133 @@ body[data-auth="in"] .login { display: none; }
   }
 
   /* =========================================================
+     Meu Financeiro — read its data, write quick expenses there
+     ========================================================= */
+  // The engine loads as a module after this script; the page redraws once it is ready.
+  const FC = () => window.FinCore || null;
+  window.addEventListener("fincore", () => render());
+  const finUnsubs = {};
+  const finDocs = snap => snap.docs.map(d => ({ ...d.data(), id: d.id }));
+  function finSub(key, ref, onData, range) {
+    if (finUnsubs[key]) return;
+    finUnsubs[key] = ref.onSnapshot(snap => {
+      onData(snap); S.fin.loaded.add(key); S.fin.err.delete(key);
+      if (key !== "txns") syncFinTxns();
+      render();
+    }, err => {
+      S.fin.loaded.add(key); delete finUnsubs[key];
+      if (codeOf(err) === "permission_denied") { S.status = "denied"; render(); return; }
+      S.fin.err.add(key); render();
+      setTimeout(() => { if (key !== "txns" || S.fin.range === range) finSub(key, ref, onData, range); }, 5000);
+    });
+  }
+  function subscribeFin() {
+    if (!db) return;
+    finSub("settings", db.doc("finSettings/main"), s => { S.fin.settings = s.exists ? s.data() : {}; });
+    finSub("share", db.doc("finShare/summary"), s => { S.fin.share = s.exists ? s.data() : null; });
+    finSub("accounts", db.collection("finAccounts"), s => { S.fin.accounts = finDocs(s); });
+    finSub("cards", db.collection("finCards"), s => { S.fin.cards = finDocs(s); });
+    finSub("categories", db.collection("finCategories"), s => { S.fin.categories = finDocs(s); });
+    syncFinTxns();
+  }
+  const finShare = () => (S.fin.settings && S.fin.settings.share) || {};
+  // A field is shown only while Meu Financeiro shares it; revoking there hides it here at once.
+  const shareOn = field => { const sh = finShare(); return !!sh.enabled && (!sh.fields || sh.fields[field] !== false); };
+  // Entries are read only for this month and the last one (enough for the month and the two weeks shown).
+  function syncFinTxns() {
+    if (!db) return;
+    const cur = monthKey(today());
+    const want = shareOn("mes") ? addMonths(cur, -1) + "-01|" + cur + "-31" : "";
+    if (S.fin.range === want) return;
+    if (finUnsubs.txns) { finUnsubs.txns(); delete finUnsubs.txns; }
+    S.fin.txns = []; S.fin.loaded.delete("txns"); S.fin.err.delete("txns"); S.fin.range = want;
+    if (!want) return;
+    const [from, to] = want.split("|");
+    finSub("txns", db.collection("finTxns").where("date", ">=", from).where("date", "<=", to), s => { S.fin.txns = finDocs(s); }, want);
+  }
+  const finLive = arr => arr.filter(x => !x.deleted);
+  const CASH_TYPES = new Set(["corrente", "poupanca", "dinheiro"]);
+  const finSpendAccounts = () => finLive(S.fin.accounts).filter(a => a.status !== "encerrada" && CASH_TYPES.has(a.type))
+    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0) || String(a.name).localeCompare(b.name));
+  const finSpendCards = () => finLive(S.fin.cards).filter(c => c.status !== "cancelado").sort((a, b) => String(a.name).localeCompare(b.name));
+  const finExpenseCats = () => finLive(S.fin.categories).filter(c => c.kind === "despesa" && !c.archived)
+    .sort((a, b) => (a.order ?? 99) - (b.order ?? 99) || String(a.name).localeCompare(b.name));
+  const finReady = () => ["settings", "accounts", "cards", "categories"].every(k => S.fin.loaded.has(k));
+  // Once Meu Financeiro has an account or a card, it is the only place money is recorded.
+  const finMode = () => finReady() && (finSpendAccounts().length + finSpendCards().length > 0);
+  const finCatName = id => ((S.fin.categories.find(c => c.id === id) || {}).name) || "Sem categoria";
+  const finWhere = t => t.cardId ? ((S.fin.cards.find(c => c.id === t.cardId) || {}).name || "cartão")
+    : ((S.fin.accounts.find(a => a.id === (t.accountId || t.fromId)) || {}).name || "");
+  const brlCents = c => brlc((Number(c) || 0) / 100);
+  // Exact up to R$ 999,99; above that the indicator card needs the compact form (R$ 1,2 mil).
+  const statMoney = n => Math.abs(n) < 1000 ? brlc(n) : brlShort(n);
+  function ago(ms) {
+    if (!ms) return "";
+    const min = Math.round((Date.now() - ms) / 60000);
+    if (min < 1) return "agora";
+    if (min < 60) return "há " + min + " min";
+    if (min < 60 * 24) return "há " + Math.round(min / 60) + " h";
+    return "em " + fmtShort(isoFromMs(ms));
+  }
+  // The expense goes to Meu Financeiro with its audit entry in the same batch, exactly as that app saves it.
+  async function addFinExpense({ amount, desc, categoryId, where, date, area }) {
+    const F = FC();
+    if (!F) { toast("Ainda carregando as regras do financeiro. Tente de novo em instantes.", "err"); return false; }
+    const now = Date.now();
+    const txn = { kind: "despesa", desc, date, status: "efetivado", amount, categoryId: categoryId || null, subcategory: "", method: "",
+      tags: area && AREAS[area] ? [AREAS[area]] : [], notes: "", accountId: null, cardId: null, fromId: null, toId: null,
+      invoice: null, dueDate: null, paidDate: null, subtype: null, source: "painel", createdAt: now, updatedAt: now };
+    if (String(where).startsWith("c:")) {
+      const c = finSpendCards().find(x => x.id === where.slice(2));
+      if (!c) { toast("Escolha o cartão ou a conta.", "err"); return false; }
+      txn.cardId = c.id; txn.method = "credito"; txn.invoice = F.invoiceFor(date, c.closingDay, c.dueDay);
+    } else {
+      const a = finSpendAccounts().find(x => x.id === String(where).slice(2));
+      if (!a) { toast("Escolha a conta ou o cartão.", "err"); return false; }
+      txn.accountId = a.id; if (a.type === "dinheiro") txn.method = "dinheiro";
+    }
+    if (!txn.desc) txn.desc = finCatName(txn.categoryId);
+    const err = F.validateTxn(txn, { accounts: S.fin.accounts, cards: S.fin.cards });
+    if (err) { toast(err, "err"); return false; }
+    return write(() => {
+      const fdb = firebase.firestore(), batch = fdb.batch();
+      const ref = db.collection("finTxns").doc();
+      batch.set(ref, txn);
+      batch.set(db.collection("finAudit").doc(), F.auditEntry("criar", "finTxns", ref.id, null, txn, now));
+      return batch.commit();
+    });
+  }
+  // Realized spending in a date range, net of refunds — the same rule Meu Financeiro uses.
+  function finSpentBetween(start, end) {
+    let c = 0;
+    for (const t of S.fin.txns) {
+      if (t.deleted || t.status !== "efetivado" || t.date < start || t.date > end) continue;
+      if (t.kind === "despesa") c += t.amount; else if (t.kind === "estorno") c -= t.amount;
+    }
+    return c;
+  }
+  // The balances come from the summary Meu Financeiro publishes. Expenses written here after that
+  // moment are known exactly, so they are taken off until the app republishes.
+  function finBalances() {
+    const sum = S.fin.share;
+    if (!sum) return null;
+    const after = S.fin.txns.filter(t => !t.deleted && t.source === "painel" && t.status === "efetivado" && t.kind === "despesa" && (t.createdAt || 0) > (sum.updatedAt || 0));
+    const cashOut = after.filter(t => t.accountId).reduce((a, t) => a + t.amount, 0);
+    const all = after.reduce((a, t) => a + t.amount, 0);
+    return {
+      cash: sum.saldo ? sum.saldo.cash - cashOut : null,
+      invested: sum.saldo ? sum.saldo.invested : null,
+      net: sum.patrimonio ? sum.patrimonio.net - all : null,
+      pendingN: after.length, updatedAt: sum.updatedAt
+    };
+  }
+  function finMonth() {
+    const F = FC();
+    if (!F || !shareOn("mes") || !S.fin.loaded.has("txns")) return null;
+    return F.monthSummary(S.fin.txns, monthKey(today()));
+  }
+
+  /* =========================================================
      Week stats — the same numbers feed Hoje and the weekly review
      ========================================================= */
   function weekRange(offset = 0) {
@@ -1393,7 +1564,8 @@ body[data-auth="in"] .login { display: none; }
       focusTotal: focus.length,
       habitsDone, habitsTarget,
       events: list("events").filter(e => inArea(e) && e.date >= r.start && e.date <= r.end).length,
-      spent: centsOf(expensesBetween(r.start, r.end)) / 100
+      // With Meu Financeiro in use the week's spending comes from there; without the shared month it is not shown.
+      spent: finMode() ? (S.fin.loaded.has("txns") ? finSpentBetween(r.start, r.end) / 100 : null) : centsOf(expensesBetween(r.start, r.end)) / 100
     };
   }
 
@@ -1615,7 +1787,8 @@ body[data-auth="in"] .login { display: none; }
     const type = fixedType || S.ui.captureType;
     const keep = (id, el) => { el.id = id; el.setAttribute("data-keep", ""); return el; };
     // Only the Gastos page offers income; Hoje's capture always records an expense.
-    const flow = type === "gasto" && fixedType === "gasto" ? S.ui.capFlow : "saida";
+    const fin = type === "gasto" && finMode();   // the expense is recorded in Meu Financeiro
+    const flow = type === "gasto" && fixedType === "gasto" && !fin ? S.ui.capFlow : "saida";
     const income = flow === "entrada";
     const [label, ph] = income ? ["Descrição da entrada", "De onde veio? (ex.: salário, freela)"] : (CAPTURE_TEXT[type] || CAPTURE_TEXT.tarefa);
     const text = keep("cap-text", h("input", { type: "text", class: "field grow", autocomplete: "off", "aria-label": label, placeholder: ph, list: type === "gasto" ? "cap-desc-list" : null }));
@@ -1630,6 +1803,22 @@ body[data-auth="in"] .login { display: none; }
       const date = keep("cap-date", h("input", { type: "date", class: "field", "aria-label": "Data", required: true }));
       date.value = today();
       extra.push(date, keep("cap-time", h("input", { type: "time", class: "field", "aria-label": "Hora (opcional)" })));
+    } else if (fin) {
+      lead.push(keep("cap-amount", h("input", { type: "text", class: "field amount-field", inputmode: "decimal", autocomplete: "off", "aria-label": "Valor em reais", placeholder: "R$ 0,00" })));
+      const cats = finExpenseCats();
+      const cat = keep("cap-fcat", h("select", { class: "field", "aria-label": "Categoria" }, cats.map(c => h("option", { value: c.id, text: c.name }))));
+      const savedCat = store.get("capFinCat", "");
+      cat.value = cats.some(c => c.id === savedCat) ? savedCat : cats.some(c => c.id === "alimentacao") ? "alimentacao" : (cats[0] || {}).id || "";
+      const accs = finSpendAccounts(), cards = finSpendCards();
+      const where = keep("cap-where", h("select", { class: "field", "aria-label": "Conta ou cartão" },
+        accs.length ? h("optgroup", { label: "Contas" }, accs.map(a => h("option", { value: "a:" + a.id, text: a.name }))) : null,
+        cards.length ? h("optgroup", { label: "Cartões de crédito" }, cards.map(c => h("option", { value: "c:" + c.id, text: c.name }))) : null));
+      const savedWhere = store.get("capWhere", "");
+      where.value = [...where.querySelectorAll("option")].some(o => o.value === savedWhere) ? savedWhere : (where.querySelector("option") || {}).value || "";
+      const date = keep("cap-date", h("input", { type: "date", class: "field", "aria-label": "Data do gasto", required: true }));
+      date.value = today();
+      const descs = [...new Set(S.fin.txns.filter(x => x.kind === "despesa" && !x.deleted && x.desc).map(x => x.desc))].slice(0, 40);
+      extra.push(cat, where, date, h("datalist", { id: "cap-desc-list" }, descs.map(x => h("option", { value: x }))));
     } else if (type === "gasto") {
       lead.push(keep("cap-amount", h("input", { type: "text", class: "field amount-field", inputmode: "decimal", autocomplete: "off", "aria-label": "Valor em reais", placeholder: "R$ 0,00" })));
       const cat = keep(income ? "cap-cat-in" : "cap-cat", h("select", { class: "field", "aria-label": "Categoria" },
@@ -1671,8 +1860,17 @@ body[data-auth="in"] .login { display: none; }
       const focusEl = id => { const el = document.getElementById(id); el && el.focus(); };
       const title = val("cap-text").trim();
       const a = val("cap-area") || defaultArea();
-      let col, body, msg;
-      if (type === "gasto") {
+      let col, body, msg, finBody = null;
+      if (type === "gasto" && db && !finReady()) { toast("Carregando suas contas do Meu Financeiro. Tente de novo em instantes.", "err"); return; }
+      if (fin) {
+        const amount = parseMoney(val("cap-amount"));
+        if (!(amount > 0)) { toast("Digite o valor gasto, por exemplo 45,90.", "err"); focusEl("cap-amount"); return; }
+        const where = val("cap-where");
+        if (!where) { toast("Escolha a conta ou o cartão.", "err"); focusEl("cap-where"); return; }
+        store.set("capFinCat", val("cap-fcat")); store.set("capWhere", where);
+        finBody = { amount: Math.round(amount * 100), desc: title, categoryId: val("cap-fcat"), where, date: val("cap-date") || today(), area: a };
+        msg = "Gasto de " + brlc(amount) + " registrado no Meu Financeiro";
+      } else if (type === "gasto") {
         const amount = parseMoney(val("cap-amount"));
         if (!(amount > 0)) { toast(income ? "Digite o valor recebido, por exemplo 1.500,00." : "Digite o valor gasto, por exemplo 45,90.", "err"); focusEl("cap-amount"); return; }
         const date = val("cap-date") || today();
@@ -1705,7 +1903,7 @@ body[data-auth="in"] .login { display: none; }
       }
       store.set("capArea", a);
       S.capturing = true; render();
-      const ok = type === "gasto" ? await addExpense(body) : await addDoc(col, body);
+      const ok = finBody ? await addFinExpense(finBody) : type === "gasto" ? await addExpense(body) : await addDoc(col, body);
       S.capturing = false;
       if (ok) {
         for (const id of ["cap-text", "cap-due", "cap-time", "cap-amount"]) { const el = document.getElementById(id); if (el) el.value = ""; }
@@ -1714,6 +1912,12 @@ body[data-auth="in"] .login { display: none; }
       render();
       if (ok) focusEl(type === "gasto" ? "cap-amount" : "cap-text");
     });
+    if (fixedType === "gasto" && fin) {
+      return h("div", { style: "display:grid;gap:10px" },
+        h("div", { class: "panel-head" }, h("h2", { text: "Anotar gasto" }),
+          h("a", { class: "link", href: FIN_URL + "#/lancamentos", text: "Lançamento completo (parcelas, receitas, transferências) no Meu Financeiro" })),
+        form);
+    }
     if (fixedType === "gasto") {
       const flowSeg = h("div", { class: "types", role: "group", "aria-label": "Tipo de lançamento" },
         [["saida", "Gasto"], ["entrada", "Entrada"]].map(([k, l]) => h("button", { type: "button", class: "type-btn", "aria-pressed": flow === k ? "true" : "false", text: l,
@@ -1765,11 +1969,22 @@ body[data-auth="in"] .login { display: none; }
     const stat = (cls, ic, n, label, sub, warn, tab) => h("button", { class: "stat4 " + cls, onclick: go(tab) },
       h("span", { class: "ic" }, icon(ic)),
       h("span", { class: "tx" }, h("span", { class: "n", text: n }), h("span", { class: "l", text: label }), sub ? h("span", { class: "s" + (warn ? " warn" : ""), text: sub }) : null));
-    out.push(h("div", { class: "stats4" },
-      stat("", "tarefas", todayTasks.length, "Tarefas hoje", late ? plural(late, "atrasada", "atrasadas") : "nenhuma atrasada", late > 0, "tarefas"),
+    const lateAll = openTasks().filter(x => x.due && x.due < t).sort((a, b) => a.due.localeCompare(b.due));
+    const focusN = list("tasks").filter(x => x.focusDate === t), focusOk = focusN.filter(x => taskStatus(x) === "feito").length;
+    const finStat = (() => {
+      const m = finMode() ? finMonth() : null;
+      if (m) return stat("c-fin", "financeiro", statMoney(m.expense / 100), "Despesas do mês", "resultado " + brlCents(m.result), m.result < 0, "financeiro");
+      if (finMode()) return stat("c-fin", "financeiro", "—", "Financeiro", finShare().enabled ? "carregando…" : "integração desativada", false, "financeiro");
+      const spent = centsOf(outsOf(expInArea(monthKey(t))));
+      return stat("c-fin", "financeiro", statMoney(spent / 100), "Gastos do mês", "anotados em Gastos", false, "gastos");
+    })();
+    out.push(h("div", { class: "stats4 six" },
+      stat("", "tarefas", todayTasks.length, "Tarefas hoje", focusN.length ? "foco: " + focusOk + " de " + focusN.length : "nenhuma no foco", false, "tarefas"),
+      stat("c-late", "tarefas", lateAll.length, lateAll.length === 1 ? "Atrasada" : "Atrasadas", lateAll.length ? "a mais antiga há " + plural(diffDays(t, lateAll[0].due), "dia", "dias") : "nada atrasado", lateAll.length > 0, "tarefas"),
       stat("c-work", "agenda", evToday.length, evToday.length === 1 ? "Compromisso" : "Compromissos", nextToday ? "próximo às " + nextToday.time : evToday.length ? "todos já passaram" : "nada marcado hoje", false, "agenda"),
       stat("c-ok", "habito", habits.length ? habitsDone + "/" + habits.length : "0", "Hábitos hoje", habits.length ? (habitsDone === habits.length ? "todos feitos" : (habits.length - habitsDone) + " faltando") : "crie o primeiro", false, "evolucao"),
-      stat("c-mid", "metas", goals.length, "Metas em progresso", staleN ? plural(staleN, "parada", "paradas") : goals.length ? "todas andando" : "defina uma meta", staleN > 0, "metas")));
+      stat("c-mid", "metas", goals.length, "Metas em progresso", staleN ? plural(staleN, "parada", "paradas") : goals.length ? "todas andando" : "defina uma meta", staleN > 0, "metas"),
+      finStat));
 
     out.push(captureBox());
 
@@ -1837,7 +2052,7 @@ body[data-auth="in"] .login { display: none; }
     const st = weekStats(weekRange(0)), prev = weekStats(weekRange(-1));
     const total = st.work + st.personal;
     const lifeTop = Object.entries(st.byLife).sort((a, b) => b[1] - a[1]).slice(0, 4);
-    const weekPanel = panel("Sua semana", { icon: "semana", sub: fmtRange(weekRange(0).start, weekRange(0).end) },
+    const weekPanel = panel("Evolução da semana", { icon: "semana", sub: fmtRange(weekRange(0).start, weekRange(0).end), action: linkBtn("Ver evolução", go("evolucao")) },
       h("div", { class: "kpis" },
         h("div", { class: "kpi" }, h("div", { class: "kpi-line" }, h("span", { class: "k", text: "Tarefas concluídas" }), h("span", { class: "v", text: st.tasksDone })),
           h("span", { class: "hint", text: "Semana passada: " + prev.tasksDone })),
@@ -1845,7 +2060,7 @@ body[data-auth="in"] .login { display: none; }
         st.habitsTarget ? h("div", { class: "kpi" },
           h("div", { class: "kpi-line" }, h("span", { class: "k", text: "Hábitos na semana" }), h("span", { class: "v", text: st.habitsDone + "/" + st.habitsTarget })),
           h("div", { class: "bar thin" }, h("span", { style: "width:" + Math.round(st.habitsDone / st.habitsTarget * 100) + "%" }))) : null,
-        st.spent || prev.spent ? h("button", { class: "kpi", style: "border:0;background:none;padding:0;text-align:left", onclick: go("gastos") },
+        st.spent || prev.spent ? h("button", { class: "kpi", style: "border:0;background:none;padding:0;text-align:left", onclick: go(finMode() ? "financeiro" : "gastos") },
           h("div", { class: "kpi-line" }, h("span", { class: "k", text: "Gastos na semana" }), h("span", { class: "v", text: brlc(st.spent) })),
           h("span", { class: "hint", text: "Semana passada: " + brlc(prev.spent) })) : null,
         h("div", { class: "kpi" },
@@ -1875,9 +2090,116 @@ body[data-auth="in"] .login { display: none; }
       h("div", { class: "list" }, notes.slice(0, 5).map(noteRow)),
       notes.length > 5 ? details("notes-more", "Mais " + (notes.length - 5), h("div", { class: "list" }, notes.slice(5).map(noteRow))) : null) : null;
 
+    const in7 = addDays(t, 7);
+    const soon = list("events").filter(e => inArea(e) && e.date > t && e.date <= in7).sort((a, b) => (a.date + (a.time || "99")).localeCompare(b.date + (b.time || "99")));
+    const soonPanel = panel("Próximos compromissos", { icon: "agenda", sub: "próximos 7 dias", action: linkBtn("Agenda", go("agenda")) },
+      loadingOr("events", soon.length ? h("div", { class: "list" }, soon.slice(0, 6).map(e => h("div", { class: "row" },
+        h("div", { class: "row-main" },
+          h("button", { class: "row-title", text: e.title, onclick: () => editEvent(e) }),
+          h("div", { class: "row-meta" }, h("span", { class: "due", text: rel(e.date) + (e.time ? " · " + e.time : "") }), e.place ? h("span", { class: "due", text: e.place }) : null, S.area === "tudo" ? areaChip(e.area) : null)))))
+        : h("p", { class: "hint", text: "Nada marcado nos próximos 7 dias." })));
+
     out.push(h("div", { class: "home2" }, agendaPanel, tasksPanel, goalsPanel, habitsPanel));
+    out.push(h("div", { class: "home2" }, finHomePanel(), soonPanel));
     out.push(h("div", { class: "home2" }, weekPanel, h("div", { class: "stack" }, followPanel, notesPanel)));
     return out;
+  }
+
+  /* ---------- financial summary (data from Meu Financeiro) ---------- */
+  const finKpi = (k, v, sub, cls) => h("div", { class: "fin-kpi" }, h("span", { class: "k", text: k }), h("span", { class: "v" + (cls ? " " + cls : ""), text: v }), sub ? h("span", { class: "s", text: sub }) : null);
+  const signCls = c => c < 0 ? "neg" : c > 0 ? "pos" : "";
+  function finSyncNote(b) {
+    if (!b || !b.updatedAt) return null;
+    return h("p", { class: "hint" }, "Saldos atualizados pelo Meu Financeiro " + ago(b.updatedAt) + ".",
+      b.pendingN ? " Já descontados " + plural(b.pendingN, "gasto anotado", "gastos anotados") + " aqui depois disso." : "");
+  }
+  function finSetupNotice() {
+    if (!finReady()) return h("div", { class: "empty", text: S.fin.err.size ? "Não foi possível ler o Meu Financeiro. Tentando de novo…" : "Carregando…" });
+    const sh = finShare();
+    if (!finMode()) return h("div", { style: "display:grid;gap:10px" },
+      h("p", {}, "Você ainda não cadastrou contas ou cartões no ", h("strong", { text: "Meu Financeiro" }), ". Enquanto isso, os gastos continuam na aba Gastos deste painel."),
+      h("p", { class: "hint", text: "Depois de cadastrar suas contas, use Configurações → Importar gastos do Painel no Meu Financeiro para levar o histórico sem duplicar nada." }),
+      h("div", { class: "chips" }, h("a", { class: "btn primary", href: FIN_URL + "#/contas", text: "Cadastrar contas no Meu Financeiro" }), linkBtn("Abrir Gastos", go("gastos"))));
+    if (!sh.enabled) return h("div", { style: "display:grid;gap:10px" },
+      h("p", { text: "O Meu Financeiro não está compartilhando o resumo com este painel." }),
+      h("p", { class: "hint", text: "Você escolhe o que aparece aqui em Configurações → Integração com o Meu Painel. Os gastos anotados aqui continuam indo para lá." }),
+      h("div", {}, h("a", { class: "btn primary", href: FIN_URL + "#/configuracoes", text: "Ativar integração" })));
+    return null;
+  }
+  function viewFinanceiro() {
+    const sum = S.fin.share, setup = finSetupNotice(), m = finMonth(), b = finBalances();
+    const head = h("div", { class: "view-head" },
+      h("div", {}, h("h2", { text: "Resumo financeiro" }), h("p", { text: "Os números vêm do Meu Financeiro. Aqui você consulta e anota gastos; o registro fica só lá." })),
+      h("div", { class: "actions" }, h("a", { class: "btn primary", href: FIN_URL, text: "Abrir Meu Financeiro" })));
+    const capture = finMode() ? h("section", { class: "panel" }, captureBox("gasto")) : null;
+    if (setup && !(finMode() && finShare().enabled)) return [head, h("section", { class: "panel" }, setup), capture];
+
+    const kpis = [];
+    if (m) {
+      kpis.push(finKpi("Receitas do mês", brlCents(m.income + m.yields), m.plannedIncome ? "+ " + brlCents(m.plannedIncome) + " previstas" : null));
+      kpis.push(finKpi("Despesas do mês", brlCents(m.expense), m.plannedExpense ? "+ " + brlCents(m.plannedExpense) + " previstas" : null));
+      kpis.push(finKpi("Resultado do mês", brlCents(m.result), "só o que já foi pago ou recebido", signCls(m.result)));
+    }
+    if (b && b.cash != null) kpis.push(finKpi("Saldo em contas", brlCents(b.cash), b.invested ? "investido: " + brlCents(b.invested) : null, b.cash < 0 ? "neg" : ""));
+    if (b && b.net != null) kpis.push(finKpi("Patrimônio líquido", brlCents(b.net), "bens menos dívidas", b.net < 0 ? "neg" : ""));
+    const t = today();
+    const venc = shareOn("vencimentos") && sum && sum.vencimentos ? sum.vencimentos : null;
+    const alerts = shareOn("alertas") && sum && sum.alertas ? sum.alertas : null;
+    const top = m ? Object.entries(m.byCategory).filter(([, v]) => v > 0).sort((a, b2) => b2[1] - a[1]).slice(0, 6) : [];
+    const recent = m ? finLive(S.fin.txns).filter(x => ["despesa", "receita", "estorno", "rendimento"].includes(x.kind) && x.date <= t)
+      .sort((a, b2) => b2.date.localeCompare(a.date) || (b2.createdAt || 0) - (a.createdAt || 0)).slice(0, 8) : [];
+    const loadingTx = shareOn("mes") && !S.fin.loaded.has("txns");
+    return [
+      head,
+      h("section", { class: "panel" },
+        h("div", { class: "panel-head" }, h("h2", { text: monthLabel(monthKey(t)) }), h("span", { class: "sub", text: "Meu Financeiro" })),
+        kpis.length ? h("div", { class: "fin-kpis" }, kpis) : h("div", { class: "empty", text: loadingTx ? "Carregando…" : sum ? "Nenhum número compartilhado. Escolha os campos em Configurações → Integração no Meu Financeiro." : "Abra o Meu Financeiro uma vez para publicar o resumo." }),
+        finSyncNote(b)),
+      capture,
+      h("div", { class: "home2" },
+        venc ? panel("Próximos vencimentos", { icon: "agenda" },
+          venc.length ? h("div", {}, venc.map(v => h("div", { class: "fin-line" },
+            h("span", { class: "t" }, v.label, h("small", { text: rel(v.date) + (v.type === "receber" ? " · a receber" : "") })),
+            h("span", { class: "a" + (v.type === "receber" ? " in" : ""), text: (v.type === "receber" ? "+ " : "") + brlCents(v.amount) })))) : h("p", { class: "hint", text: "Nada a pagar ou receber até o fim do próximo mês." })) : null,
+        alerts ? panel("Alertas", { icon: "semana" },
+          alerts.length ? h("div", {}, alerts.map(a => h("div", { class: "fin-line" }, h("span", { class: "t", style: "white-space:normal", text: a.text }),
+            h("span", { class: "chip " + (a.level === "neg" ? "high" : "mid"), text: a.level === "neg" ? "Atenção" : "Aviso" })))) : h("p", { class: "hint", text: "Nenhum alerta. Orçamento, faturas e contas estão em dia." })) : null,
+        m ? panel("Para onde foi o dinheiro", { icon: "financeiro", sub: "despesas do mês" },
+          top.length ? h("div", {}, top.map(([id, v]) => h("div", { class: "fin-line" }, h("span", { class: "t", text: finCatName(id) }),
+            h("span", { class: "a", text: brlCents(v) + " · " + Math.round(v / Math.max(1, m.expense) * 100) + "%" })))) : h("p", { class: "hint", text: "Nenhuma despesa paga neste mês ainda." })) : null,
+        m ? panel("Últimos lançamentos", { icon: "nota", action: h("a", { class: "link", href: FIN_URL + "#/lancamentos", text: "Ver todos" }) },
+          recent.length ? h("div", {}, recent.map(x => {
+            const inc = x.kind === "receita" || x.kind === "rendimento" || x.kind === "estorno";
+            return h("div", { class: "fin-line" },
+              h("span", { class: "t" }, x.desc || finCatName(x.categoryId), h("small", { text: [rel(x.date), finWhere(x), x.status === "previsto" ? "previsto" : "", x.source === "painel" ? "anotado no Painel" : ""].filter(Boolean).join(" · ") })),
+              h("span", { class: "a" + (inc ? " in" : ""), text: (inc ? "+ " : "") + brlCents(x.amount) }));
+          })) : h("p", { class: "hint", text: "Nenhum lançamento neste mês." })) : null)
+    ];
+  }
+  // The overview block: the month in four lines, or what to do to see it.
+  function finHomePanel() {
+    if (!finReady()) return panel("Resumo financeiro", { icon: "financeiro" }, h("div", { class: "empty", text: "Carregando…" }));
+    if (!finMode()) {
+      const mk = monthKey(today()), out = centsOf(outsOf(expInArea(mk)));
+      return panel("Resumo financeiro", { icon: "financeiro", action: linkBtn("Abrir Gastos", go("gastos")) },
+        h("div", { class: "fin-kpis" }, finKpi("Gastos no mês", brlc(out / 100), "anotados na aba Gastos")),
+        h("p", { class: "hint" }, "Cadastre suas contas no ", h("a", { href: FIN_URL + "#/contas", text: "Meu Financeiro" }), " para ver saldo, faturas e patrimônio aqui."));
+    }
+    if (!finShare().enabled) return panel("Resumo financeiro", { icon: "financeiro" },
+      h("p", { class: "hint", text: "A integração está desativada no Meu Financeiro. Os gastos anotados aqui continuam indo para lá." }),
+      h("div", {}, h("a", { class: "btn small", href: FIN_URL + "#/configuracoes", text: "Ativar integração" })));
+    const m = finMonth(), b = finBalances(), sum = S.fin.share;
+    const kp = [];
+    if (m) kp.push(finKpi("Despesas do mês", brlCents(m.expense), "resultado " + brlCents(m.result)));
+    if (b && b.cash != null) kp.push(finKpi("Saldo em contas", brlCents(b.cash), null, b.cash < 0 ? "neg" : ""));
+    const venc = shareOn("vencimentos") && sum && sum.vencimentos ? sum.vencimentos.slice(0, 3) : [];
+    const alert = shareOn("alertas") && sum && sum.alertas && sum.alertas[0];
+    return panel("Resumo financeiro", { icon: "financeiro", action: linkBtn("Ver resumo", go("financeiro")) },
+      kp.length ? h("div", { class: "fin-kpis" }, kp) : h("p", { class: "hint", text: sum ? "Nenhum número compartilhado." : "Abra o Meu Financeiro uma vez para publicar o resumo." }),
+      venc.length ? h("div", {}, venc.map(v => h("div", { class: "fin-line" }, h("span", { class: "t" }, v.label, h("small", { text: rel(v.date) })),
+        h("span", { class: "a" + (v.type === "receber" ? " in" : ""), text: (v.type === "receber" ? "+ " : "") + brlCents(v.amount) })))) : null,
+      alert ? h("div", { class: "notice warn", style: "margin:0" }, h("span", { text: alert.text })) : null,
+      finSyncNote(b));
   }
 
   let dragId = null;
@@ -2047,7 +2369,8 @@ body[data-auth="in"] .login { display: none; }
     const inc = isIncome(e);
     return h("div", { class: "row" },
       h("div", { class: "row-main" },
-        h("button", { class: "row-title", text: e.desc || catLabel(e.category) || (inc ? "Entrada" : "Gasto"), onclick: () => editExpense(e) }),
+        finMode() ? h("span", { class: "row-title", style: "font-weight:500", text: e.desc || catLabel(e.category) || (inc ? "Entrada" : "Gasto") })
+          : h("button", { class: "row-title", text: e.desc || catLabel(e.category) || (inc ? "Entrada" : "Gasto"), onclick: () => editExpense(e) }),
         h("div", { class: "row-meta" },
           h("span", { class: "chip" + (inc ? " ok" : ""), text: catLabel(e.category) }),
           e.method ? h("span", { class: "due", text: METHOD_LABEL[e.method] || e.method }) : null,
@@ -2220,15 +2543,23 @@ body[data-auth="in"] .login { display: none; }
       h("span", { class: "m", text: monthLabel(mk) }),
       h("button", { class: "icon-btn", "aria-label": "Próximo mês", text: "›", disabled: mk >= addMonths(curMk, 24), onclick: () => setExpMonth(addMonths(mk, 1)) }));
 
+    // With Meu Financeiro in use this tab is the read-only history: new money goes there, never here.
+    const ro = finMode();
+    const imported = S.fin.settings && S.fin.settings.painelImport;
     return [
       h("div", { class: "view-head" },
-        h("div", {}, h("h2", { text: "Gastos" }), h("p", { text: "Anote na hora. O painel soma, compara com o mês passado e avisa do limite." })),
+        h("div", {}, h("h2", { text: ro ? "Gastos antigos" : "Gastos" }), h("p", { text: ro ? "Histórico anotado aqui antes do Meu Financeiro. Só consulta." : "Anote na hora. O painel soma, compara com o mês passado e avisa do limite." })),
         h("div", { class: "actions" }, nav,
           h("button", { class: "btn", text: "Relatório", onclick: openReport }),
-          h("button", { class: "btn", text: "+ Entrada", onclick: () => editExpense(null, "entrada") }),
-          h("button", { class: "btn primary", text: "+ Gasto", onclick: () => editExpense(null, "saida") }))),
-      h("section", { class: "panel" }, captureBox("gasto")),
-      fixedPanel,
+          ro ? null : h("button", { class: "btn", text: "+ Entrada", onclick: () => editExpense(null, "entrada") }),
+          ro ? null : h("button", { class: "btn primary", text: "+ Gasto", onclick: () => editExpense(null, "saida") }))),
+      ro ? h("div", { class: "notice" },
+        h("span", {}, h("strong", { text: "Seus gastos agora ficam no Meu Financeiro. " }),
+          imported ? "Este histórico já foi importado para lá" + (imported.at ? " em " + fmtShort(isoFromMs(imported.at)) : "") + "; importar de novo não duplica."
+            : "Para levar este histórico, use Configurações → Importar gastos do Painel no Meu Financeiro."),
+        h("a", { class: "btn small primary", href: FIN_URL + (imported ? "" : "#/configuracoes"), text: imported ? "Abrir Meu Financeiro" : "Importar histórico" }))
+        : h("section", { class: "panel" }, captureBox("gasto")),
+      ro ? null : fixedPanel,
       !loaded ? h("section", { class: "panel" }, h("div", { class: "empty", text: "Carregando…" })) : null,
       loaded && all.length ? h("div", { class: "grid" }, summary, catPanel) : null,
       loaded && outs.length ? h("div", { class: "grid" }, dayChart, monthChart) : null,
@@ -2800,7 +3131,8 @@ body[data-auth="in"] .login { display: none; }
       agenda: list("events").filter(e => inArea(e) && e.date === t).length,
       metas: list("goals").filter(g => inArea(g) && goalStale(g)).length,
       contatos: list("contacts").filter(c => c.nextFollowUp && c.nextFollowUp <= t && inArea(c, contactArea(c))).length,
-      evolucao: pendingReviewStart() ? 1 : 0
+      evolucao: pendingReviewStart() ? 1 : 0,
+      financeiro: finMode() && shareOn("alertas") && S.fin.share && S.fin.share.alertas ? S.fin.share.alertas.length : 0
     };
   }
   function icon(name) {
@@ -2811,12 +3143,19 @@ body[data-auth="in"] .login { display: none; }
     el.innerHTML = ICONS[name]; // constant markup defined above
     return el;
   }
+  const TAB_LABEL = Object.fromEntries(TABS);
+  // With Meu Financeiro in use, the old Gastos tab is only the history kept here.
+  const tabLabel = k => k === "gastos" && finMode() ? "Gastos antigos" : TAB_LABEL[k];
   function renderNav() {
     const counts = tabCounts();
-    $("#tabs").replaceChildren(...TABS.map(([k, l]) =>
-      h("a", { href: "#" + k, "aria-current": S.tab === k ? "page" : null, title: l, "aria-label": l + (counts[k] ? " (" + counts[k] + ")" : "") },
-        icon(NAV_ICON[k] || k), h("span", { class: "lbl", text: l }), counts[k] ? h("span", { class: "count", text: counts[k] }) : null)));
-    $("#bottomnav").replaceChildren(...TABS.map(([k, l]) =>
+    const link = k => { const l = tabLabel(k); return h("a", { href: "#" + k, "aria-current": S.tab === k ? "page" : null, title: l, "aria-label": l + (counts[k] ? " (" + counts[k] + ")" : "") },
+      icon(NAV_ICON[k] || k), h("span", { class: "lbl", text: l }), counts[k] ? h("span", { class: "count", text: counts[k] }) : null); };
+    $("#tabs").replaceChildren(...NAV_GROUPS.flatMap(([g, keys]) => [
+      h("div", { class: "grp", text: g, role: "presentation" }),
+      ...keys.map(link),
+      g === "Financeiro" ? h("a", { class: "ext", href: FIN_URL, title: "Abrir Meu Financeiro", "aria-label": "Abrir Meu Financeiro" }, icon("externo"), h("span", { class: "lbl", text: "Meu Financeiro" })) : null
+    ].filter(Boolean)));
+    $("#bottomnav").replaceChildren(...BOTTOM_TABS.map(k => [k, TAB_LABEL[k]]).map(([k, l]) =>
       h("a", { href: "#" + k, "aria-current": S.tab === k ? "page" : null, "aria-label": l + (counts[k] ? " (" + counts[k] + ")" : "") },
         icon(NAV_ICON[k] || k), h("span", { class: "lbl", text: TAB_SHORT[k] || l }), counts[k] ? h("span", { class: "count", text: counts[k] }) : null)));
   }
@@ -2830,7 +3169,7 @@ body[data-auth="in"] .login { display: none; }
     for (const b of document.querySelectorAll("#area-seg button")) b.setAttribute("aria-pressed", b.dataset.area === S.area ? "true" : "false");
     renderSaveState();
   }
-  const VIEWS = { hoje: viewHoje, tarefas: viewTarefas, agenda: viewAgenda, gastos: viewGastos, metas: viewMetas, contatos: viewContatos, evolucao: viewEvolucao };
+  const VIEWS = { hoje: viewHoje, tarefas: viewTarefas, agenda: viewAgenda, gastos: viewGastos, financeiro: viewFinanceiro, metas: viewMetas, contatos: viewContatos, evolucao: viewEvolucao };
   function render() {
     // Keep typed text and focus across re-renders.
     const keep = {};
@@ -2904,7 +3243,7 @@ body[data-auth="in"] .login { display: none; }
   setInterval(() => {
     if (today() === lastDay) return;
     lastDay = today();
-    if (db) { subscribeMonths(); syncExpSubs(); }
+    if (db) { subscribeMonths(); syncExpSubs(); syncFinTxns(); }
     render();
   }, 60000);
 
@@ -2952,6 +3291,7 @@ body[data-auth="in"] .login { display: none; }
     for (const c of SUB_COLS) subscribe(c);
     subscribeMonths();
     syncExpSubs();
+    subscribeFin();
     render();
   }
 

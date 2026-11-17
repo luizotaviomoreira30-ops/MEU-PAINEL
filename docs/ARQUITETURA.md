@@ -104,3 +104,13 @@ Todo valor monetário é gravado em **centavos inteiros**, para não haver erro 
 - Uma despesa lançada pela captura rápida do Painel é gravada **uma vez**, em `finTxns`.
 - Desativar o compartilhamento apaga o resumo publicado e faz o Painel parar de mostrar os dados financeiros.
 - Os gastos antigos do Painel (`expenseMonths`) são **copiados** para `finTxns` por um botão no Financeiro. Os originais não são apagados, e cada cópia tem um id fixo (`painel_<mês>_<id>`), então repetir a importação não duplica nada.
+
+### Como ficou implementado (Etapa C)
+- `index.html` carrega `shared/fincore.js` como módulo (`window.FinCore`): o Painel usa as mesmas regras do Financeiro para o mês e para a fatura do cartão.
+- Leituras do Painel: `finSettings/main`, `finShare/summary`, `finAccounts`, `finCards`, `finCategories` e, só com o campo "mês" liberado, `finTxns` do mês atual e do anterior (consulta por `date`).
+- **Modo Financeiro**: liga quando existe ao menos uma conta (corrente, poupança ou dinheiro) ou um cartão ativo no Financeiro. A partir daí:
+  - a captura rápida "Gasto" grava em `finTxns` (`source: "painel"`), com a entrada de `finAudit` no mesmo lote;
+  - a aba Gastos vira "Gastos antigos", só leitura, com o caminho para importar o histórico;
+  - "Gastos na semana" vem de `finTxns`.
+- Saldo e patrimônio vêm do resumo publicado. Gastos anotados no Painel **depois** da última publicação são descontados na tela (sabemos exatamente quais são) até o Financeiro republicar.
+- Sem contas no Financeiro, o Painel continua com a aba Gastos como antes (nada é perdido nem bloqueado).
