@@ -185,6 +185,7 @@ a.btn { text-decoration: none; display: inline-flex; align-items: center; }
 .fin-line .a { font-variant-numeric: tabular-nums; font-weight: 600; white-space: nowrap; }
 .fin-line .a.in { color: var(--ok); }
 .fin-line small { display: block; color: var(--muted); font-size: 12px; }
+.fin-line small.late { color: var(--high); font-weight: 600; }
 .stat4 { display: flex; align-items: center; gap: 14px; padding: 16px; border-radius: 16px; border: 1px solid transparent; text-align: left; color: var(--ink); min-width: 0; background: var(--accent-soft); }
 .stat4:hover { border-color: var(--line); }
 .stat4 .ic { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; color: var(--surface); background: var(--accent); flex: none; }
@@ -2157,9 +2158,9 @@ body[data-auth="in"] .login { display: none; }
         finSyncNote(b)),
       capture,
       h("div", { class: "home2" },
-        venc ? panel("Próximos vencimentos", { icon: "agenda" },
+        venc ? panel("Contas a pagar e receber", { icon: "agenda", action: h("a", { class: "link", href: FIN_URL + "#/a-pagar-receber", text: "Ver todas" }) },
           venc.length ? h("div", {}, venc.map(v => h("div", { class: "fin-line" },
-            h("span", { class: "t" }, v.label, h("small", { text: rel(v.date) + (v.type === "receber" ? " · a receber" : "") })),
+            h("span", { class: "t" }, v.label, h("small", { class: v.overdue ? "late" : null, text: (v.overdue ? "vencida · " : "") + rel(v.date) + (v.type === "receber" ? " · a receber" : "") })),
             h("span", { class: "a" + (v.type === "receber" ? " in" : ""), text: (v.type === "receber" ? "+ " : "") + brlCents(v.amount) })))) : h("p", { class: "hint", text: "Nada a pagar ou receber até o fim do próximo mês." })) : null,
         alerts ? panel("Alertas", { icon: "semana" },
           alerts.length ? h("div", {}, alerts.map(a => h("div", { class: "fin-line" }, h("span", { class: "t", style: "white-space:normal", text: a.text }),
@@ -2196,7 +2197,7 @@ body[data-auth="in"] .login { display: none; }
     const alert = shareOn("alertas") && sum && sum.alertas && sum.alertas[0];
     return panel("Resumo financeiro", { icon: "financeiro", action: linkBtn("Ver resumo", go("financeiro")) },
       kp.length ? h("div", { class: "fin-kpis" }, kp) : h("p", { class: "hint", text: sum ? "Nenhum número compartilhado." : "Abra o Meu Financeiro uma vez para publicar o resumo." }),
-      venc.length ? h("div", {}, venc.map(v => h("div", { class: "fin-line" }, h("span", { class: "t" }, v.label, h("small", { text: rel(v.date) })),
+      venc.length ? h("div", {}, venc.map(v => h("div", { class: "fin-line" }, h("span", { class: "t" }, v.label, h("small", { class: v.overdue ? "late" : null, text: (v.overdue ? "vencida · " : "") + rel(v.date) })),
         h("span", { class: "a" + (v.type === "receber" ? " in" : ""), text: (v.type === "receber" ? "+ " : "") + brlCents(v.amount) })))) : null,
       alert ? h("div", { class: "notice warn", style: "margin:0" }, h("span", { text: alert.text })) : null,
       finSyncNote(b));

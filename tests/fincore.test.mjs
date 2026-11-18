@@ -215,3 +215,27 @@ test("possíveis duplicados", () => {
   assert.equal(d.length, 1);
   assert.deepEqual(d[0].map(t => t.id), ["1", "2"]);
 });
+
+test("contas a pagar e receber: previstos e faturas em aberto, vencidas marcadas", () => {
+  const today = "2026-11-18";
+  const txns = [
+    txn({ id: "luz", kind: "despesa", status: "previsto", accountId: "a", amount: 18000, date: "2026-11-15" }),            // vencida
+    txn({ id: "agua", kind: "despesa", status: "previsto", accountId: "a", amount: 9000, date: "2026-11-01", dueDate: "2026-11-25" }),
+    txn({ id: "sal", kind: "receita", status: "previsto", accountId: "a", amount: 300000, date: "2026-12-05" }),
+    txn({ id: "paga", kind: "despesa", status: "efetivado", accountId: "a", amount: 5000, date: "2026-11-20" }),         // já paga: fora
+    txn({ id: "poup", kind: "transferencia", status: "previsto", fromId: "a", toId: "p", amount: 10000, date: "2026-11-20" }), // entre contas: fora
+    txn({ id: "emp", kind: "transferencia", subtype: "pagamento_divida", status: "previsto", fromId: "a", toId: "d", amount: 40000, date: "2026-11-28" }),
+    txn({ id: "del", kind: "despesa", status: "previsto", accountId: "a", amount: 7000, date: "2026-11-22", deleted: true }),
+    // card: purchase on 05/11 goes to the December invoice (closes 03/12, due 10/12); a payment of 100 leaves 200 open
+    txn({ id: "tv", kind: "despesa", cardId: "nu", amount: 30000, date: "2026-11-05", invoice: "2026-12" }),
+    txn({ id: "pg", kind: "pagamento_fatura", fromId: "a", toId: "nu", amount: 10000, date: "2026-11-06", invoice: "2026-12" })
+  ];
+  const items = F.payables(txns, [card], today);
+  assert.deepEqual(items.map(x => x.key), ["t:luz", "t:agua", "t:emp", "t:sal", "f:nu:2026-12"]);
+  assert.equal(items[0].overdue, true);
+  assert.equal(items[1].due, "2026-11-25");            // the due date wins over the entry date
+  assert.equal(items.at(-1).amount, 20000);            // invoice: only what is still open
+  const tot = F.payablesTotals(items);
+  assert.deepEqual(tot, { pay: 18000 + 9000 + 40000 + 20000, receive: 300000, payLate: 18000, receiveLate: 0 });
+  assert.deepEqual(F.payables(txns, [card], today, { from: "2026-11-18", to: "2026-11-30" }).map(x => x.key), ["t:agua", "t:emp"]);
+});

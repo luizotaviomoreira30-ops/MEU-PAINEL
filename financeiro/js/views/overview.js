@@ -82,7 +82,7 @@ export function viewOverview(app) {
       h("small", { text: fmtDay(x.date) + (x.invoice ? " · vencimento" : " · " + whereLabel(st, x.txn)) })),
     h("span", { class: "amt " + (x.type === "receber" ? "pos" : ""), text: brl(x.amount) }));
   const upcomingBlock = h("section", { class: "card" },
-    h("div", { class: "card-head" }, h("h2", { text: "Próximos 30 dias" }), h("a", { class: "link", href: "#/lancamentos?status=previsto", text: "Pendentes" })),
+    h("div", { class: "card-head" }, h("h2", { text: "Próximos 30 dias" }), h("a", { class: "link", href: "#/a-pagar-receber", text: "Contas a pagar e receber" })),
     up.length ? [
       pay.length ? [h("div", { class: "hint", text: "A pagar · " + brl(pay.reduce((s, x) => s + x.amount, 0)) }), h("div", { class: "rows" }, pay.slice(0, 6).map(upRow))] : null,
       receive.length ? [h("div", { class: "hint", text: "A receber · " + brl(receive.reduce((s, x) => s + x.amount, 0)) }), h("div", { class: "rows" }, receive.slice(0, 6).map(upRow))] : null

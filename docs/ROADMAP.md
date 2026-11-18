@@ -15,6 +15,7 @@ Estado real de cada parte. "Feito" = implementado, testado e publicado. Nada aqu
 - [x] Contas (incluindo dívida e externa) e extrato com saldo acumulado
 - [x] Cartões, faturas por vencimento, parcelas, pagamento de fatura, estornos
 - [x] Orçamento por categoria com níveis 50/75/90/100%
+- [x] Contas a pagar e receber: vencidas, próximos dias, faturas em aberto, "Paguei"/"Recebi", saldo estimado depois dos pagamentos
 - [x] Relatórios com exportação CSV, Excel e PDF
 - [x] Configurações: categorias, integração com o Painel, importação dos gastos do Painel, backup, histórico de alterações
 
@@ -27,6 +28,13 @@ Estado real de cada parte. "Feito" = implementado, testado e publicado. Nada aqu
 - [x] Aba Gastos antiga só leitura quando o Financeiro está em uso
 
 ## Pendente (próximas etapas)
+
+### Ideias enviadas em 18/11 (ordem combinada)
+- [ ] Categorias em dois níveis (grupo → categoria) com a lista enviada, sem perder os lançamentos atuais
+- [ ] Balancete: DRE do mês, balanço patrimonial, balancete por conta e fechamento de mês
+- [ ] Projeção de caixa 30/60/90/180 dias e 12 meses (sempre marcada como estimativa)
+- [ ] Score de saúde financeira 0–1000 calculado com os seus dados (não é o score do Serasa)
+- [ ] Conta do tipo Benefício (VA/VR), se for usada
 
 ### Meu Financeiro
 - [ ] Planejamento / fluxo de caixa 30, 60, 90 e 180 dias (projeção marcada como estimativa)

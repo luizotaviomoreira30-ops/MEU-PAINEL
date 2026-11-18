@@ -184,6 +184,35 @@ export function cardInvoiceIds(card, txns, today) {
   return [...ids].sort();
 }
 
+/* ---------------- bills to pay and to receive ---------------- */
+// Planned entries and card invoices with something left to pay, by due date.
+// Overdue = due before today and still not paid. Transfers between your own accounts are not bills;
+// a planned payment to a debt account is.
+export function payables(txns, cards, today, { from = "0000-01-01", to = "9999-12-31" } = {}) {
+  const out = [];
+  for (const t of txns) {
+    if (!isLive(t) || t.status !== "previsto" || t.cardId) continue;
+    const type = t.kind === "receita" || t.kind === "rendimento" ? "receber"
+      : t.kind === "despesa" || (t.kind === "transferencia" && t.subtype === "pagamento_divida") ? "pagar" : null;
+    if (!type) continue;
+    const due = t.dueDate || t.date;
+    if (due < from || due > to) continue;
+    out.push({ key: "t:" + t.id, type, due, amount: t.amount, overdue: due < today, txn: t });
+  }
+  for (const c of cards) {
+    for (const id of cardInvoiceIds(c, txns, today)) {
+      const inv = invoiceSummary(c, txns, id, today);
+      if (inv.open <= 0 || inv.due < from || inv.due > to) continue;
+      out.push({ key: "f:" + c.id + ":" + id, type: "pagar", due: inv.due, amount: inv.open, overdue: inv.due < today, invoice: inv, card: c });
+    }
+  }
+  return out.sort((a, b) => a.due.localeCompare(b.due) || a.type.localeCompare(b.type));
+}
+export function payablesTotals(items) {
+  const sum = (type, overdue) => items.filter(x => x.type === type && (overdue == null || x.overdue === overdue)).reduce((s, x) => s + x.amount, 0);
+  return { pay: sum("pagar"), receive: sum("receber"), payLate: sum("pagar", true), receiveLate: sum("receber", true) };
+}
+
 /* ---------------- installments ---------------- */
 export function splitInstallments(totalCents, n) {
   const part = Math.floor(totalCents / n);

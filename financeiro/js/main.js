@@ -11,6 +11,7 @@ import { viewCards, openInvoicePayment } from "./views/cards.js";
 import { viewBudget } from "./views/budget.js";
 import { viewReports } from "./views/reports.js";
 import { viewSettings } from "./views/settings.js";
+import { viewBills } from "./views/bills.js";
 import { openTxnForm } from "./views/txnForm.js";
 
 const ROUTES = {
@@ -18,12 +19,13 @@ const ROUTES = {
   "lancamentos": { title: "Lançamentos", sub: "Receitas, despesas, transferências e pendências", icon: "txns", view: viewTransactions },
   "contas": { title: "Contas", sub: "Saldos calculados a partir do saldo inicial e do que foi efetivado", icon: "bank", view: viewAccounts },
   "cartoes": { title: "Cartões", sub: "Limites, faturas e parcelas", icon: "card", view: viewCards },
+  "a-pagar-receber": { title: "Contas a pagar e receber", sub: "O que vence, o que está atrasado e o que vai entrar", icon: "calendar", view: viewBills },
   "orcamento": { title: "Orçamento", sub: "Limites mensais por categoria", icon: "budget", view: viewBudget },
   "relatorios": { title: "Relatórios", sub: "Resultados do período e exportação", icon: "report", view: viewReports },
   "configuracoes": { title: "Configurações", sub: "Categorias, integração, backup e auditoria", icon: "settings", view: viewSettings }
 };
 const NAV = [
-  ["Principal", ["visao-geral", "lancamentos"]],
+  ["Principal", ["visao-geral", "lancamentos", "a-pagar-receber"]],
   ["Contas e cartões", ["contas", "cartoes"]],
   ["Planejamento", ["orcamento"]],
   ["Análise", ["relatorios"]],
@@ -76,8 +78,9 @@ function buildSummary(fields) {
   if (fields.mes !== false) out.mes = { income: sm.income + sm.yields, expense: sm.expense, result: sm.result, plannedIncome: sm.plannedIncome, plannedExpense: sm.plannedExpense,
     top: Object.entries(sm.byCategory).filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]).slice(0, 4).map(([k, v]) => ({ name: categoryName(st, k), value: v })) };
   if (fields.patrimonio !== false) out.patrimonio = { net: nw.net, assets: nw.assets, liabilities: nw.liabilities };
-  if (fields.vencimentos !== false) out.vencimentos = F.upcoming(txns, activeCards(st), t, F.dayIn(F.addMonths(mk, 1), 31), t).slice(0, 6)
-    .map(x => ({ date: x.date, amount: x.amount, type: x.type, label: x.invoice ? "Fatura " + x.card.name : (x.txn.desc || categoryName(st, x.txn.categoryId)) }));
+  // Overdue bills come first, then what is due up to the end of next month.
+  if (fields.vencimentos !== false) out.vencimentos = F.payables(txns, activeCards(st), t, { to: F.dayIn(F.addMonths(mk, 1), 31) }).slice(0, 6)
+    .map(x => ({ date: x.due, amount: x.amount, type: x.type, overdue: x.overdue, label: x.invoice ? "Fatura " + x.card.name : (x.txn.desc || categoryName(st, x.txn.categoryId)) }));
   if (fields.alertas !== false) out.alertas = alerts(st, t).slice(0, 5).map(a => ({ level: a.level, text: a.text }));
   return out;
 }
