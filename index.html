@@ -152,7 +152,7 @@ main { padding-block: 14px 56px; display: grid; gap: 18px; max-width: 1240px; }
   .top { padding-block: 14px 2px; }
   .hello .lead { font-size: 14px; }
   .bottomnav {
-    display: grid; grid-template-columns: repeat(7, minmax(0, 1fr));
+    display: grid; grid-template-columns: repeat(6, minmax(0, 1fr));
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
     background: var(--surface); border-top: 1px solid var(--line);
     padding: 6px max(6px, env(safe-area-inset-right, 0px)) calc(6px + env(safe-area-inset-bottom, 0px)) max(6px, env(safe-area-inset-left, 0px));
@@ -173,6 +173,44 @@ main { padding-block: 14px 56px; display: grid; gap: 18px; max-width: 1240px; }
 .stat4.c-fin { background: var(--fin-soft); } .stat4.c-fin .ic { background: var(--fin); }
 .stat4.c-late { background: var(--high-soft); } .stat4.c-late .ic { background: var(--high); }
 a.btn { text-decoration: none; display: inline-flex; align-items: center; }
+/* Mais (phone) */
+.more-scrim { position: fixed; inset: 0; z-index: 39; background: rgba(0, 0, 0, .28); }
+.more-scrim[hidden] { display: none; }
+.more-sheet { position: absolute; left: 0; right: 0; bottom: calc(64px + env(safe-area-inset-bottom, 0px)); background: var(--surface); border-radius: 18px 18px 0 0; padding: 14px 16px 16px; max-height: 70vh; overflow-y: auto; box-shadow: 0 -8px 24px rgba(0, 0, 0, .12); }
+.more-sheet .grp { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 10px 0 6px; }
+.more-sheet .grp:first-child { margin-top: 0; }
+.more-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.more-sheet a { display: flex; align-items: center; gap: 10px; padding: 11px 12px; border-radius: 12px; background: var(--surface-2); color: var(--ink); text-decoration: none; font-weight: 600; font-size: 14px; min-width: 0; }
+.more-sheet a span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.more-sheet a[aria-current="page"] { background: var(--accent-soft); color: var(--accent); }
+.more-sheet a svg { width: 20px; height: 20px; flex: none; }
+.more-sheet a .count { margin-left: auto; }
+.more-sheet .more-ext { margin-top: 12px; background: none; border: 1px solid var(--line); }
+@media (min-width: 760px) { .more-scrim { display: none !important; } }
+.bottomnav .more-btn { display: grid; justify-items: center; gap: 2px; font-size: 11px; font-weight: 600; color: var(--muted); background: none; border: 0; padding: 4px 0; position: relative; min-width: 0; }
+.bottomnav .more-btn[aria-current="page"] { color: var(--accent); }
+.bottomnav .more-btn span.lbl { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* Aniversários */
+.due.wrap { white-space: normal; }
+.bday-ic { font-size: 20px; width: 28px; text-align: center; flex: none; }
+.row.bday-today { background: var(--mid-soft); border-radius: 12px; padding-inline: 8px; }
+.notice.bday { border-color: var(--mid); background: var(--mid-soft); color: var(--ink); }
+/* Modo foco */
+.focus-go { font-size: 11px; color: var(--accent); flex: none; }
+.focus-card { justify-items: center; text-align: center; gap: 14px; padding-block: 28px; }
+.focus-card .focus-what { font-weight: 600; font-size: 16px; max-width: 100%; overflow-wrap: anywhere; }
+.focus-clock { font-family: var(--f-display); font-size: clamp(64px, 14vw, 112px); font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+.focus-clock.small { font-size: 48px; }
+.focus-card .bar { width: min(420px, 100%); }
+.focus-card.pause .focus-clock { color: var(--ok); }
+.focus-strip { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px 14px; border-radius: var(--r); background: var(--accent-soft); border: 1px solid var(--accent); }
+.focus-strip.pause { background: var(--ok-soft); border-color: var(--ok); }
+.focus-strip .fs-main { flex: 1 1 200px; display: flex; gap: 10px; align-items: baseline; color: var(--ink); text-decoration: none; min-width: 0; }
+.focus-strip .fs-main span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+.focus-strip .fs-main b { font-family: var(--f-display); font-size: 20px; font-variant-numeric: tabular-nums; }
+/* Lista de compras */
+.shop-row .row-title { font-size: 15px; }
+@media (max-width: 759px) { .shop-row { padding-block: 12px; } .shop-row .check { width: 28px; height: 28px; } }
 .fin-kpis { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
 .fin-kpi { padding: 14px 16px; border-radius: 14px; background: var(--surface-2, rgba(0,0,0,.03)); display: grid; gap: 4px; min-width: 0; }
 .fin-kpi .k { font-size: 12.5px; color: var(--muted); font-weight: 600; }
@@ -693,18 +731,19 @@ body[data-auth="in"] .login { display: none; }
     ["rendimentos", "Rendimentos"], ["outras_entradas", "Outras entradas"]];
   const INCOME_LABEL = Object.fromEntries(INCOME_CATS);
   const TABS = [
-    ["hoje", "Painel inicial"], ["tarefas", "Tarefas"], ["agenda", "Agenda"], ["metas", "Metas"], ["evolucao", "Evolução"],
-    ["contatos", "Contatos"], ["financeiro", "Resumo financeiro"], ["gastos", "Gastos"]
+    ["hoje", "Painel inicial"], ["tarefas", "Tarefas"], ["agenda", "Agenda"], ["foco", "Modo foco"], ["metas", "Metas"], ["evolucao", "Evolução"],
+    ["compras", "Lista de compras"], ["aniversarios", "Aniversários"], ["contatos", "Contatos"], ["financeiro", "Resumo financeiro"], ["gastos", "Gastos"]
   ];
   // The side menu groups the sections; the phone's bottom bar keeps the daily ones.
   const NAV_GROUPS = [
-    ["Visão geral", ["hoje"]], ["Organização", ["tarefas", "agenda"]], ["Desenvolvimento", ["metas", "evolucao"]],
-    ["Vida pessoal", ["contatos"]], ["Financeiro", ["financeiro", "gastos"]]
+    ["Visão geral", ["hoje"]], ["Organização", ["tarefas", "agenda", "foco"]], ["Desenvolvimento", ["metas", "evolucao"]],
+    ["Vida pessoal", ["compras", "aniversarios", "contatos"]], ["Financeiro", ["financeiro", "gastos"]]
   ];
-  const BOTTOM_TABS = ["hoje", "tarefas", "agenda", "financeiro", "metas", "contatos", "evolucao"];
+  // The phone's bottom bar: the daily sections, and "Mais" opens the rest.
+  const BOTTOM_TABS = ["hoje", "tarefas", "agenda", "compras", "financeiro"];
   const FIN_URL = "./financeiro/";
   const TAB_ALIASES = { inicio: "hoje", quadro: "tarefas" };
-  const TAB_SHORT = { hoje: "Início", financeiro: "Finanças" };   // the phone's bottom bar has room for short names only
+  const TAB_SHORT = { hoje: "Início", financeiro: "Finanças", compras: "Compras", foco: "Foco", aniversarios: "Aniversários" };   // the phone's bottom bar has room for short names only
   const ICONS = {
     hoje: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
     tarefas: '<rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 12l3 3 5-6"/>',
@@ -714,6 +753,10 @@ body[data-auth="in"] .login { display: none; }
     evolucao: '<path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/>',
     gastos: '<rect x="3" y="6" width="18" height="14" rx="2"/><path d="M3 10h18"/><path d="M15.5 15h2.5"/><path d="M6 6l9.5-3 1.2 3"/>',
     financeiro: '<path d="M3 8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M16 13h2"/><path d="M3 10h18"/>',
+    foco: '<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5"/><path d="M9.5 2.5h5"/>',
+    compras: '<path d="M3 4h2l2.4 11.2a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.5L21 8H6.2"/><circle cx="10" cy="20.5" r="1.2"/><circle cx="17" cy="20.5" r="1.2"/>',
+    aniversarios: '<path d="M4 21h16v-8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2z"/><path d="M4 16c1.3 1 2.7 1 4 0s2.7-1 4 0 2.7 1 4 0 2.7-1 4 0"/><path d="M12 11V8"/><path d="M12 5.5c-.8-.8-.8-2 0-3 .8 1 .8 2.2 0 3z"/>',
+    mais: '<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>',
     externo: '<path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>',
     inicio: '<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/>',
     habito: '<path d="M17 2l4 4-4 4"/><path d="M3 11V9a3 3 0 0 1 3-3h15"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a3 3 0 0 1-3 3H3"/>',
@@ -725,7 +768,7 @@ body[data-auth="in"] .login { display: none; }
   const NAV_ICON = { hoje: "inicio" };
   const COL_PT = { tasks: "tarefas", contacts: "contatos", goals: "metas", events: "compromissos", habits: "hábitos",
     reviews: "revisões", notes: "anotações", cards: "quadro antigo", habitLog: "registro de hábitos",
-    expenseMonths: "meses de gastos", expenses: "gastos", settings: "preferências" };
+    expenseMonths: "meses de gastos", expenses: "gastos", settings: "preferências", birthdays: "aniversários", shopping: "lista de compras", focusSessions: "sessões de foco" };
 
   const areaChip = a => a ? h("span", { class: "chip " + (a === "pessoal" ? "life" : "work"), text: AREAS[a] || a }) : null;
   const lifeChip = k => k && LIFE_LABEL[k] ? h("span", { class: "chip", text: LIFE_LABEL[k] }) : null;
@@ -738,7 +781,9 @@ body[data-auth="in"] .login { display: none; }
   // Coleções acompanhadas em tempo real. "cards" é o quadro antigo, lido só para a importação.
   // Gastos ficam em uma lista por mês (expenseMonths/<AAAA-MM>/items), para que cada consulta continue pequena com os anos.
   // "settings" guarda preferências como o limite de gastos e as categorias criadas por você.
-  const SUB_COLS = ["tasks", "contacts", "goals", "events", "habits", "reviews", "notes", "cards", "expenseMonths", "settings"];
+  const SUB_COLS = ["tasks", "contacts", "goals", "events", "habits", "reviews", "notes", "cards", "expenseMonths", "settings", "birthdays", "shopping", "focusSessions"];
+  // Focus sessions only need the last eight weeks on screen; the backup still reads all of them.
+  const SUB_QUERY = { focusSessions: c => c.where("date", ">=", addDays(today(), -56)) };
   const BACKUP_COLS = [...SUB_COLS, "habitLog"];
   const S = {
     tab: "hoje",
@@ -1480,12 +1525,12 @@ body[data-auth="in"] .login { display: none; }
     return "em " + fmtShort(isoFromMs(ms));
   }
   // The expense goes to Meu Financeiro with its audit entry in the same batch, exactly as that app saves it.
-  async function addFinExpense({ amount, desc, categoryId, where, date, area }) {
+  async function addFinExpense({ amount, desc, categoryId, where, date, area, notes = "" }) {
     const F = FC();
     if (!F) { toast("Ainda carregando as regras do financeiro. Tente de novo em instantes.", "err"); return false; }
     const now = Date.now();
     const txn = { kind: "despesa", desc, date, status: "efetivado", amount, categoryId: categoryId || null, subcategory: "", method: "",
-      tags: area && AREAS[area] ? [AREAS[area]] : [], notes: "", accountId: null, cardId: null, fromId: null, toId: null,
+      tags: area && AREAS[area] ? [AREAS[area]] : [], notes, accountId: null, cardId: null, fromId: null, toId: null,
       invoice: null, dueDate: null, paidDate: null, subtype: null, source: "painel", createdAt: now, updatedAt: now };
     if (String(where).startsWith("c:")) {
       const c = finSpendCards().find(x => x.id === where.slice(2));
@@ -1565,6 +1610,7 @@ body[data-auth="in"] .login { display: none; }
       focusTotal: focus.length,
       habitsDone, habitsTarget,
       events: list("events").filter(e => inArea(e) && e.date >= r.start && e.date <= r.end).length,
+      focusMin: sumMin(list("focusSessions").filter(s => inArea(s) && s.date >= r.start && s.date <= r.end)),
       // With Meu Financeiro in use the week's spending comes from there; without the shared month it is not shown.
       spent: finMode() ? (S.fin.loaded.has("txns") ? finSpentBetween(r.start, r.end) / 100 : null) : centsOf(expensesBetween(r.start, r.end)) / 100
     };
@@ -1595,6 +1641,7 @@ body[data-auth="in"] .login { display: none; }
       st.focusTotal ? h("span", { text: "Foco do dia cumprido: " + st.focusDone + " de " + st.focusTotal }) : null,
       st.habitsTarget ? h("span", { text: "Hábitos: " + st.habitsDone + " de " + st.habitsTarget + " na semana" }) : null,
       h("span", { text: plural(st.events, "compromisso", "compromissos") }),
+      st.focusMin ? h("span", { text: "Tempo de foco: " + fmtMin(st.focusMin) }) : null,
       st.spent ? h("span", { text: "Gastos registrados: " + brlc(st.spent) }) : null);
   }
   function editReview(start) {
@@ -1745,6 +1792,7 @@ body[data-auth="in"] .login { display: none; }
           lifeChip(t.lifeArea),
           t.due && st !== "feito" ? h("span", { class: dueClass(t.due), text: rel(t.due) }) : null,
           opts.showDone && t.doneAt ? h("span", { class: "due", text: "feita " + rel(isoFromMs(t.doneAt)) }) : null)),
+      st === "feito" ? null : focusBtn(t),
       opts.noStar || st === "feito" ? null : starBtn(t));
   }
   function eventRow(e, showDate) {
@@ -1958,6 +2006,11 @@ body[data-auth="in"] .login { display: none; }
         h("button", { class: "btn small primary", text: "Fazer revisão", onclick: () => editReview(pendingStart) })));
     }
 
+    const bdToday = list("birthdays").filter(b => nextBday(b) === t);
+    if (bdToday.length) out.push(h("div", { class: "notice bday" },
+      h("span", {}, "🎂 ", h("strong", { text: "Hoje é aniversário de " + bdToday.map(b => b.name + (bdayAge(b, t) > 0 ? " (" + bdayAge(b, t) + " anos)" : "")).join(", ") + "." }), " Que tal mandar uma mensagem?"),
+      h("button", { class: "btn small", text: "Ver aniversários", onclick: go("aniversarios") })));
+
     /* ---------- the day's numbers ---------- */
     const todayTasks = sortedTasks(openTasks().filter(x => (x.due && x.due <= t) || x.focusDate === t || taskStatus(x) === "fazendo"));
     const late = todayTasks.filter(x => x.due && x.due < t).length;
@@ -2058,6 +2111,9 @@ body[data-auth="in"] .login { display: none; }
         h("div", { class: "kpi" }, h("div", { class: "kpi-line" }, h("span", { class: "k", text: "Tarefas concluídas" }), h("span", { class: "v", text: st.tasksDone })),
           h("span", { class: "hint", text: "Semana passada: " + prev.tasksDone })),
         st.focusTotal ? h("div", { class: "kpi-line" }, h("span", { class: "k", text: "Foco do dia cumprido" }), h("span", { class: "v", text: st.focusDone + "/" + st.focusTotal })) : null,
+        st.focusMin || prev.focusMin ? h("button", { class: "kpi", style: "border:0;background:none;padding:0;text-align:left", onclick: go("foco") },
+          h("div", { class: "kpi-line" }, h("span", { class: "k", text: "Tempo em modo foco" }), h("span", { class: "v", text: st.focusMin ? fmtMin(st.focusMin) : "—" })),
+          h("span", { class: "hint", text: "Semana passada: " + (prev.focusMin ? fmtMin(prev.focusMin) : "—") })) : null,
         st.habitsTarget ? h("div", { class: "kpi" },
           h("div", { class: "kpi-line" }, h("span", { class: "k", text: "Hábitos na semana" }), h("span", { class: "v", text: st.habitsDone + "/" + st.habitsTarget })),
           h("div", { class: "bar thin" }, h("span", { style: "width:" + Math.round(st.habitsDone / st.habitsTarget * 100) + "%" }))) : null,
@@ -2074,7 +2130,10 @@ body[data-auth="in"] .login { display: none; }
 
     const follow = list("contacts").filter(c => c.nextFollowUp && c.nextFollowUp <= t && inArea(c, contactArea(c)))
       .sort((a, b) => a.nextFollowUp.localeCompare(b.nextFollowUp));
-    const followPanel = follow.length ? panel("Falar com", { icon: "contatos", action: linkBtn("Contatos", go("contatos")) },
+    const soonBd = bdaysWithin(30);
+    const bdayPanel = soonBd.length ? panel("Próximos aniversários", { icon: "aniversarios", action: linkBtn("Ver todos", go("aniversarios")) },
+      h("div", { class: "list" }, soonBd.slice(0, 5).map(bdayRow))) : null;
+    const followPanel = follow.length && showContacts() ? panel("Falar com", { icon: "contatos", action: linkBtn("Contatos", go("contatos")) },
       h("div", { class: "list" }, follow.slice(0, 6).map(c => h("div", { class: "row" },
         h("div", { class: "row-main" },
           h("button", { class: "row-title", text: c.name, onclick: () => editContact(c) }),
@@ -2102,7 +2161,7 @@ body[data-auth="in"] .login { display: none; }
 
     out.push(h("div", { class: "home2" }, agendaPanel, tasksPanel, goalsPanel, habitsPanel));
     out.push(h("div", { class: "home2" }, finHomePanel(), soonPanel));
-    out.push(h("div", { class: "home2" }, weekPanel, h("div", { class: "stack" }, followPanel, notesPanel)));
+    out.push(h("div", { class: "home2" }, weekPanel, h("div", { class: "stack" }, bdayPanel, followPanel, notesPanel)));
     return out;
   }
 
@@ -2201,6 +2260,325 @@ body[data-auth="in"] .login { display: none; }
         h("span", { class: "a" + (v.type === "receber" ? " in" : ""), text: (v.type === "receber" ? "+ " : "") + brlCents(v.amount) })))) : null,
       alert ? h("div", { class: "notice warn", style: "margin:0" }, h("span", { text: alert.text })) : null,
       finSyncNote(b));
+  }
+
+  /* =========================================================
+     Aniversários — a list of its own, no contacts needed
+     ========================================================= */
+  const MONTHS = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
+  const BDAY_REL = { familia: "Família", amigo: "Amigo(a)", trabalho: "Trabalho", outro: "Outro" };
+  // Next date the birthday happens, from a given day. 29/02 falls on 28/02 in other years.
+  function nextBday(b, from = today()) {
+    const [m, d] = String(b.date || "").split("-").map(Number);
+    if (!m || !d) return "9999-12-31";
+    const on = y => y + "-" + pad(m) + "-" + pad(Math.min(d, new Date(y, m, 0).getDate()));
+    const y = Number(from.slice(0, 4));
+    return on(y) >= from ? on(y) : on(y + 1);
+  }
+  const bdayAge = (b, iso) => b.year ? Number(iso.slice(0, 4)) - Number(b.year) : null;
+  const bdaysSorted = () => list("birthdays").map(b => ({ b, next: nextBday(b) })).sort((x, y) => x.next.localeCompare(y.next) || String(x.b.name).localeCompare(y.b.name));
+  const bdaysWithin = days => { const end = addDays(today(), days); return bdaysSorted().filter(x => x.next <= end); };
+  const bdayWhen = iso => { const n = diffDays(iso, today()); return n === 0 ? "hoje" : n === 1 ? "amanhã" : "em " + n + " dias"; };
+  function bdayLine(b, next) {
+    const age = bdayAge(b, next);
+    return [parseIso(next).getDate() + " de " + MONTHS[parseIso(next).getMonth()] + (b.date === "02-29" && next.endsWith("-02-28") ? " (nasceu em 29/02)" : ""), bdayWhen(next), age != null && age > 0 ? "faz " + age + " anos" : null].filter(Boolean).join(" · ");
+  }
+  function editBirthday(b) {
+    const [m0, d0] = b ? String(b.date).split("-") : ["", ""];
+    openForm({
+      title: b ? "Editar aniversário" : "Novo aniversário",
+      values: b ? { ...b, day: String(Number(d0)), month: String(Number(m0)) } : { relation: "amigo", day: "", month: "" },
+      fields: [
+        { key: "name", label: "Nome", required: true, full: true },
+        { key: "day", label: "Dia", type: "select", options: [["", "—"], ...Array.from({ length: 31 }, (_, i) => [String(i + 1), String(i + 1)])] },
+        { key: "month", label: "Mês", type: "select", options: [["", "—"], ...MONTHS.map((n, i) => [String(i + 1), n[0].toUpperCase() + n.slice(1)])] },
+        { key: "year", label: "Ano de nascimento (opcional)", inputmode: "numeric", placeholder: "ex.: 1990", hint: "Com o ano, o painel mostra a idade que a pessoa vai fazer." },
+        { key: "relation", label: "Relação", type: "select", options: Object.entries(BDAY_REL) },
+        { key: "note", label: "Ideias de presente / observações", type: "textarea", full: true }
+      ],
+      onSave: v => {
+        const day = Number(v.day), month = Number(v.month);
+        if (!day || !month) return "Escolha o dia e o mês.";
+        if (day > new Date(2024, month, 0).getDate()) return "Esse mês não tem dia " + day + ".";
+        const year = v.year ? Number(v.year) : "";
+        if (v.year && !(year >= 1900 && year <= Number(today().slice(0, 4)))) return "Ano inválido. Deixe em branco se não souber.";
+        const body = { name: v.name, date: pad(month) + "-" + pad(day), year, relation: v.relation, note: v.note };
+        if (!b) return addDoc("birthdays", { ...body, createdAt: Date.now() });
+        const patch = changed(b, body);
+        return Object.keys(patch).length ? updateDoc("birthdays", b.id, patch) : true;
+      },
+      onDelete: b && (() => deleteDoc("birthdays", b.id))
+    });
+  }
+  // One reminder task per person per year, three days before (or today, if it is closer).
+  const giftRef = (b, next) => b.id + "_" + next;
+  const giftTask = (b, next) => list("tasks").find(x => x.bdayRef === giftRef(b, next));
+  async function addGiftTask(b, next) {
+    if (giftTask(b, next)) return;
+    const due = diffDays(next, today()) > 3 ? addDays(next, -3) : today();
+    const ok = await addDoc("tasks", { title: "Presente para " + b.name + " (aniversário " + parseIso(next).getDate() + "/" + (parseIso(next).getMonth() + 1) + ")",
+      notes: b.note || "", area: "pessoal", lifeArea: "", priority: "media", due, ...statusPatch(null, "afazer"), focusDate: "", bdayRef: giftRef(b, next), createdAt: Date.now() });
+    if (ok) toast("Lembrete criado nas tarefas para " + fmtShort(due));
+  }
+  function bdayRow({ b, next }) {
+    const task = giftTask(b, next), isToday = next === today();
+    return h("div", { class: "row" + (isToday ? " bday-today" : "") },
+      h("span", { class: "bday-ic", "aria-hidden": "true", text: isToday ? "🎉" : "🎂" }),
+      h("div", { class: "row-main" },
+        h("button", { class: "row-title", text: b.name, onclick: () => editBirthday(b) }),
+        h("div", { class: "row-meta" }, h("span", { class: (next === today() ? "due today" : "due") + " wrap", text: bdayLine(b, next) }), b.relation ? h("span", { class: "chip", text: BDAY_REL[b.relation] || b.relation }) : null),
+        b.note ? h("span", { class: "hint note-text", text: b.note }) : null),
+      diffDays(next, today()) <= 45 ? (task
+        ? h("span", { class: "chip ok", text: taskStatus(task) === "feito" ? "Presente ok" : "Lembrete criado" })
+        : h("button", { class: "btn small", text: "Lembrar do presente", disabled: busy("tasks/new"), onclick: () => addGiftTask(b, next) })) : null);
+  }
+  function viewAniversarios() {
+    const all = bdaysSorted(), t = today();
+    const todayL = all.filter(x => x.next === t), soon = all.filter(x => x.next > t && diffDays(x.next, t) <= 30);
+    const byMonth = MONTHS.map((n, i) => [n, list("birthdays").filter(b => Number(String(b.date).slice(0, 2)) === i + 1)
+      .sort((a, b) => String(a.date).localeCompare(b.date) || String(a.name).localeCompare(b.name))]).filter(([, l]) => l.length);
+    const row = b => bdayRow({ b, next: nextBday(b) });
+    return [
+      h("div", { class: "view-head" },
+        h("div", {}, h("h2", { text: "Aniversários" }), h("p", { text: "Ninguém esquecido: o painel avisa na visão geral e cria o lembrete do presente." })),
+        h("div", { class: "actions" }, h("button", { class: "btn primary", text: "+ Aniversário", onclick: () => editBirthday() }))),
+      loadingOr("birthdays", all.length ? null : h("section", { class: "panel" }, empty("Nenhum aniversário cadastrado. Comece pela família e pelos amigos mais próximos.", "Adicionar aniversário", () => editBirthday()))),
+      todayL.length ? panel("Hoje", { icon: "aniversarios" }, h("div", { class: "list" }, todayL.map(bdayRow))) : null,
+      soon.length ? panel("Próximos 30 dias", { icon: "aniversarios", sub: plural(soon.length, "aniversário", "aniversários") }, h("div", { class: "list" }, soon.map(bdayRow))) : null,
+      byMonth.length ? panel("Todos", { icon: "agenda", sub: plural(list("birthdays").length, "pessoa", "pessoas") },
+        h("div", { style: "display:grid;gap:12px" }, byMonth.map(([n, l]) => [h("div", { class: "group-label", text: n[0].toUpperCase() + n.slice(1) }), h("div", { class: "list" }, l.map(row))]))) : null
+    ];
+  }
+
+  /* =========================================================
+     Modo foco — a timer tied to a task; each session is saved
+     ========================================================= */
+  // The running timer lives in this device's storage (it survives a reload); the finished session goes to the database.
+  const focusGet = () => { try { const v = JSON.parse(localStorage.getItem("painel:focusTimer") || "null"); return v && v.start ? v : null; } catch { return null; } };
+  const focusPut = v => { try { v ? localStorage.setItem("painel:focusTimer", JSON.stringify(v)) : localStorage.removeItem("painel:focusTimer"); } catch {} };
+  const focusElapsed = f => Math.max(0, (f.pausedAt || Date.now()) - f.start - (f.pausedTotal || 0));
+  const focusLeft = f => f.dur * 60000 - focusElapsed(f);
+  const mmss = ms => { const s = Math.max(0, Math.ceil(ms / 1000)); return pad(Math.floor(s / 60)) + ":" + pad(s % 60); };
+  const fmtMin = m => { m = Math.round(m); return m >= 60 ? Math.floor(m / 60) + "h" + (m % 60 ? " " + (m % 60) + "min" : "") : m + " min"; };
+  const FOCUS_DURS = [25, 50, 90];
+  function startFocus({ taskId = "", title = "", area = defaultArea(), dur, mode = "foco" }) {
+    dur = Number(dur) || Number(store.get("focusDur", "25")) || 25;
+    if (mode === "foco") store.set("focusDur", String(dur));
+    focusPut({ id: "f" + Date.now(), mode, start: Date.now(), dur, pausedAt: null, pausedTotal: 0, taskId, title: title || (mode === "pausa" ? "Pausa" : "Foco livre"), area });
+    S.focusDone = null;
+    try { if (mode === "foco" && "Notification" in window && Notification.permission === "default") Notification.requestPermission(); } catch {}
+    if (S.tab !== "foco") location.hash = "foco"; else render();
+  }
+  function focusPause() { const f = focusGet(); if (!f) return; if (f.pausedAt) { f.pausedTotal += Date.now() - f.pausedAt; f.pausedAt = null; } else f.pausedAt = Date.now(); focusPut(f); render(); }
+  // Saves the session (a fixed id, so two open tabs never save it twice) and clears the timer.
+  async function focusFinish(full) {
+    const f = focusGet(); if (!f) return;
+    focusPut(null);
+    const minutes = full ? f.dur : Math.floor(focusElapsed(f) / 60000);
+    if (f.mode === "pausa") { S.focusDone = null; toast("Pausa encerrada. Bora!"); render(); return; }
+    if (minutes < 1) { toast("Menos de 1 minuto: nada foi registrado."); render(); return; }
+    S.focusDone = { title: f.title, taskId: f.taskId, minutes, area: f.area };
+    render();
+    await setPath("focusSessions/" + f.id, { taskId: f.taskId || "", title: f.title, area: f.area || "pessoal", date: isoFromMs(f.start), start: f.start, minutes, createdAt: Date.now() });
+  }
+  function focusCancel() { focusPut(null); S.focusDone = null; toast("Sessão cancelada, nada foi registrado."); render(); }
+  function beep() {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      [0, .35, .7].forEach(t0 => { const o = ctx.createOscillator(), g = ctx.createGain(); o.frequency.value = 880; o.connect(g); g.connect(ctx.destination);
+        g.gain.setValueAtTime(.18, ctx.currentTime + t0); g.gain.exponentialRampToValueAtTime(.001, ctx.currentTime + t0 + .3); o.start(ctx.currentTime + t0); o.stop(ctx.currentTime + t0 + .3); });
+    } catch {}
+  }
+  const baseTitle = document.title;
+  setInterval(() => {
+    const f = focusGet();
+    if (!f) { if (document.title !== baseTitle) document.title = baseTitle; return; }
+    const left = focusLeft(f);
+    for (const el of document.querySelectorAll("[data-focus-clock]")) el.textContent = mmss(left);
+    for (const el of document.querySelectorAll("[data-focus-bar]")) el.style.width = Math.min(100, focusElapsed(f) / (f.dur * 600)) + "%";
+    document.title = (f.pausedAt ? "⏸ " : "") + mmss(left) + " · " + (f.mode === "pausa" ? "Pausa" : "Foco");
+    if (left <= 0 && !f.pausedAt && db) {
+      beep();
+      try { if ("Notification" in window && Notification.permission === "granted") new Notification(f.mode === "pausa" ? "Fim da pausa" : "Foco concluído", { body: f.mode === "pausa" ? "Hora de voltar." : f.title + " · " + f.dur + " min" }); } catch {}
+      focusFinish(true);
+    }
+  }, 1000);
+  window.addEventListener("storage", e => { if (e.key === "painel:focusTimer") render(); });
+  function focusBtn(t) {
+    return h("button", { class: "icon-btn focus-go", title: "Focar nesta tarefa", "aria-label": "Focar em " + t.title, text: "▶",
+      onclick: () => startFocus({ taskId: t.id, title: t.title, area: t.area }) });
+  }
+  function focusBar() {
+    const f = focusGet();
+    if (!f || S.tab === "foco") return null;
+    return h("div", { class: "focus-strip" + (f.mode === "pausa" ? " pause" : "") },
+      h("a", { href: "#foco", class: "fs-main" }, h("span", { text: f.mode === "pausa" ? "☕ Pausa" : "🎯 " + f.title }), h("b", { "data-focus-clock": "", text: mmss(focusLeft(f)) })),
+      h("button", { class: "btn small", text: f.pausedAt ? "Continuar" : "Pausar", onclick: focusPause }),
+      h("button", { class: "btn small primary", text: "Concluir", onclick: () => focusFinish(false) }));
+  }
+  const focusInRange = (start, end) => list("focusSessions").filter(s => s.date >= start && s.date <= end);
+  const sumMin = arr => arr.reduce((a, s) => a + (Number(s.minutes) || 0), 0);
+  function viewFoco() {
+    const f = focusGet(), t = today(), wr = weekRange(0);
+    let main;
+    if (f) {
+      const pct = Math.min(100, focusElapsed(f) / (f.dur * 600));
+      main = h("section", { class: "panel focus-card" + (f.mode === "pausa" ? " pause" : "") },
+        h("span", { class: "focus-what", text: f.mode === "pausa" ? "☕ Pausa de " + f.dur + " min" : "🎯 " + f.title }),
+        h("div", { class: "focus-clock", "data-focus-clock": "", role: "timer", "aria-live": "off", text: mmss(focusLeft(f)) }),
+        h("div", { class: "bar" }, h("span", { "data-focus-bar": "", style: "width:" + pct + "%" })),
+        f.pausedAt ? h("p", { class: "hint", text: "Pausado." }) : null,
+        h("div", { class: "chips", style: "justify-content:center" },
+          h("button", { class: "btn", text: f.pausedAt ? "Continuar" : "Pausar", onclick: focusPause }),
+          h("button", { class: "btn primary", text: f.mode === "pausa" ? "Encerrar pausa" : "Concluir agora", onclick: () => focusFinish(false) }),
+          f.mode === "foco" ? h("button", { class: "btn danger", text: "Cancelar", title: "Descarta sem registrar", onclick: focusCancel }) : null));
+    } else if (S.focusDone) {
+      const d = S.focusDone, task = d.taskId && byId("tasks", d.taskId);
+      main = h("section", { class: "panel focus-card done" },
+        h("span", { class: "focus-what", text: "Sessão concluída ✓" }),
+        h("div", { class: "focus-clock small", text: fmtMin(d.minutes) }),
+        h("p", { class: "hint", text: d.title }),
+        h("div", { class: "chips", style: "justify-content:center" },
+          task && taskStatus(task) !== "feito" ? h("button", { class: "btn primary", text: "Marcar tarefa como feita", onclick: async () => { await toggleDone(task); S.focusDone = null; render(); } }) : null,
+          h("button", { class: "btn", text: "Pausa de 5 min", onclick: () => startFocus({ mode: "pausa", dur: 5 }) }),
+          h("button", { class: "btn", text: "Mais " + (store.get("focusDur", "25")) + " min", onclick: () => startFocus({ taskId: d.taskId, title: d.title, area: d.area }) }),
+          h("button", { class: "link", text: "Fechar", onclick: () => { S.focusDone = null; render(); } })));
+    } else {
+      const open = sortedTasks(openTasks());
+      const focusIds = new Set(list("tasks").filter(x => x.focusDate === t).map(x => x.id));
+      const ordered = [...open.filter(x => focusIds.has(x.id)), ...open.filter(x => !focusIds.has(x.id))];
+      const sel = h("select", { class: "field grow", id: "focus-task", "data-keep": "", "aria-label": "Tarefa" },
+        h("option", { value: "", text: "Sem tarefa (foco livre)" }),
+        ordered.slice(0, 60).map(x => h("option", { value: x.id, text: (focusIds.has(x.id) ? "★ " : "") + x.title })));
+      const free = h("input", { class: "field grow", id: "focus-free", "data-keep": "", placeholder: "No que você vai focar? (opcional)", "aria-label": "Assunto do foco livre" });
+      const durNow = Number(store.get("focusDur", "25")) || 25;
+      const custom = h("input", { class: "field", id: "focus-min", "data-keep": "", type: "number", min: 1, max: 240, value: FOCUS_DURS.includes(durNow) ? "" : String(durNow), placeholder: "outro", style: "width:90px", "aria-label": "Minutos" });
+      const durSeg = h("div", { class: "seg", role: "group", "aria-label": "Duração" }, FOCUS_DURS.map(m => h("button", { type: "button", "aria-pressed": durNow === m && !custom.value ? "true" : "false", text: m + " min",
+        onclick: () => { store.set("focusDur", String(m)); const c = document.getElementById("focus-min"); if (c) c.value = ""; render(); } })));
+      main = h("section", { class: "panel" },
+        h("div", { class: "panel-head" }, h("h2", { text: "Começar uma sessão" })),
+        h("div", { class: "filters" }, sel, free),
+        h("div", { class: "filters" }, durSeg, custom, h("span", { class: "hint", text: "minutos" })),
+        h("div", {}, h("button", { class: "btn primary", id: "focus-start", text: "▶ Começar", onclick: () => {
+          const id = (document.getElementById("focus-task") || {}).value || "", task = id && byId("tasks", id);
+          const c = Number((document.getElementById("focus-min") || {}).value);
+          startFocus({ taskId: id, title: task ? task.title : ((document.getElementById("focus-free") || {}).value || "").trim(), area: task ? task.area : defaultArea(), dur: c > 0 && c <= 240 ? Math.round(c) : durNow });
+        } })),
+        h("p", { class: "hint", text: "Dica: o ▶ ao lado de cada tarefa também começa uma sessão. O painel apita no fim (deixe o som ligado)." }));
+    }
+    const todayS = focusInRange(t, t).sort((a, b) => b.start - a.start), weekS = focusInRange(wr.start, wr.end), lastW = weekRange(-1), prevS = focusInRange(lastW.start, lastW.end);
+    const work = sumMin(weekS.filter(s => s.area === "trabalho")), pers = sumMin(weekS) - work;
+    const byTitle = {}; for (const s of weekS) byTitle[s.title] = (byTitle[s.title] || 0) + (Number(s.minutes) || 0);
+    const top = Object.entries(byTitle).sort((a, b) => b[1] - a[1]).slice(0, 6);
+    const tot = sumMin(weekS);
+    return [
+      h("div", { class: "view-head" }, h("div", {}, h("h2", { text: "Modo foco" }), h("p", { text: "Um cronômetro por vez, sem distração. Cada sessão concluída fica registrada." }))),
+      main,
+      h("div", { class: "home2" },
+        panel("Hoje", { icon: "foco", sub: todayS.length ? plural(todayS.length, "sessão", "sessões") + " · " + fmtMin(sumMin(todayS)) : null },
+          loadingOr("focusSessions", todayS.length ? h("div", { class: "list" }, todayS.map(s => h("div", { class: "row" },
+            h("div", { class: "row-main" }, h("span", { style: "font-weight:500", text: s.title }),
+              h("div", { class: "row-meta" }, h("span", { class: "due", text: new Date(s.start).toTimeString().slice(0, 5) }), S.area === "tudo" ? areaChip(s.area) : null)),
+            h("span", { class: "exp-amt", text: fmtMin(s.minutes) }),
+            h("button", { class: "icon-btn", title: "Apagar sessão", "aria-label": "Apagar sessão " + s.title, text: "×", onclick: () => deleteDoc("focusSessions", s.id) }))))
+            : h("p", { class: "hint", text: "Nenhuma sessão hoje ainda." }))),
+        panel("Onde foi seu tempo", { icon: "semana", sub: fmtRange(wr.start, wr.end) },
+          tot ? h("div", { style: "display:grid;gap:12px" },
+            h("div", { class: "kpi-line" }, h("span", { class: "k", text: "Foco na semana" }), h("span", { class: "v", text: fmtMin(tot) })),
+            h("span", { class: "hint", text: "Semana passada: " + (sumMin(prevS) ? fmtMin(sumMin(prevS)) : "—") }),
+            h("div", { class: "split", role: "img", "aria-label": fmtMin(work) + " de trabalho e " + fmtMin(pers) + " pessoal" },
+              h("span", { class: "w", style: "width:" + (work / tot * 100) + "%" }), h("span", { class: "p", style: "width:" + (pers / tot * 100) + "%" })),
+            h("span", { class: "hint", text: fmtMin(work) + " trabalho · " + fmtMin(pers) + " pessoal" }),
+            h("div", {}, top.map(([n, m]) => h("div", { class: "fin-line" }, h("span", { class: "t", text: n }), h("span", { class: "a", text: fmtMin(m) })))))
+            : h("p", { class: "hint", text: "Conclua sessões para ver aqui quanto tempo foi para cada tarefa e área." })))
+    ];
+  }
+
+  /* =========================================================
+     Lista de compras — checked items become one expense
+     ========================================================= */
+  const shopIn = st => list("shopping").filter(x => (x.status || "pendente") === st);
+  async function addShopItem(name, qty) {
+    name = name.trim(); if (!name) return false;
+    const twin = list("shopping").find(x => x.name.toLowerCase() === name.toLowerCase());
+    if (twin && twin.status !== "comprado") { toast(twin.name + " já está na lista."); return "dup"; }
+    // Something bought before comes back to the list instead of creating a copy.
+    if (twin) return updateDoc("shopping", twin.id, { status: "pendente", qty: qty || twin.qty || "", boughtAt: null, addedAt: Date.now() });
+    return addDoc("shopping", { name, qty: qty || "", status: "pendente", createdAt: Date.now(), addedAt: Date.now() });
+  }
+  const setShop = (x, status) => updateDoc("shopping", x.id, { status });
+  function finishShopping() {
+    const cart = shopIn("carrinho");
+    if (!cart.length) return;
+    const fin = finMode();
+    const whereOpts = fin ? [...finSpendAccounts().map(a => ["a:" + a.id, "Conta: " + a.name]), ...finSpendCards().map(c => ["c:" + c.id, "Cartão: " + c.name])] : [];
+    const catOpts = fin ? finExpenseCats().map(c => [c.id, c.name]) : expCatOptions();
+    const savedWhere = store.get("capWhere", ""), savedCat = store.get("shopCat", fin ? "alimentacao" : "mercado");
+    const items = cart.map(x => x.name + (x.qty ? " (" + x.qty + ")" : "")).join(", ");
+    openForm({
+      title: "Finalizar compra · " + plural(cart.length, "item", "itens"),
+      values: { amount: "", desc: "Supermercado", date: today(), where: whereOpts.some(o => o[0] === savedWhere) ? savedWhere : (whereOpts[0] || [""])[0],
+        category: catOpts.some(o => o[0] === savedCat) ? savedCat : (catOpts[0] || [""])[0], skip: false },
+      fields: [
+        { type: "node", node: h("p", { class: "hint", text: "Itens: " + items }) },
+        { key: "amount", label: "Valor total pago", inputmode: "decimal", placeholder: "R$ 0,00" },
+        { key: "desc", label: "Descrição", suggestions: ["Supermercado", "Feira", "Farmácia", "Açougue", "Padaria"] },
+        { key: "date", label: "Data", type: "date" },
+        fin ? { key: "where", label: "Pago com", type: "select", options: whereOpts } : null,
+        { key: "category", label: "Categoria", type: "select", options: catOpts },
+        { key: "skip", label: "Não lançar gasto", type: "checkbox", hint: "(alguém pagou, ou você já lançou)" },
+        { type: "node", node: h("p", { class: "hint", text: fin ? "O gasto vai para o Meu Financeiro, uma vez só, com a lista de itens na observação." : "O gasto vai para a aba Gastos com a lista de itens na observação." }) }
+      ].filter(Boolean),
+      saveLabel: "Finalizar",
+      onSave: async v => {
+        let ok = true;
+        if (!v.skip) {
+          const amount = parseMoney(v.amount);
+          if (!(amount > 0)) return "Digite o valor total, por exemplo 235,90. Ou marque \"Não lançar gasto\".";
+          store.set("shopCat", v.category); if (fin) store.set("capWhere", v.where);
+          const notes = "Lista de compras: " + items;
+          ok = fin ? await addFinExpense({ amount: Math.round(amount * 100), desc: v.desc || "Supermercado", categoryId: v.category, where: v.where, date: v.date || today(), area: "pessoal", notes })
+            : await addExpense({ type: "saida", amount, desc: v.desc || "Supermercado", category: v.category, method: "", bank: "", date: v.date || today(), area: "pessoal", notes, createdAt: Date.now() });
+          if (!ok) return "Não foi possível lançar o gasto. A lista continua como estava.";
+        }
+        const now = Date.now();
+        ok = await write(() => { const batch = firebase.firestore().batch(); for (const x of cart) batch.update(db.collection("shopping").doc(x.id), { status: "comprado", boughtAt: now }); return batch.commit(); });
+        if (ok) toast(v.skip ? "Compra finalizada" : "Compra finalizada e gasto lançado");
+        return ok || "O gasto foi lançado, mas a lista não foi atualizada. Marque os itens como comprados de novo.";
+      }
+    });
+  }
+  function viewCompras() {
+    const pend = shopIn("pendente").sort((a, b) => (a.addedAt || a.createdAt || 0) - (b.addedAt || b.createdAt || 0));
+    const cart = shopIn("carrinho"), bought = shopIn("comprado").sort((a, b) => (b.boughtAt || 0) - (a.boughtAt || 0));
+    const name = h("input", { class: "field grow", id: "shop-name", "data-keep": "", placeholder: "O que precisa comprar?", autocomplete: "off", "aria-label": "Item", list: "shop-list" });
+    const qty = h("input", { class: "field", id: "shop-qty", "data-keep": "", placeholder: "Qtd. (opcional)", autocomplete: "off", "aria-label": "Quantidade", style: "width:130px" });
+    const form = h("form", { class: "inline-form" }, name, qty, h("button", { class: "btn primary", type: "submit", text: "Adicionar" }),
+      h("datalist", { id: "shop-list" }, bought.map(x => h("option", { value: x.name }))));
+    form.addEventListener("submit", async e => {
+      e.preventDefault();
+      const n = (document.getElementById("shop-name") || {}).value || "", q = ((document.getElementById("shop-qty") || {}).value || "").trim();
+      if (!n.trim()) { document.getElementById("shop-name").focus(); return; }
+      if (await addShopItem(n, q)) { for (const id of ["shop-name", "shop-qty"]) { const el = document.getElementById(id); if (el) el.value = ""; } }
+      const el = document.getElementById("shop-name"); el && el.focus();
+    });
+    const item = (x, inCart) => h("div", { class: "row shop-row" + (inCart ? " done" : "") },
+      h("button", { class: "check", role: "checkbox", "aria-checked": inCart ? "true" : "false", "aria-label": (inCart ? "Tirar do carrinho: " : "Pegar: ") + x.name, text: inCart ? "✓" : "",
+        disabled: busy("shopping/" + x.id), onclick: () => setShop(x, inCart ? "pendente" : "carrinho") }),
+      h("div", { class: "row-main" }, h("span", { class: "row-title", style: "cursor:default", text: x.name }), x.qty ? h("div", { class: "row-meta" }, h("span", { class: "due", text: x.qty })) : null),
+      h("button", { class: "icon-btn", title: "Tirar da lista", "aria-label": "Tirar da lista: " + x.name, text: "×", disabled: busy("shopping/" + x.id), onclick: () => deleteDoc("shopping", x.id) }));
+    return [
+      h("div", { class: "view-head" }, h("div", {}, h("h2", { text: "Lista de compras" }), h("p", { text: "Marque o que já pegou. No fim, informe o total e o gasto é lançado de uma vez." }))),
+      h("section", { class: "panel" }, form),
+      loadingOr("shopping", h("div", { class: "home2" },
+        panel("Para comprar", { icon: "compras", sub: pend.length ? plural(pend.length, "item", "itens") : null },
+          pend.length ? h("div", { class: "list" }, pend.map(x => item(x, false))) : h("p", { class: "hint", text: cart.length ? "Tudo no carrinho!" : "Lista vazia. Adicione o que está faltando em casa." })),
+        panel("No carrinho", { icon: "tarefas", sub: cart.length ? plural(cart.length, "item", "itens") : null,
+          action: cart.length ? h("button", { class: "btn small primary", text: "Finalizar compra", onclick: finishShopping }) : null },
+          cart.length ? h("div", { class: "list" }, cart.map(x => item(x, true))) : h("p", { class: "hint", text: "Toque no quadrado de um item quando colocar no carrinho." })))),
+      bought.length ? panel("Comprados", { icon: "nota", sub: "toque para pôr na lista de novo" },
+        h("div", { class: "chips" }, bought.slice(0, 30).map(x => h("button", { class: "filter-chip", text: "+ " + x.name, disabled: busy("shopping/" + x.id), onclick: () => addShopItem(x.name, x.qty) })))) : null
+    ];
   }
 
   let dragId = null;
@@ -2775,11 +3153,19 @@ body[data-auth="in"] .login { display: none; }
       h("div", { class: "list" }, older.map(r => h("div", { class: "row" }, details("rev-" + r.id, fmtRange(r.start, r.end) + " · " + (r.stats ? plural(r.stats.tasksDone, "tarefa", "tarefas") : ""),
         h("div", { style: "display:grid;gap:8px;margin-top:8px" }, reviewSummary(r, false), h("button", { class: "btn small", style: "justify-self:start", text: "Editar", onclick: () => editReview(r.start) })), "row-title"))))));
 
+    // Preferences
+    const pc = h("input", { type: "checkbox", id: "pref-contacts", disabled: !db || busy("settings/prefs"),
+      onchange: e => write(() => db.doc("settings/prefs").set({ showContacts: e.target.checked }, { merge: true }), "settings/prefs") });
+    pc.checked = showContacts();
+    out.push(h("section", { class: "panel" },
+      h("div", { class: "panel-head" }, h("h2", { text: "Preferências" })),
+      h("label", { class: "check-label", for: "pref-contacts" }, pc, h("span", {}, "Mostrar Contatos no menu ", h("span", { class: "hint", text: "(desligado, seus contatos continuam guardados e no backup)" })))));
+
     // Backup
     const lastBackup = store.get("lastBackup", "");
     out.push(h("section", { class: "panel" },
       h("div", { class: "panel-head" }, h("h2", { text: "Backup dos seus dados" })),
-      h("p", { class: "hint", text: "Baixa um arquivo .json com tudo: tarefas, metas, hábitos, revisões, contatos, agenda e anotações. Faça de vez em quando e guarde no seu Drive." }),
+      h("p", { class: "hint", text: "Baixa um arquivo .json com tudo: tarefas, metas, hábitos, revisões, agenda, anotações, aniversários, lista de compras, sessões de foco e contatos. Faça de vez em quando e guarde no seu Drive." }),
       h("div", { class: "filters" },
         h("button", { class: "btn", id: "backup-btn", text: "Exportar backup", disabled: !db, onclick: exportBackup }),
         h("span", { class: "hint", text: lastBackup ? "Último backup neste aparelho: " + rel(lastBackup) : "Nenhum backup feito neste aparelho ainda." })),
@@ -3133,6 +3519,9 @@ body[data-auth="in"] .login { display: none; }
       metas: list("goals").filter(g => inArea(g) && goalStale(g)).length,
       contatos: list("contacts").filter(c => c.nextFollowUp && c.nextFollowUp <= t && inArea(c, contactArea(c))).length,
       evolucao: pendingReviewStart() ? 1 : 0,
+      compras: list("shopping").filter(x => (x.status || "pendente") !== "comprado").length,
+      aniversarios: list("birthdays").filter(b => nextBday(b) === t).length,
+      foco: focusGet() ? 1 : 0,
       financeiro: finMode() && shareOn("alertas") && S.fin.share && S.fin.share.alertas ? S.fin.share.alertas.length : 0
     };
   }
@@ -3145,20 +3534,37 @@ body[data-auth="in"] .login { display: none; }
     return el;
   }
   const TAB_LABEL = Object.fromEntries(TABS);
+  // Contacts stay saved but leave the menu unless you turn them back on (Evolução → Preferências).
+  const prefs = () => byId("settings", "prefs") || {};
+  const showContacts = () => prefs().showContacts === true;
+  const navGroups = () => NAV_GROUPS.map(([g, keys]) => [g, keys.filter(k => k !== "contatos" || showContacts())]).filter(([, k]) => k.length);
   // With Meu Financeiro in use, the old Gastos tab is only the history kept here.
   const tabLabel = k => k === "gastos" && finMode() ? "Gastos antigos" : TAB_LABEL[k];
   function renderNav() {
     const counts = tabCounts();
     const link = k => { const l = tabLabel(k); return h("a", { href: "#" + k, "aria-current": S.tab === k ? "page" : null, title: l, "aria-label": l + (counts[k] ? " (" + counts[k] + ")" : "") },
       icon(NAV_ICON[k] || k), h("span", { class: "lbl", text: l }), counts[k] ? h("span", { class: "count", text: counts[k] }) : null); };
-    $("#tabs").replaceChildren(...NAV_GROUPS.flatMap(([g, keys]) => [
+    $("#tabs").replaceChildren(...navGroups().flatMap(([g, keys]) => [
       h("div", { class: "grp", text: g, role: "presentation" }),
       ...keys.map(link),
       g === "Financeiro" ? h("a", { class: "ext", href: FIN_URL, title: "Abrir Meu Financeiro", "aria-label": "Abrir Meu Financeiro" }, icon("externo"), h("span", { class: "lbl", text: "Meu Financeiro" })) : null
     ].filter(Boolean)));
+    const inMore = !BOTTOM_TABS.includes(S.tab);
+    const moreCount = Object.entries(counts).filter(([k]) => !BOTTOM_TABS.includes(k) && (k !== "contatos" || showContacts())).reduce((a, [, n]) => a + (n || 0), 0);
     $("#bottomnav").replaceChildren(...BOTTOM_TABS.map(k => [k, TAB_LABEL[k]]).map(([k, l]) =>
-      h("a", { href: "#" + k, "aria-current": S.tab === k ? "page" : null, "aria-label": l + (counts[k] ? " (" + counts[k] + ")" : "") },
-        icon(NAV_ICON[k] || k), h("span", { class: "lbl", text: TAB_SHORT[k] || l }), counts[k] ? h("span", { class: "count", text: counts[k] }) : null)));
+      h("a", { href: "#" + k, "aria-current": S.tab === k && !S.ui.more ? "page" : null, "aria-label": l + (counts[k] ? " (" + counts[k] + ")" : "") },
+        icon(NAV_ICON[k] || k), h("span", { class: "lbl", text: TAB_SHORT[k] || l }), counts[k] ? h("span", { class: "count", text: counts[k] }) : null)),
+      h("button", { type: "button", class: "more-btn", "aria-expanded": S.ui.more ? "true" : "false", "aria-current": inMore || S.ui.more ? "page" : null, "aria-label": "Mais seções" + (moreCount ? " (" + moreCount + ")" : ""),
+        onclick: () => { S.ui.more = !S.ui.more; renderNav(); } },
+        icon(inMore && !S.ui.more ? (NAV_ICON[S.tab] || S.tab) : "mais"), h("span", { class: "lbl", text: inMore && !S.ui.more ? (TAB_SHORT[S.tab] || TAB_LABEL[S.tab]) : "Mais" }), moreCount ? h("span", { class: "count", text: moreCount }) : null));
+    // The "Mais" sheet: every section, grouped as in the side menu.
+    let sheet = $("#more-sheet");
+    if (!sheet) { sheet = h("div", { id: "more-sheet", class: "more-scrim", onclick: e => { if (e.target === sheet) { S.ui.more = false; renderNav(); } } }); document.body.append(sheet); }
+    sheet.hidden = !S.ui.more;
+    sheet.replaceChildren(S.ui.more ? h("nav", { class: "more-sheet", "aria-label": "Todas as seções" },
+      navGroups().map(([g, keys]) => [h("div", { class: "grp", text: g }), h("div", { class: "more-grid" }, keys.map(k =>
+        h("a", { href: "#" + k, "aria-current": S.tab === k ? "page" : null, onclick: () => { S.ui.more = false; } }, icon(NAV_ICON[k] || k), h("span", { text: tabLabel(k) }), counts[k] ? h("span", { class: "count", text: counts[k] }) : null)))]),
+      h("a", { class: "more-ext", href: FIN_URL }, icon("externo"), h("span", { text: "Abrir Meu Financeiro" }))) : "");
   }
   function renderHeader() {
     const d = new Date();
@@ -3170,7 +3576,8 @@ body[data-auth="in"] .login { display: none; }
     for (const b of document.querySelectorAll("#area-seg button")) b.setAttribute("aria-pressed", b.dataset.area === S.area ? "true" : "false");
     renderSaveState();
   }
-  const VIEWS = { hoje: viewHoje, tarefas: viewTarefas, agenda: viewAgenda, gastos: viewGastos, financeiro: viewFinanceiro, metas: viewMetas, contatos: viewContatos, evolucao: viewEvolucao };
+  const VIEWS = { hoje: viewHoje, tarefas: viewTarefas, agenda: viewAgenda, gastos: viewGastos, financeiro: viewFinanceiro,
+    foco: viewFoco, compras: viewCompras, aniversarios: viewAniversarios, metas: viewMetas, contatos: viewContatos, evolucao: viewEvolucao };
   function render() {
     // Keep typed text and focus across re-renders.
     const keep = {};
@@ -3181,7 +3588,7 @@ body[data-auth="in"] .login { display: none; }
 
     renderHeader(); renderNav();
     const out = (VIEWS[S.tab] || viewHoje)();
-    $("#main").replaceChildren(...[...statusNotices(), S.tab === "hoje" ? examplesNotice() : null, ...out].filter(Boolean));
+    $("#main").replaceChildren(...[...statusNotices(), focusBar(), S.tab === "hoje" ? examplesNotice() : null, ...out].filter(Boolean));
 
     for (const [id, v] of Object.entries(keep)) { const el = document.getElementById(id); if (el) el.value = v; }
     if (focusId) {
@@ -3202,7 +3609,7 @@ body[data-auth="in"] .login { display: none; }
     S.tab = k;
     store.set("tab", k);
   }
-  window.addEventListener("hashchange", () => { readHash(); render(); window.scrollTo(0, 0); });
+  window.addEventListener("hashchange", () => { S.ui.more = false; readHash(); render(); window.scrollTo(0, 0); });
   $("#area-seg").addEventListener("click", e => {
     const b = e.target.closest("button[data-area]"); if (!b) return;
     S.area = b.dataset.area; store.set("area", S.area); render();
@@ -3210,7 +3617,7 @@ body[data-auth="in"] .login { display: none; }
 
   /* ---------- live data ---------- */
   function subscribe(c, attempt = 0) {
-    coll(c).onSnapshot(snap => {
+    (SUB_QUERY[c] ? SUB_QUERY[c](coll(c)) : coll(c)).onSnapshot(snap => {
       S.data[c] = snap.docs.map(d => ({ ...d.data(), id: d.id }));
       S.loaded.add(c);
       if (S.syncErr.delete(c)) attempt = 0;

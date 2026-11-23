@@ -26,6 +26,12 @@ Estado real de cada parte. "Feito" = implementado, testado e publicado. Nada aqu
 - [x] Página "Resumo financeiro" (mês ao vivo, saldo, patrimônio, vencimentos, alertas, categorias, últimos lançamentos)
 - [x] Gasto anotado no Painel salvo uma única vez no Financeiro, com auditoria
 - [x] Aba Gastos antiga só leitura quando o Financeiro está em uso
+- [x] Aniversários: lista própria, aviso no dia, próximos 30 dias, idade, lembrete de presente como tarefa
+- [x] Modo foco: cronômetro por tarefa (25/50/90 ou personalizado), pausa, registro das sessões, "onde foi seu tempo" e tempo de foco na semana
+- [x] Lista de compras: itens, carrinho, finalizar lançando um gasto só (no Financeiro, ou em Gastos se ainda não houver contas)
+- [x] Contatos fora do menu por padrão (dados guardados; Evolução → Preferências mostra de novo)
+- [x] Celular: barra com Início, Tarefas, Agenda, Compras, Finanças e "Mais" com todas as seções
+- [x] Testes ponta a ponta guardados no repositório (`tests/e2e`)
 
 ## Pendente (próximas etapas)
 
