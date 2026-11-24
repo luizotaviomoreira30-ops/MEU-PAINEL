@@ -36,7 +36,7 @@ async function suite(name, fn) {
     await p.goto(url); await wait(700);
     return p;
   };
-  const login = async p => { await p.evaluate(u => firebase.auth().signInWithCredential(firebase.auth.GoogleAuthProvider.credential(JSON.stringify(u))), LUIZ); await wait(2200); };
+  const login = async (p, user = LUIZ) => { await p.evaluate(u => firebase.auth().signInWithCredential(firebase.auth.GoogleAuthProvider.credential(JSON.stringify(u))), user); await wait(2200); };
   // Runs code against the signed-in user's data: db, B ("users/<uid>/") and arg are in scope.
   const dbOf = p => (fn, arg) => p.evaluate(new Function('arg', 'return (async()=>{const u=firebase.auth().currentUser.uid;const db=firebase.firestore();const B="users/"+u+"/";' + fn + '})()'), arg);
   await fn({ ok, ctx, page, login, dbOf, errs });
@@ -47,4 +47,4 @@ async function suite(name, fn) {
   await b.close();
   process.exitCode = fails ? 1 : 0;
 }
-module.exports = { suite, PAINEL, FIN, plus, addM, pad, wait, txt, iso };
+module.exports = { LUIZ, suite, PAINEL, FIN, plus, addM, pad, wait, txt, iso };

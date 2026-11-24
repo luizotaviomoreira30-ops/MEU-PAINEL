@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Painel Luiz Otávio</title>
+<title>Meu Painel</title>
 <meta name="theme-color" content="#1E5F4E">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -567,7 +567,7 @@ body[data-auth="in"] .login { display: none; }
 <body data-auth="pending">
 <section class="login" id="login" aria-live="polite">
   <div class="login-card">
-    <h1>Painel Luiz Otávio</h1>
+    <h1>Meu Painel</h1>
     <p id="login-msg">Carregando…</p>
     <p class="form-error" id="login-err" hidden></p>
     <button type="button" class="btn primary" id="login-btn" hidden>
@@ -581,7 +581,7 @@ body[data-auth="in"] .login { display: none; }
   <aside class="side" aria-label="Menu">
     <a class="brand" href="#hoje" title="Visão geral">
       <span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
-      <span class="brand-txt"><b>Meu Painel</b><small>Luiz Otávio</small></span>
+      <span class="brand-txt"><b>Meu Painel</b><small id="brand-who"></small></span>
     </a>
     <nav class="side-nav" id="tabs" aria-label="Seções"></nav>
     <div class="side-foot"><span class="avatar-sm" id="me-initials" aria-hidden="true">L</span><span class="me-name" id="me-name"></span></div>
@@ -812,7 +812,9 @@ body[data-auth="in"] .login { display: none; }
       contactKind: "todos", contactStage: "", contactQuery: ""
     },
     // Read from Meu Financeiro. The Painel keeps no ledger of its own: a quick expense is written there, once.
-    fin: { settings: {}, share: null, accounts: [], cards: [], categories: [], txns: [], range: "", loaded: new Set(), err: new Set() }
+    fin: { settings: {}, share: null, accounts: [], cards: [], categories: [], txns: [], range: "", loaded: new Set(), err: new Set() },
+    owner: false, email: "",
+    access: { emails: [], loaded: false, err: "" }   // who the owner has let in (owner only)
   };
   let db = null, pending = 0;
 
@@ -2263,6 +2265,63 @@ body[data-auth="in"] .login { display: none; }
   }
 
   /* =========================================================
+     Pessoas com acesso — only the owner sees and changes this list
+     ========================================================= */
+  const ACCESS_MAX = 20;
+  function subscribeAccess(fdb) {
+    fdb.doc("config/access").onSnapshot(snap => {
+      S.access = { emails: snap.exists && Array.isArray(snap.data().emails) ? snap.data().emails : [], loaded: true, err: "" };
+      render();
+    }, () => { S.access = { ...S.access, loaded: true, err: "Não foi possível ler a lista de acesso." }; render(); });
+  }
+  async function saveAccess(emails) {
+    pending++; renderSaveState();
+    try {
+      await firebase.firestore().doc("config/access").set({ emails, updatedAt: Date.now() });
+      return true;
+    } catch (e) {
+      // Before the new rules are published in the Firebase console, the owner cannot write the list.
+      toast(codeOf(e) === "permission_denied" ? "O Firebase recusou: publique as regras novas (arquivo firestore.rules) no console do Firebase e tente de novo." : errText(e), "err");
+      return false;
+    } finally { pending--; renderSaveState(); }
+  }
+  async function grantAccess() {
+    const input = document.getElementById("access-email");
+    const email = String((input && input.value) || "").trim().toLowerCase();
+    const list = S.access.emails;
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { toast("Digite um e-mail válido, por exemplo nome@gmail.com.", "err"); input && input.focus(); return; }
+    if (email === OWNER_EMAIL) { toast("Esse é o seu e-mail: você já tem acesso.", "err"); return; }
+    if (list.includes(email)) { toast("Esse e-mail já está liberado.", "err"); return; }
+    if (list.length >= ACCESS_MAX) { toast("Limite de " + ACCESS_MAX + " pessoas.", "err"); return; }
+    if (await saveAccess([...list, email])) { if (input) input.value = ""; toast(email + " liberado. A pessoa já pode entrar com essa conta Google."); }
+  }
+  async function revokeAccess(email) {
+    if (await saveAccess(S.access.emails.filter(x => x !== email))) toast(email + " não tem mais acesso. Os dados dessa pessoa continuam guardados.");
+  }
+  function accessPanel() {
+    if (!S.owner) return null;
+    const input = h("input", { type: "email", class: "field grow", id: "access-email", "data-keep": "", placeholder: "e-mail do Google da pessoa", autocomplete: "off", "aria-label": "E-mail para liberar",
+      onkeydown: e => { if (e.key === "Enter") { e.preventDefault(); grantAccess(); } } });
+    const confirmRemove = email => {
+      let armed = false;
+      const b = h("button", { class: "btn small danger", text: "Remover", onclick: () => {
+        if (!armed) { armed = true; b.textContent = "Confirmar remoção"; b.classList.add("armed"); return; }
+        b.disabled = true; revokeAccess(email);
+      } });
+      return b;
+    };
+    return h("section", { class: "panel" },
+      h("div", { class: "panel-head" }, h("h2", { text: "Pessoas com acesso" }), h("span", { class: "sub", text: S.access.loaded ? plural(S.access.emails.length + 1, "pessoa", "pessoas") : "" })),
+      h("p", { class: "hint", text: "Cada pessoa liberada entra com a própria conta do Google e ganha um painel e um financeiro só dela, começando vazios. Você não vê os dados dela e ela não vê os seus." }),
+      h("div", { class: "list" },
+        h("div", { class: "row" }, h("div", { class: "row-main" }, h("span", { style: "font-weight:500", text: S.email }), h("div", { class: "row-meta" }, h("span", { class: "chip accent", text: "Você (administra)" })))),
+        S.access.emails.map(e => h("div", { class: "row" }, h("div", { class: "row-main" }, h("span", { style: "font-weight:500;overflow-wrap:anywhere", text: e })), confirmRemove(e)))),
+      S.access.err ? h("p", { class: "hint", style: "color:var(--high)", text: S.access.err }) : null,
+      h("div", { class: "filters" }, input, h("button", { class: "btn primary", text: "Liberar acesso", onclick: grantAccess })),
+      h("p", { class: "hint", text: "Remover tira o acesso na hora; os dados da pessoa ficam guardados e voltam se você liberar de novo." }));
+  }
+
+  /* =========================================================
      Aniversários — a list of its own, no contacts needed
      ========================================================= */
   const MONTHS = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
@@ -3161,6 +3220,8 @@ body[data-auth="in"] .login { display: none; }
       h("div", { class: "panel-head" }, h("h2", { text: "Preferências" })),
       h("label", { class: "check-label", for: "pref-contacts" }, pc, h("span", {}, "Mostrar Contatos no menu ", h("span", { class: "hint", text: "(desligado, seus contatos continuam guardados e no backup)" })))));
 
+    out.push(accessPanel());
+
     // Backup
     const lastBackup = store.get("lastBackup", "");
     out.push(h("section", { class: "panel" },
@@ -3215,7 +3276,7 @@ body[data-auth="in"] .login { display: none; }
     const btn = document.getElementById("backup-btn");
     if (btn) { btn.disabled = true; btn.textContent = "Preparando…"; }
     try {
-      const out = { painel: "Painel Luiz Otávio", formato: 2, exportadoEm: new Date().toISOString(), colecoes: {} };
+      const out = { painel: "Meu Painel", conta: S.email || "", formato: 2, exportadoEm: new Date().toISOString(), colecoes: {} };
       for (const c of BACKUP_COLS) out.colecoes[c] = (await fetchAll(c)).map(d => ({ id: d.id, ...d.data() }));
       // Every month that has expenses: the index plus whatever is loaded, in case an index write failed.
       const months = new Set([...out.colecoes.expenseMonths.map(m => m.id), ...Object.keys(S.exp)]);
@@ -3368,7 +3429,7 @@ body[data-auth="in"] .login { display: none; }
     doc.text("Relatório financeiro", M, 54);
     doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(92, 102, 96);
     doc.text(periodLabel(from, to) + "  ·  Área: " + (area === "tudo" ? "todas" : AREAS[area].toLowerCase()), M, 72);
-    doc.text("Gerado em " + new Date().toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" }) + " pelo Painel Luiz Otávio", M, 86);
+    doc.text("Gerado em " + new Date().toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" }) + " pelo Meu Painel" + (S.name ? " · " + S.name : ""), M, 86);
     const table = (title, head, body, opts = {}) => {
       let y = doc.lastAutoTable ? doc.lastAutoTable.finalY + 26 : 112;
       if (y > H - 120) { doc.addPage(); y = 54; }
@@ -3400,7 +3461,7 @@ body[data-auth="in"] .login { display: none; }
     const n = doc.getNumberOfPages();
     for (let i = 1; i <= n; i++) {
       doc.setPage(i); doc.setFont("helvetica", "normal"); doc.setFontSize(8); doc.setTextColor(120);
-      doc.text("Painel Luiz Otávio · " + periodLabel(from, to), M, H - 20);
+      doc.text("Meu Painel · " + periodLabel(from, to), M, H - 20);
       doc.text("Página " + i + " de " + n, W - M, H - 20, { align: "right" });
     }
     doc.save("relatorio-financeiro-" + fileStamp(from, to) + ".pdf");
@@ -3484,7 +3545,7 @@ body[data-auth="in"] .login { display: none; }
      ========================================================= */
   function statusNotices() {
     const out = [];
-    if (S.status === "denied") out.push(h("div", { class: "notice err" }, h("span", {}, h("strong", { text: "Sem permissão para ler seus dados. " }), "Saia e entre de novo com a conta " + ALLOWED_EMAIL + ".")));
+    if (S.status === "denied") out.push(h("div", { class: "notice err" }, h("span", {}, h("strong", { text: "Sem permissão para ler seus dados. " }), "Saia e entre de novo com a sua conta do Google. Se o problema continuar, peça para conferir se o seu e-mail está liberado.")));
     if (S.syncErr.size) out.push(h("div", { class: "notice err" }, h("span", {}, h("strong", { text: "Não foi possível atualizar: " }),
       [...S.syncErr].map(c => COL_PT[c] || c).join(", ") + ". Tentando de novo…")));
     return out;
@@ -3572,6 +3633,7 @@ body[data-auth="in"] .login { display: none; }
     $("#greeting").textContent = first ? "Olá, " + first + "! 👋" : "Olá! 👋";
     $("#date-text").textContent = "Hoje, " + new Intl.DateTimeFormat("pt-BR", { day: "numeric", month: "long" }).format(d);
     $("#me-name").textContent = S.name || "";
+    $("#brand-who").textContent = (S.name || "").split(/\s+/)[0] || "";
     $("#me-initials").textContent = (S.name || "L").split(/\s+/).filter(w => /^\p{L}/u.test(w)).slice(0, 2).map(w => w[0].toUpperCase()).join("") || "L";
     for (const b of document.querySelectorAll("#area-seg button")) b.setAttribute("aria-pressed", b.dataset.area === S.area ? "true" : "false");
     renderSaveState();
@@ -3669,8 +3731,19 @@ body[data-auth="in"] .login { display: none; }
     messagingSenderId: "296050221551",
     appId: "1:296050221551:web:83efcb462b068bc18f161a"
   };
-  // The Firestore rules accept only this account; the page says so instead of showing an empty panel.
-  const ALLOWED_EMAIL = "luizotaviomoreira30@gmail.com";
+  // The owner manages who may use the panel (config/access); firestore.rules enforce the same list.
+  // Same logic as shared/firebase-config.js, used by Meu Financeiro.
+  const OWNER_EMAIL = "luizotaviomoreira30@gmail.com";
+  async function checkAccess(fdb, user) {
+    const email = String(user.email || "").toLowerCase();
+    if (!user.emailVerified) return { ok: false, reason: "unverified" };
+    if (email === OWNER_EMAIL) return { ok: true, owner: true };
+    try {
+      const snap = await fdb.doc("config/access").get();
+      const list = snap.exists && Array.isArray(snap.data().emails) ? snap.data().emails : [];
+      return list.includes(email) ? { ok: true, owner: false } : { ok: false, reason: "not_listed" };
+    } catch (e) { return { ok: false, reason: codeOf(e) === "permission_denied" ? "not_listed" : "offline" }; }
+  }
 
   const loginMsg = $("#login-msg"), loginErr = $("#login-err"), loginBtn = $("#login-btn"), logoutBtn = $("#logout-btn");
   function showLogin(msg, { err = "", canLogin = true, canLogout = false } = {}) {
@@ -3738,12 +3811,22 @@ body[data-auth="in"] .login { display: none; }
     $("#signout").addEventListener("click", signOut);
     auth.getRedirectResult().catch(e => { const msg = authErrText(e); if (msg) { loginErr.textContent = msg; loginErr.hidden = false; } });
 
-    auth.onAuthStateChanged(user => {
+    auth.onAuthStateChanged(async user => {
       if (!user) { showLogin("Entre com sua conta do Google para ver seus dados."); return; }
-      if ((user.email || "").toLowerCase() !== ALLOWED_EMAIL) {
-        showLogin("A conta " + (user.email || "escolhida") + " não tem acesso a este painel.", { err: "Entre com " + ALLOWED_EMAIL + ".", canLogin: false, canLogout: true });
+      showLogin("Conferindo o seu acesso…", { canLogin: false });
+      const access = await checkAccess(fdb, user);
+      if (!access.ok) {
+        const msgs = {
+          offline: ["Não foi possível confirmar o seu acesso.", "Verifique a conexão com a internet e recarregue a página."],
+          unverified: ["Esta conta do Google ainda não tem o e-mail verificado.", "Entre com outra conta."],
+          not_listed: ["A conta " + (user.email || "escolhida") + " ainda não foi liberada.", "Peça a quem administra o painel para liberar este e-mail. Depois, recarregue a página."]
+        };
+        const [msg, err] = msgs[access.reason] || msgs.not_listed;
+        showLogin(msg, { err, canLogin: false, canLogout: true });
         return;
       }
+      S.owner = !!access.owner; S.email = String(user.email || "").toLowerCase();
+      if (S.owner) subscribeAccess(fdb);
       S.name = user.displayName || "";
       document.body.dataset.auth = "in";
       startData(user.uid);

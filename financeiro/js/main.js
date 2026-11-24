@@ -1,6 +1,6 @@
 // Meu Financeiro: sign-in, routing, layout and the summary shared with Meu Painel.
 import * as F from "../../shared/fincore.js";
-import { FIREBASE_CONFIG, ALLOWED_EMAIL } from "../../shared/firebase-config.js";
+import { FIREBASE_CONFIG, checkAccess, accessMessage } from "../../shared/firebase-config.js";
 import { h, $, icon, monthLabel, today, toast } from "./ui.js";
 import { createStore } from "./store.js";
 import { live, activeAccounts, activeCards, netWorthAt, alerts, categoryName } from "./domain.js";
@@ -168,10 +168,12 @@ async function boot() {
   $("#signout").addEventListener("click", signOut);
   auth.getRedirectResult().catch(e => { const m = authErrText(e); if (m) { loginErr.textContent = m; loginErr.hidden = false; } });
 
-  auth.onAuthStateChanged(user => {
+  auth.onAuthStateChanged(async user => {
     if (!user) { showLogin("Entre com sua conta do Google. É a mesma do Meu Painel."); return; }
-    if ((user.email || "").toLowerCase() !== ALLOWED_EMAIL) {
-      showLogin("A conta " + (user.email || "escolhida") + " não tem acesso.", { err: "Entre com " + ALLOWED_EMAIL + ".", canLogin: false, canLogout: true });
+    const access = await checkAccess(fdb, user);
+    if (!access.ok) {
+      const [msg, err] = accessMessage(user, access.reason);
+      showLogin(msg, { err, canLogin: false, canLogout: true });
       return;
     }
     document.body.dataset.auth = "in";
