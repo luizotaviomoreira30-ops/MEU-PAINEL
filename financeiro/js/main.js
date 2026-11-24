@@ -1,6 +1,7 @@
 // Meu Financeiro: sign-in, routing, layout and the summary shared with Meu Painel.
 import * as F from "../../shared/fincore.js";
 import { FIREBASE_CONFIG, checkAccess, accessMessage } from "../../shared/firebase-config.js";
+import { mountPasswordLogin, renderVerify } from "../../shared/login.js";
 import { h, $, icon, monthLabel, today, toast } from "./ui.js";
 import { createStore } from "./store.js";
 import { live, activeAccounts, activeCards, netWorthAt, alerts, categoryName } from "./domain.js";
@@ -135,6 +136,8 @@ function showLogin(msg, { err = "", canLogin = true, canLogout = false } = {}) {
   document.body.dataset.auth = "out";
   loginMsg.textContent = msg; loginErr.textContent = err; loginErr.hidden = !err;
   loginBtn.hidden = !canLogin; loginBtn.disabled = false; logoutBtn.hidden = !canLogout;
+  $("#pw-box").hidden = !canLogin || !$("#pw-box").childElementCount;
+  $("#verify-box").hidden = true;
 }
 function authErrText(e) {
   const c = (e && e.code) || "";
@@ -168,8 +171,14 @@ async function boot() {
   $("#signout").addEventListener("click", signOut);
   auth.getRedirectResult().catch(e => { const m = authErrText(e); if (m) { loginErr.textContent = m; loginErr.hidden = false; } });
 
-  auth.onAuthStateChanged(async user => {
-    if (!user) { showLogin("Entre com sua conta do Google. É a mesma do Meu Painel."); return; }
+  mountPasswordLogin(auth, $("#pw-box"));
+  const enter = async user => {
+    if (!user) { showLogin("Entre com a mesma conta do Meu Painel: Google ou e-mail e senha."); return; }
+    if (!user.emailVerified) {
+      showLogin("Confirme o seu e-mail para continuar.", { canLogin: false, canLogout: true });
+      renderVerify($("#verify-box"), user, { onVerified: () => enter(auth.currentUser) });
+      return;
+    }
     const access = await checkAccess(fdb, user);
     if (!access.ok) {
       const [msg, err] = accessMessage(user, access.reason);
@@ -194,7 +203,8 @@ async function boot() {
       }
     });
     render();
-  });
+  };
+  auth.onAuthStateChanged(enter);
 }
 
 window.addEventListener("hashchange", () => { document.body.classList.remove("nav-open"); $("#scrim-nav").hidden = true; window.scrollTo(0, 0); render(); });

@@ -72,6 +72,22 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round
 .login-card p { color: var(--muted); }
 body:not([data-auth="in"]) .shell, body:not([data-auth="in"]) .fab { display: none !important; }
 body[data-auth="in"] .login { display: none; }
+/* E-mail e senha */
+.pw-box { display: grid; gap: 10px; width: 100%; text-align: left; }
+.pw-box[hidden] { display: none; }
+.pw-or { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 13px; }
+.pw-or::before, .pw-or::after { content: ""; flex: 1; border-top: 1px solid var(--line); }
+.pw-form { display: grid; gap: 10px; }
+.pw-form .field { width: 100%; font-size: 16px; padding: 11px 12px; }
+.pw-pass { position: relative; }
+.pw-pass .field { padding-right: 76px; }
+.pw-show { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); border: 0; background: none; color: var(--muted); font-size: 13px; font-weight: 600; padding: 6px; cursor: pointer; }
+.pw-links { display: flex; flex-wrap: wrap; gap: 6px 14px; justify-content: center; }
+.pw-links .link { font-size: 13.5px; }
+.pw-note { font-size: 13px; color: var(--muted); text-align: center; }
+.pw-ok { font-size: 13.5px; color: var(--ok, var(--pos)); text-align: center; }
+.pw-box .btn.wide, .pw-box .btn { width: 100%; justify-content: center; }
+
 
 /* ---------- shell ---------- */
 .shell { display: grid; grid-template-columns: 252px minmax(0, 1fr); min-height: 100vh; }

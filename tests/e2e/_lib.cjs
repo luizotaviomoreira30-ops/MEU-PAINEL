@@ -16,7 +16,7 @@ const addM = (mk, n) => { const d = new Date(+mk.slice(0, 4), +mk.slice(5) - 1 +
 const wait = ms => new Promise(r => setTimeout(r, ms));
 const txt = async (p, sel = 'main') => (await p.textContent(sel)).replace(/ /g, ' ');
 
-async function suite(name, fn) {
+async function suite(name, fn, { ignoreConsole = null } = {}) {
   const R = [], errs = [];
   const ok = (n, c, i = '') => R.push((c ? 'PASS ' : 'FAIL ') + n + (i && !c ? '  → ' + i : ''));
   process.on('unhandledRejection', e => { console.log(R.join('\n')); console.log('PAROU:', e.message.split('\n')[0]); process.exit(1); });
@@ -32,7 +32,7 @@ async function suite(name, fn) {
   const page = async (c, url, label = '') => {
     const p = await c.newPage();
     p.on('pageerror', e => errs.push(label + e.message));
-    p.on('console', m => { if (m.type() === 'error' && !/fonts|ERR_FAILED|net::/.test(m.text())) errs.push(label + 'console: ' + m.text()); });
+    p.on('console', m => { if (m.type() === 'error' && !/fonts|ERR_FAILED|net::/.test(m.text()) && !(ignoreConsole && ignoreConsole.test(m.text()))) errs.push(label + 'console: ' + m.text()); });
     await p.goto(url); await wait(700);
     return p;
   };

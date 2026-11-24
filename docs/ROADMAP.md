@@ -33,6 +33,7 @@ Estado real de cada parte. "Feito" = implementado, testado e publicado. Nada aqu
 - [x] Celular: barra com Início, Tarefas, Agenda, Compras, Finanças e "Mais" com todas as seções
 - [x] Testes ponta a ponta guardados no repositório (`tests/e2e`)
 - [x] Mais de uma pessoa: lista de acesso gerenciada pelo dono (Evolução → Pessoas com acesso), dados separados por pessoa, nome tirado das telas
+- [x] Login com e-mail e senha nos dois apps: criar conta, confirmar e-mail, esqueci a senha
 
 ## Pendente (próximas etapas)
 

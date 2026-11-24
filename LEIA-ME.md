@@ -4,12 +4,15 @@ Painel pessoal (tarefas, foco, agenda, metas, hábitos, aniversários, lista de 
 
 - **Site:** GitHub Pages (este repositório, branch `main`, pasta raiz). O Financeiro fica em `/financeiro/`.
 - **Dados:** Firebase do projeto `meu-paniel` (Firestore). Cada pessoa tem a própria pasta `users/<uid>/…`.
-- **Login:** Google. Quem pode entrar:
+- **Login:** conta Google ou e-mail e senha (o e-mail precisa ser confirmado pelo link que o Firebase envia). Quem pode entrar:
   - o dono (e-mail definido em `firestore.rules` e em `shared/firebase-config.js`);
   - as pessoas que o dono liberar no painel, em **Evolução → Pessoas com acesso** (lista guardada em `config/access`).
 - Ninguém lê os dados de outra pessoa, nem o dono. Remover alguém tira o acesso, mas não apaga os dados dessa pessoa.
 
 O código é público, mas os dados não: as regras do Firestore conferem o login em cada leitura e gravação.
+
+## Login com e-mail e senha
+Precisa estar ativado no console do Firebase: **Authentication → Método de login → E-mail/senha → Ativar**. O próprio Firebase guarda as senhas e envia os e-mails de confirmação e de nova senha.
 
 ## Regras do banco
 `firestore.rules` precisa estar publicado no console do Firebase: **Firestore Database → Regras**, colar o arquivo inteiro e clicar em **Publicar**. Sempre que esse arquivo mudar, repita.
