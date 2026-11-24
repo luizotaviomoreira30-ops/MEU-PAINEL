@@ -25,6 +25,7 @@ suite('acesso', async ({ ok, ctx, page, login, dbOf }) => {
   const acc = await p.evaluate(async () => (await firebase.firestore().doc('config/access').get()).data());
   ok('libera o e-mail (minúsculo, sem espaços)', acc && acc.emails.join() === 'ana.teste@gmail.com', JSON.stringify(acc));
   ok('lista mostra a pessoa', (await txt(p)).includes('ana.teste@gmail.com'));
+  ok('campo fica limpo depois de liberar', (await p.inputValue('#access-email')) === '');
   await p.fill('#access-email', 'ana.teste@gmail.com'); await p.click('button:text("Liberar acesso")'); await wait(500);
   ok('não duplica', (await p.evaluate(async () => (await firebase.firestore().doc('config/access').get()).data().emails.length)) === 1);
 
@@ -63,5 +64,9 @@ suite('acesso', async ({ ok, ctx, page, login, dbOf }) => {
   const fa2 = await page(ca, FIN, 'ana fin2: '); await wait(2500);
   const pc = await ctx(390, 844); const ph = await page(pc, PAINEL + '#evolucao', 'phone: '); await login(ph); await ph.goto(PAINEL + '#evolucao'); await wait(1200);
   ok('celular: Pessoas com acesso sem rolagem lateral', (await txt(ph)).includes('Pessoas com acesso') && await ph.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth));
+  await ph.click('#bottomnav .more-btn'); await wait(400);
+  ok('celular: Sair da conta na lista do Mais', (await txt(ph, '.more-sheet')).includes('Sair da conta'));
+  await ph.click('.more-sheet .more-out'); await wait(2500);
+  ok('celular: Sair volta para a tela de entrar', await ph.isVisible('#login-btn'));
   ok('Financeiro também barra', (await txt(fa2, '#login-msg')).includes('ainda não foi liberada'));
 });

@@ -113,6 +113,12 @@ p { margin: 0; }
 .side-nav a.ext .lbl::after { content: " ↗"; opacity: .7; }
 .side-foot { margin-top: auto; display: flex; align-items: center; gap: 10px; padding: 12px 8px 4px; border-top: 1px solid rgba(255, 255, 255, .1); font-size: 13px; min-width: 0; }
 .side-foot .me-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.side-out { margin-top: auto; display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 11px; border: 0; background: none; color: var(--side-muted); font-weight: 600; font-size: 14px; text-align: left; cursor: pointer; }
+.side-out:hover { color: var(--side-ink); background: rgba(255, 255, 255, .05); }
+.side-out svg { width: 20px; height: 20px; flex: none; }
+.side-out + .side-foot { margin-top: 6px; }
+.more-sheet .more-out { margin-top: 8px; width: 100%; display: flex; align-items: center; gap: 10px; padding: 11px 12px; border-radius: 12px; border: 1px solid var(--line); background: none; color: var(--high); font-weight: 600; font-size: 14px; }
+.more-sheet .more-out svg { width: 20px; height: 20px; }
 .avatar-sm { width: 32px; height: 32px; border-radius: 50%; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; font-weight: 700; font-family: var(--f-display); font-size: 13px; flex: none; }
 .content { min-width: 0; padding-left: 28px; padding-right: max(28px, env(safe-area-inset-right, 0px)); }
 .top { padding-block: 22px 6px; }
@@ -137,7 +143,8 @@ main { padding-block: 14px 56px; display: grid; gap: 18px; max-width: 1240px; }
   .shell { grid-template-columns: 84px minmax(0, 1fr); }
   .side { padding: 16px 10px; align-items: center; }
   .brand { padding: 4px; }
-  .brand-txt, .side-nav .lbl, .side-foot .me-name { display: none; }
+  .brand-txt, .side-nav .lbl, .side-foot .me-name, .side-out .lbl { display: none; }
+  .side-out { justify-content: center; padding: 11px; }
   .side-nav a { justify-content: center; padding: 11px; position: relative; }
   .side-nav .grp { font-size: 0; padding: 6px 0 0; margin: 6px 10px 0; border-top: 1px solid rgba(255, 255, 255, .08); }
   .side-nav .grp:first-child { display: none; }
@@ -602,6 +609,7 @@ body[data-auth="in"] .login { display: none; }
       <span class="brand-txt"><b>Meu Painel</b><small id="brand-who"></small></span>
     </a>
     <nav class="side-nav" id="tabs" aria-label="Seções"></nav>
+    <button type="button" class="side-out" id="signout-side" title="Sair da conta" aria-label="Sair da conta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3"/><path d="M10 17l-5-5 5-5"/><path d="M5 12h11"/></svg><span class="lbl">Sair</span></button>
     <div class="side-foot"><span class="avatar-sm" id="me-initials" aria-hidden="true">L</span><span class="me-name" id="me-name"></span></div>
   </aside>
   <div class="content">
@@ -775,6 +783,7 @@ body[data-auth="in"] .login { display: none; }
     compras: '<path d="M3 4h2l2.4 11.2a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.5L21 8H6.2"/><circle cx="10" cy="20.5" r="1.2"/><circle cx="17" cy="20.5" r="1.2"/>',
     aniversarios: '<path d="M4 21h16v-8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2z"/><path d="M4 16c1.3 1 2.7 1 4 0s2.7-1 4 0 2.7 1 4 0 2.7-1 4 0"/><path d="M12 11V8"/><path d="M12 5.5c-.8-.8-.8-2 0-3 .8 1 .8 2.2 0 3z"/>',
     mais: '<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>',
+    sair: '<path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3"/><path d="M10 17l-5-5 5-5"/><path d="M5 12h11"/>',
     externo: '<path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>',
     inicio: '<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/>',
     habito: '<path d="M17 2l4 4-4 4"/><path d="M3 11V9a3 3 0 0 1 3-3h15"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a3 3 0 0 1-3 3H3"/>',
@@ -2313,7 +2322,11 @@ body[data-auth="in"] .login { display: none; }
     if (email === OWNER_EMAIL) { toast("Esse é o seu e-mail: você já tem acesso.", "err"); return; }
     if (list.includes(email)) { toast("Esse e-mail já está liberado.", "err"); return; }
     if (list.length >= ACCESS_MAX) { toast("Limite de " + ACCESS_MAX + " pessoas.", "err"); return; }
-    if (await saveAccess([...list, email])) { if (input) input.value = ""; toast(email + " liberado. A pessoa já pode entrar com essa conta Google."); }
+    if (await saveAccess([...list, email])) {
+      // The list re-renders while saving, so the field on screen may be a new element: clear it by id.
+      const now = document.getElementById("access-email"); if (now) now.value = "";
+      toast(email + " liberado. A pessoa já pode entrar com esse e-mail (Google ou e-mail e senha).");
+    }
   }
   async function revokeAccess(email) {
     if (await saveAccess(S.access.emails.filter(x => x !== email))) toast(email + " não tem mais acesso. Os dados dessa pessoa continuam guardados.");
@@ -2332,7 +2345,7 @@ body[data-auth="in"] .login { display: none; }
     };
     return h("section", { class: "panel" },
       h("div", { class: "panel-head" }, h("h2", { text: "Pessoas com acesso" }), h("span", { class: "sub", text: S.access.loaded ? plural(S.access.emails.length + 1, "pessoa", "pessoas") : "" })),
-      h("p", { class: "hint", text: "Cada pessoa liberada entra com a própria conta do Google e ganha um painel e um financeiro só dela, começando vazios. Você não vê os dados dela e ela não vê os seus." }),
+      h("p", { class: "hint", text: "Cada pessoa liberada entra com a própria conta (Google ou e-mail e senha) e ganha um painel e um financeiro só dela, começando vazios. Pelos apps, você não vê os dados dela e ela não vê os seus. Como dono do projeto, você ainda consegue ver os dados guardados pelo console do Firebase." }),
       h("div", { class: "list" },
         h("div", { class: "row" }, h("div", { class: "row-main" }, h("span", { style: "font-weight:500", text: S.email }), h("div", { class: "row-meta" }, h("span", { class: "chip accent", text: "Você (administra)" })))),
         S.access.emails.map(e => h("div", { class: "row" }, h("div", { class: "row-main" }, h("span", { style: "font-weight:500;overflow-wrap:anywhere", text: e })), confirmRemove(e)))),
@@ -3645,7 +3658,8 @@ body[data-auth="in"] .login { display: none; }
     sheet.replaceChildren(S.ui.more ? h("nav", { class: "more-sheet", "aria-label": "Todas as seções" },
       navGroups().map(([g, keys]) => [h("div", { class: "grp", text: g }), h("div", { class: "more-grid" }, keys.map(k =>
         h("a", { href: "#" + k, "aria-current": S.tab === k ? "page" : null, onclick: () => { S.ui.more = false; } }, icon(NAV_ICON[k] || k), h("span", { text: tabLabel(k) }), counts[k] ? h("span", { class: "count", text: counts[k] }) : null)))]),
-      h("a", { class: "more-ext", href: FIN_URL }, icon("externo"), h("span", { text: "Abrir Meu Financeiro" }))) : "");
+      h("a", { class: "more-ext", href: FIN_URL }, icon("externo"), h("span", { text: "Abrir Meu Financeiro" })),
+      h("button", { type: "button", class: "more-out", onclick: () => doSignOut && doSignOut() }, icon("sair"), h("span", { text: "Sair da conta" }))) : "");
   }
   function renderHeader() {
     const d = new Date();
@@ -3783,7 +3797,7 @@ body[data-auth="in"] .login { display: none; }
     return "Não foi possível entrar. Tente de novo.";
   }
 
-  let auth = null, started = false;
+  let auth = null, started = false, doSignOut = null;
   function startData(uid) {
     if (started) return;
     started = true;
@@ -3829,8 +3843,10 @@ body[data-auth="in"] .login { display: none; }
       }
     });
     const signOut = async () => { try { await auth.signOut(); } finally { location.reload(); } };
+    doSignOut = signOut;
     logoutBtn.addEventListener("click", signOut);
     $("#signout").addEventListener("click", signOut);
+    $("#signout-side").addEventListener("click", signOut);
     auth.getRedirectResult().catch(e => { const msg = authErrText(e); if (msg) { loginErr.textContent = msg; loginErr.hidden = false; } });
 
     // E-mail and password: the shared module (also used by Meu Financeiro). If it fails to load, Google still works.

@@ -38,7 +38,8 @@ suite('login', async ({ ok, ctx, page, login }) => {
   ok('liberado, entra com e-mail e senha', await b.isVisible('.shell') && (await txt(b, '#greeting')).startsWith('Olá, Bruno'));
 
   // sign out and back in with the password
-  await b.click('#signout'); await wait(2500);
+  ok('item Sair no menu lateral', await b.isVisible('#signout-side'));
+  await b.click('#signout-side'); await wait(2500);
   ok('saiu', await b.isVisible('#pw-email'));
   await b.fill('#pw-email', 'bruno.lima@outlook.com'); await b.fill('#pw-pass', 'senhaBoa123'); await b.click('#pw-submit'); await wait(2800);
   ok('entra de novo com a senha', await b.isVisible('.shell'));
