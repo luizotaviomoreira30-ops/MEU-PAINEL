@@ -108,6 +108,10 @@ function render() {
 }
 function paint() {
   if (!app.store) return;
+  // An address that does not exist (e.g. #/contas-a-pagar) shows the overview and fixes the address,
+  // so the menu highlights the right item and the back button does not return to the broken one.
+  const asked = (location.hash || "").replace(/^#\/?/, "").split("?")[0].split("/")[0];
+  if (asked && !ROUTES[asked]) { location.replace(location.pathname + location.search + "#/visao-geral"); return; }
   const { name, id } = app.route();
   const r = ROUTES[name];
   document.title = r.title + " · Meu Financeiro";

@@ -34,18 +34,22 @@ Estado real de cada parte. "Feito" = implementado, testado e publicado. Nada aqu
 - [x] Testes ponta a ponta guardados no repositório (`tests/e2e`)
 - [x] Mais de uma pessoa: lista de acesso gerenciada pelo dono (Evolução → Pessoas com acesso), dados separados por pessoa, nome tirado das telas
 - [x] Login com e-mail e senha nos dois apps: criar conta, confirmar e-mail, esqueci a senha
+- [x] CLAUDE.md com as regras do projeto; "Resultado do mês" diz "mês zerado" com resultado zero; endereço inexistente no Financeiro volta para #/visao-geral
 
 ## Pendente (próximas etapas)
 
 ### Ideias enviadas em 18/11 (ordem combinada)
 - [ ] Categorias em dois níveis (grupo → categoria) com a lista enviada, sem perder os lançamentos atuais
 - [ ] Balancete: DRE do mês, balanço patrimonial, balancete por conta e fechamento de mês
-- [ ] Projeção de caixa 30/60/90/180 dias e 12 meses (sempre marcada como estimativa)
+- [ ] Projeção de caixa 30/60/90/180 dias e 12 meses, com planejamento / fluxo de caixa (sempre marcada como estimativa)
 - [ ] Score de saúde financeira 0–1000 calculado com os seus dados (não é o score do Serasa)
 - [ ] Conta do tipo Benefício (VA/VR), se for usada
 
 ### Meu Financeiro
-- [ ] Planejamento / fluxo de caixa 30, 60, 90 e 180 dias (projeção marcada como estimativa)
+- [ ] Restaurar backup e lixeira
+- [ ] Regras de categorização automática
+- [ ] Vencimentos na agenda do Painel
+- [ ] Taxa de poupança na visão geral
 - [ ] Dívidas: juros, saldo devedor, simulação de quitação
 - [ ] Metas financeiras, compartilhadas com as metas do Painel sem duplicar
 - [ ] Investimentos (aplicações, resgates, rendimentos por ativo; sem cotação inventada)

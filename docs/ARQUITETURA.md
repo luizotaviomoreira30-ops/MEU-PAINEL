@@ -1,6 +1,6 @@
 # Ecossistema pessoal: Meu Painel + Meu Financeiro
 
-Documento vivo. Atualize a cada etapa. O estado de cada funcionalidade está em `docs/ROADMAP.md`.
+Documento vivo. Atualize a cada etapa. O estado de cada funcionalidade está em `docs/ROADMAP.md`; as regras de trabalho estão em `CLAUDE.md`.
 
 ## 1. Auditoria do que existe (17/11/2026)
 
@@ -11,9 +11,9 @@ Documento vivo. Atualize a cada etapa. O estado de cada funcionalidade está em 
 | Hospedagem | GitHub Pages, repositório `luizotaviomoreira30-ops/MEU-PAINEL`, branch `main`, pasta raiz |
 | Login | Firebase Authentication com Google (projeto `meu-paniel`) |
 | Banco | Cloud Firestore (NoSQL), plano gratuito Spark |
-| Segurança | `firestore.rules`: cada conta só lê e grava `users/{uid}/**`, e só o e-mail do Luiz é aceito |
+| Segurança | `firestore.rules`: cada conta só lê e grava `users/{uid}/**`; entram o dono e as pessoas da lista `config/access` |
 | Bibliotecas | Firebase compat 10.12.2; jsPDF, jsPDF-AutoTable e SheetJS carregadas só ao gerar relatório |
-| Testes | Scripts Playwright contra o emulador do Firebase (fora do repositório, recriados a cada sessão) |
+| Testes | `npm test` (regras financeiras) e `tests/e2e` (Playwright contra os emuladores do Firebase), guardados no repositório |
 
 ### Funcionalidades do Meu Painel (preservar)
 - Visão geral: 4 cartões, captura rápida, agenda em linha do tempo, tarefas com foco do dia, progresso das metas, hábitos da semana, sua semana, falar com, anotações.

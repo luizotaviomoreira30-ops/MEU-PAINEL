@@ -70,6 +70,10 @@ suite('basico', async ({ ok, ctx, page, login, dbOf }) => {
     await f.goto(FIN + '#/' + r); await wait(700);
     ok('Financeiro abre #/' + r, (await f.$$('main > *')).length > 0);
   }
+  await f.goto(FIN + '#/visao-geral'); await wait(800);
+  ok('Financeiro: mês zerado com resultado zero', (await txt(f)).includes('mês zerado') && !(await txt(f)).includes('sobrou dinheiro'));
+  await f.goto(FIN + '#/contas-a-pagar'); await wait(900);
+  ok('Financeiro: endereço inexistente vira #/visao-geral', (await f.evaluate(() => location.hash)) === '#/visao-geral' && (await txt(f, '#page-title')) === 'Visão geral');
   await f.goto(FIN + '#/contas'); await wait(500);
   await f.click('button:text("+ Nova conta")'); await f.fill('#f-name', 'Nubank'); await f.selectOption('#f-type', 'corrente'); await f.fill('#f-opening', '1.000,00');
   await f.click('.modal button[type=submit]'); await wait(1000);

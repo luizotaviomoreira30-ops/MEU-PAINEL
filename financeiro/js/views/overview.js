@@ -37,7 +37,7 @@ export function viewOverview(app) {
     kpi("Receitas do mês", "up", brl(cur.income + cur.yields), delta(cur.income + cur.yields, prev.income + prev.yields)),
     kpi("Despesas do mês", "down", brl(cur.expense), delta(cur.expense, prev.expense, true)),
     kpi("Resultado do mês", "chart", signed(cur.result), cur.plannedExpense || cur.plannedIncome
-      ? "Previsto ainda: " + signed(cur.plannedIncome - cur.plannedExpense) : (cur.result >= 0 ? "sobrou dinheiro" : "gastou mais do que entrou"), cur.result < 0 ? "neg-v" : ""));
+      ? "Previsto ainda: " + signed(cur.plannedIncome - cur.plannedExpense) : (cur.result > 0 ? "sobrou dinheiro" : cur.result < 0 ? "gastou mais do que entrou" : "mês zerado"), cur.result < 0 ? "neg-v" : ""));
 
   // Charts
   const series = monthSeries(st, mk, 6);
